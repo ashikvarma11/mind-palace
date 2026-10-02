@@ -1,5 +1,11 @@
 # Implementation research
 
+## Session contracts and listing — 2 October 2026
+
+Inspected installed json-schema-to-typescript 16.0.0 README/API and Ajv 8.20.0 standalone generation, plus ajv-formats 3.0.1 runtime helpers. Official [Ajv standalone documentation](https://ajv.js.org/standalone.html) explicitly supports build-time generation to avoid runtime Function evaluation under CSP. The upstream [type generator repository](https://github.com/bcherny/json-schema-to-typescript) fetch timed out; the locked installed package README establishes compile(schema, name, options). Types and validators come from native-memory.schema.json, with drift checking. Only inspected ucs2length/formats CommonJS helper references are converted to static imports; an unknown helper fails generation. Calendar date validation and UTC-only patterns are tested, not disabled to silence schema errors.
+
+Listing is an explicitly bounded foundation (50 results/page, 1000 records/inventory), not the future scalable index. It reads bounded frontmatter without loading originals, sorts actual UTC instants then IDs, reports invalid owned-directory entries, and never repairs or deletes files. Source integrity is verified when opening a conversation, not certified by metadata listing. There is no native storage command or production AI implied by these generated contracts.
+
 ## Cloud/storage foundation — 2 October 2026
 
 OpenAI Docs skill used to search/fetch current official text generation, response fields, token limits and data policies before the provider contracts. No platform-key tool was available and no real key was read/requested. Direct adapters fit the approved native/Python architecture; inspected the AI SDK skill but did not add its JavaScript SDK, gateway or agent loop for these pure contracts.
@@ -36,6 +42,20 @@ No claim of tested model inference, worker freezing, or Graphify extraction yet.
 Scaffold generated safely in ignored `.tools/scaffold` because the generator refused to merge the pre-existing README; only enumerated new source/config files were adopted. Existing repository guidance/privacy exclusions were preserved.
 
 # Step 02 diagnostic packaging research — 2 October 2026
+
+## Project-local native compiler follow-up — 2 October 2026
+
+Actual WebView verification follows https://playwright.dev/docs/webview2 and https://playwright.dev/docs/api/class-browsertype#browser-type-connect-over-cdp with process-local WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS and WEBVIEW2_USER_DATA_FOLDER. Existing Playwright 1.63.0 used because agent-browser CLI is unavailable; no global browser tool installation. Only the owned local app is attached and closed. Browser-verification skills prompted screenshot/console and full-boundary checking, which exposed the real Angular style issue rather than accepting build success as UI proof.
+
+Rechecked https://v2.tauri.app/security/csp/ and https://angular.dev/best-practices/security. Inspected tauri-utils 2.10.1 src/html.rs: bundled style elements receive STYLE_NONCE_TOKEN; src/assets.rs defines the token. Inspected Angular 22.2.1 CSP_NONCE implementation and documented injection token. Native response nonce read from the bundled inert style marker is passed to Angular; browser mode returns null. Final native screenshot/computed layout and console checks pass with style-src 'self' plus Tauri's nonce sources, no unsafe-inline or disabled CSP.
+
+Official https://rust-lang.github.io/rustup/installation/ and https://forge.rust-lang.org/infra/archive-stable-version-installers.html distinguish installation locations and standalone components. Inspected https://static.rust-lang.org/dist/channel-rust-stable.toml (2026-10-01): rustc/cargo/rust-std 1.99.0, Windows x86_64 MSVC. Used hash-verified tar.xz component contents, not rustup, MSI or install.sh. URLs/hashes are locked in config/native-toolchain.json; raw copyright/license files are retained locally.
+
+Read https://learn.microsoft.com/en-us/cpp/overview/acquire-msvc?view=msvc-170 and https://learn.microsoft.com/en-us/visualstudio/extensibility/anatomy-of-a-vsix-package?view=vs-2022. Inspected official https://aka.ms/vs/17/release/channel and its 17.14.37710.0 VisualStudio.vsman payload, then downloaded only locked VSIX headers/compiler/English resources/static and dynamic CRT packages. SHA-256 matches were checked before extraction. Actual archive paths use VC/Tools/MSVC/14.44.35207 despite differing servicing package versions. CRT.x64.Store.base contains required desktop lib/x64/msvcrt.lib as well as store-specific libraries; use the desktop directory. An initial compile exposed missing msvcrt.lib; adding that inspected package fixed it. This is an experimental project-local development layout, not a standard supported VS installation or redistribution clearance.
+
+Existing Windows SDK 10.0.20348.0 supplies ucrt/um headers/libraries and x64 rc.exe. Only child-process PATH/LIB/INCLUDE/CC/CXX/CARGO_HOME are changed. Rust/cargo versions and compiling/running tools/fixtures/native-smoke.rs passed. No global changes or administrator installer used.
+
+Rechecked https://v2.tauri.app/start/create-project/, https://v2.tauri.app/security/capabilities/, https://v2.tauri.app/reference/config/ and https://v2.tauri.app/develop/calling-rust/. Registries reported @tauri-apps/cli 2.12.1, @tauri-apps/api 2.12.1, Rust tauri 2.12.1 and tauri-build 2.7.1; CLI/Rust packages introduced, frontend API package not yet needed. Inspected downloaded tauri-build 2.7.1 src/acl.rs: AppManifest.commands generates allow/deny permissions, so do not hand-create duplicate permission IDs. Inspected Angular build output at dist/mind-palace/browser before configuring frontendDist. Generated local icons through pinned Tauri CLI from approved raster; no AI redrawing or public asset redistribution.
 
 ## Local generation follow-up — 2 October 2026
 

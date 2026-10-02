@@ -1,5 +1,33 @@
 # Development
 
+## Shared session contracts
+
+Run `npm run generate:contracts` after editing schemas/native-memory.schema.json; never hand-edit the generated types/validators. `npm run check:contracts` checks drift and runs offline validation tests; `npm run check` includes this gate. Node 24 runs the generated TypeScript validators directly for these tests. The generated browser validators use static imports, not runtime schema compilation. Native supervision and the real vault interface remain the next step.
+
+## Project-local Windows desktop development
+
+Verified only on the current Windows x64 machine with an existing Windows SDK 10.0.20348.0. Python 3.12 is needed for development helpers; neither developer toolchains nor a Python installation will be required by the future packaged product.
+
+First-time setup only, in a fresh `.tools/native` layout:
+
+```powershell
+python tools/setup-local-native.py --extract
+python tools/run-native.py smoke
+node node_modules/@tauri-apps/cli/tauri.js icon public/brand/logo-original.png --output src-tauri/icons
+npm run build:desktop
+npm run test:rust
+npm run verify:desktop
+npm run open:desktop
+```
+
+Run `npm ci` first. Icon generation needs the approved local artwork, which is deliberately omitted from public clones until redistribution provenance is resolved. Do not substitute an unapproved generated logo. Build fails if required icons/tools are absent; it does not secretly download/install an end-user runtime.
+
+Setup downloads locked official developer archives, validates hashes and extracts into ignored project-local directories; no installers or global settings. It refuses an already-existing extraction target instead of overwriting it. On this already-prepared workspace, skip setup and icon generation; use the build/test/verify/open commands. `python tools/setup-local-native.py` without extraction rechecks cached archive integrity. An interrupted partial download/extraction is retained for inspection, not silently removed.
+
+`build:desktop` embeds the current Angular production output in an unsigned development executable. `open:desktop` opens that existing build; changes require rebuilding (no hot reload). `verify:desktop` uses Playwright against the real app's WebView with an isolated ignored profile, temporary loopback debugging and synthetic content; it closes the owned window afterward. Debugging is not enabled on ordinary launch. Test screenshots/profiles stay local under `.tools/native/verification`, with no automatic upload or purge.
+
+The compiler arrangement is an experimental developer workaround using the already-installed SDK, not a standard VS installation or a redistributable compiler bundle. No macOS/native installer claim. Storage and AI remain disconnected from this shell; see verification/native-toolchain-01.md and verification/step-03b.md for actual results and remaining gates.
+
 ## Storage and offline cloud contracts
 
 Using the existing isolated diagnostic environment, from the repository root:

@@ -6,6 +6,8 @@ A private, local-first memory workspace for notes, conversations, decisions, and
 
 Backend progress: portable storage and a packaged Windows worker are tested separately; offline OpenAI/Anthropic API adapters and sharing previews are implemented. They are not connected to this interface and cannot send requests yet. Secure native key handling and transport remain pending. See [the latest verification](docs/verification/cloud-foundation-01.md).
 
+Desktop progress: a Windows native development shell now builds and renders the approved interface with your local artwork. Native health/navigation/reload/close checks pass; it still uses sample-only state. See [native verification](docs/verification/step-03b.md) and [local toolchain setup](docs/development.md#project-local-windows-desktop-development).
+
 ## Development
 
 Angular 22 on compatible Node.js, Tauri 2, and a bundled Python memory service are the approved architecture. See the [implementation plan](docs/implementation-plan.md), [current status](docs/implementation-status.md), and [research](docs/research.md).
@@ -24,7 +26,7 @@ npm run test:e2e
 npm run probe:runtime
 ```
 
-Browser tests can reuse an existing compatible Chromium binary through the optional `MP_BROWSER_EXECUTABLE` environment variable; otherwise use Playwright's installation above. Developer tools are required for this prototype, not a claim that end users must install them in the planned desktop release. Python 3.12 was used for the runtime probe. Native desktop launch and installer commands do not exist yet.
+Browser tests can reuse an existing compatible Chromium binary through the optional `MP_BROWSER_EXECUTABLE` environment variable; otherwise use Playwright's installation above. Developer tools are required for this prototype, not a claim that end users must install them in the planned desktop release. Python 3.12 was used for the runtime probe. Windows development desktop commands now exist; installer commands remain unavailable.
 
 Verified first milestone: production browser build, seven unit tests, seven end-to-end browser tests (all routes at 1024/768/390/320 px, source/review/handoff flow, theme, keyboard entry, unknown-answer abstention, inert input, and no external HTTP requests in the tested sample flow). See [verification evidence](docs/verification/step-03a.md).
 

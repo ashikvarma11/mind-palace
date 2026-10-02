@@ -1,0 +1,6 @@
+{
+  "identifier": "main-local",
+  "description": "Local main-window health only; storage and AI are unavailable.",
+  "windows": ["main"],
+  "permissions": ["allow-native-health"]
+}

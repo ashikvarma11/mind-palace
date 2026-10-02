@@ -9,6 +9,7 @@
         "health",
         "sessions.create",
         "sessions.read",
+        "sessions.list",
         "decisions.create",
         "decisions.read",
         "decisions.confirm",

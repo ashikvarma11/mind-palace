@@ -1,0 +1,20 @@
+[package]
+name = "mind-palace"
+version = "0.1.0"
+description = "Mind Palace local-first desktop development shell"
+edition = "2021"
+license = "MIT"
+publish = false
+
+[lib]
+name = "mind_palace_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "=2.7.1", features = [] }
+
+[dependencies]
+tauri = { version = "=2.12.1", features = [] }
+
+[features]
+custom-protocol = ["tauri/custom-protocol"]

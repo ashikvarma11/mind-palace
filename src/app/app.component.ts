@@ -23,6 +23,8 @@ import { WorkspaceStore } from './core/workspace-store';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class App {
+  readonly environmentLabel =
+    '__TAURI_INTERNALS__' in globalThis ? 'Desktop prototype' : 'Browser prototype';
   readonly store = inject(WorkspaceStore);
   readonly logoMissing = signal(false);
   readonly icons = { search: LucideSearch, shield: LucideShieldCheck };

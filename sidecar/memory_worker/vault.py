@@ -1,5 +1,7 @@
 import datetime
 import json
+import os
+import re
 import uuid
 from contextlib import contextmanager
 import portalocker
@@ -7,7 +9,7 @@ from .atomic_io import digest, file_hash, write
 from .contracts import validate, object_params
 from .errors import WorkerError
 from .journal import Journal, encoded, load
-from .paths import no_links, owned_path, root_path
+from .paths import ID, no_links, owned_path, root_path
 
 
 def identifier():
@@ -54,7 +56,54 @@ class Vault:
             raise WorkerError("VALIDATION_ERROR", "Record identity mismatch.")
         return value
 
+    def session_header(self, record_id):
+        """Read only bounded frontmatter; list operations never load source content."""
+        path = owned_path(self.root, "sessions/" + record_id + ".md")
+        if not path.is_file():
+            raise WorkerError("NOT_FOUND", "Session is unavailable.")
+        if path.stat().st_size > 1024 * 1024:
+            raise WorkerError("VALIDATION_ERROR", "Stored file exceeds the supported bounds.")
+        try:
+            with path.open("rb") as stream:
+                opening = stream.readline(8)
+                front = stream.readline(8192)
+                closing = stream.readline(8)
+            if opening not in (b"---\n", b"---\r\n") or closing not in (b"---\n", b"---\r\n") or not front.endswith(b"\n"):
+                raise ValueError()
+            from .protocol import parse
+            metadata = parse(front)
+            validate("native-memory", metadata, "SessionMetadata")
+            if metadata["id"] != record_id:
+                raise ValueError()
+            return metadata
+        except (ValueError, KeyError, TypeError, UnicodeError):
+            raise WorkerError("VALIDATION_ERROR", "Invalid session format.") from None
+
+    def list_sessions(self, limit, offset):
+        directory = self.root / "sessions"
+        no_links(directory)
+        if not directory.exists():
+            return {"items": [], "total": 0, "next_offset": None}
+        if not directory.is_dir():
+            raise WorkerError("VALIDATION_ERROR", "Invalid sessions directory.")
+        records = []
+        with os.scandir(directory) as entries:
+            for entry in entries:
+                if len(records) >= 1000:
+                    raise WorkerError("LIMIT_EXCEEDED", "Session listing supports up to 1000 records; existing files were preserved.")
+                if not re.fullmatch(ID + r"\.md", entry.name):
+                    raise WorkerError("VALIDATION_ERROR", "Unexpected session entry; existing files were preserved.")
+                records.append(self.session_header(entry.name[:-3]))
+        # Parse calendar instants: lexical fractions would misorder equal seconds.
+        records.sort(key=lambda item: (datetime.datetime.fromisoformat(item["created_at"]), item["id"]), reverse=True)
+        end = min(offset + limit, len(records))
+        result = {"items": records[offset:end], "total": len(records),
+                  "next_offset": end if end < len(records) else None}
+        validate("native-memory", result, "SessionList")
+        return result
+
     def read_session(self, record_id):
+        metadata = self.session_header(record_id)
         path = owned_path(self.root, "sessions/" + record_id + ".md")
         file_hash(path)
         text = path.read_text(encoding="utf-8")
@@ -77,7 +126,9 @@ class Vault:
                 raise ValueError()
             if file_hash(source) != source_meta["sha256"] or source.stat().st_size != source_meta["bytes"]:
                 raise WorkerError("CONFLICT", "Original source changed; it was not overwritten.")
-            return {"metadata": metadata, "body": body[4:], "source_text": source.read_bytes().decode("utf-8")}
+            result = {"metadata": metadata, "body": body[4:], "source_text": source.read_bytes().decode("utf-8")}
+            validate("native-memory", result, "SessionRead")
+            return result
         except (ValueError, KeyError, TypeError):
             raise WorkerError("VALIDATION_ERROR", "Invalid session format.") from None
 
@@ -86,8 +137,12 @@ class Vault:
             self.journal.recover()
             if method == "sessions.read":
                 return self.read_session(params["id"])
+            if method == "sessions.list":
+                return self.list_sessions(params["limit"], params["offset"])
             if method == "decisions.read":
                 return self.read_decision(params["id"])
+            if method not in ("sessions.create", "decisions.create", "decisions.confirm"):
+                raise WorkerError("VALIDATION_ERROR", "Unsupported vault operation.")
             def prepare():
                 record_id = identifier()
                 if method == "sessions.create":

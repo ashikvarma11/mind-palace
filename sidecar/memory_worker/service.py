@@ -9,6 +9,8 @@ PARAMS = {
     "health": object_params({}),
     "sessions.create": object_params({"op_id": UUID, "title": TITLE, "body": TEXT, "source_text": {"type": "string", "maxLength": 65536}}),
     "sessions.read": object_params({"id": UUID}),
+    "sessions.list": object_params({"limit": {"type": "integer", "minimum": 1, "maximum": 50},
+                                    "offset": {"type": "integer", "minimum": 0, "maximum": 1000}}),
     "decisions.create": object_params({"op_id": UUID, "title": TITLE, "body": TEXT}),
     "decisions.read": object_params({"id": UUID}),
     "decisions.confirm": object_params({"op_id": UUID, "id": UUID, "expected_revision": {"type": "integer", "minimum": 1}, "confirm": {"const": True}}),
