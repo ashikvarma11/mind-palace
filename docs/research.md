@@ -2,12 +2,12 @@
 
 Checked: 2 October 2026. Versions below come from registry/tool output, not memory.
 
-| Source | Finding and use |
-| --- | --- |
-| https://cli.github.com/manual/gh_repo_create | `--public --source --remote` creates the approved public repo and connects the existing local Git root. Verified remote: https://github.com/ashikvarma11/mind-palace.git. |
-| https://angular.dev/reference/versions | Angular 22 supports Node ^24.15.0; installed Node 24.16.0 is compatible. Registry Angular core/CLI/build report 22.2.1; inspect generated package compatibility before locking. |
-| https://angular.dev/cli/new | Standalone client-only scaffold with routing and SCSS; use the pinned generator and inspect actual filenames/build/test runner. |
-| https://v2.tauri.app/start/prerequisites/ | Windows native builds need Rust MSVC and Microsoft C++ build tools. Rust/cargo not in PATH; vswhere C++ component probe returned no installation. Desktop readiness is not verified. |
+| Source                                       | Finding and use                                                                                                                                                                      |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| https://cli.github.com/manual/gh_repo_create | `--public --source --remote` creates the approved public repo and connects the existing local Git root. Verified remote: https://github.com/ashikvarma11/mind-palace.git.            |
+| https://angular.dev/reference/versions       | Angular 22 supports Node ^24.15.0; installed Node 24.16.0 is compatible. Registry Angular core/CLI/build report 22.2.1; inspect generated package compatibility before locking.      |
+| https://angular.dev/cli/new                  | Standalone client-only scaffold with routing and SCSS; use the pinned generator and inspect actual filenames/build/test runner.                                                      |
+| https://v2.tauri.app/start/prerequisites/    | Windows native builds need Rust MSVC and Microsoft C++ build tools. Rust/cargo not in PATH; vswhere C++ component probe returned no installation. Desktop readiness is not verified. |
 
 No claim of tested model inference, worker freezing, or Graphify extraction yet. Registry and source snapshots/hashes for those dependencies are pending Step 02.
 
@@ -22,3 +22,7 @@ No claim of tested model inference, worker freezing, or Graphify extraction yet.
 - Prototype bundling uses only local assets/system fonts. No third-party runtime network requests occurred in the tested browser sample flow; this does not certify the future native runtime.
 
 Scaffold generated safely in ignored `.tools/scaffold` because the generator refused to merge the pre-existing README; only enumerated new source/config files were adopted. Existing repository guidance/privacy exclusions were preserved.
+
+# Step 02 diagnostic packaging research — 2 October 2026
+
+Checked PyPI metadata and installed packages for PyInstaller 6.22.3 (Python >=3.8,<3.16), jsonschema 4.26.0 (>=3.10), portalocker 4.4.0 (>=3.10). Compatible with the measured Python 3.12.10; exact transitive versions are in tools/requirements-probe-lock.txt. Official sources: https://pyinstaller.org/en/stable/operating-mode.html (onedir includes Python, platform-specific builds); https://python-jsonschema.readthedocs.io/en/stable/validate/ (Draft202012Validator.check_schema/is_valid); https://portalocker.readthedocs.io/en/latest/ (Lock timeout and contention). Inspected actual packaging warning report and ran packaged behavior rather than treating successful freezing as runtime success. No paid API, remote schema resolver, Redis lock or global Python installation was used.

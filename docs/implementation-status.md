@@ -6,11 +6,11 @@ Updated: 2 October 2026.
 | --- | --- | --- |
 | 00 | verified | Own local Git root and public remote verified. Initial commit/push recorded separately in repository-setup.md. |
 | 01 | verified | Stack, branding, Workspace approval and autonomous safe/free decisions recorded; release gates remain explicitly unverified. |
-| 02 | in_progress | Node compatibility and native prerequisites inspected. Runtime/model/Graphify packaging probes pending. |
+| 02 | in_progress | Windows frozen diagnostic passed FTS5, strict schema, atomic replacement and cross-process locking checks. Production worker/MCP/Graphify/model/native probes remain pending. |
 | 03A | verified | Approved Angular browser shell and explicit synthetic state: build, 7 unit tests, 7 browser tests pass. Native/AI/storage capabilities remain visibly unavailable. |
 | 03–26 | not_started | Full numbered exit gates are not completed by a browser prototype. |
 
-Next: continue Step 02 with an isolated Python environment, frozen-worker/Graphify/model probes and a safe native toolchain strategy; implement real schema-validated transport and recoverable storage afterward. No model binaries, native installer, cloud connection, or system-wide build-tool installer has been activated.
+Next: continue Step 02 with inspected Graphify/MCP dependencies, model probes and a safe native toolchain strategy; implement production schema-validated transport and recoverable storage afterward. The isolated diagnostic environment is in ignored .tools/probe-venv; it is not the production sidecar. No model binaries, native installer, cloud connection, or system-wide build-tool installer has been activated.
 
 Browser preview: `http://127.0.0.1:4200/welcome`. Sample changes are in-memory, not persistent user memory. Appearance works in the browser session. Artwork is present locally but excluded from public Git history pending redistribution provenance.
 

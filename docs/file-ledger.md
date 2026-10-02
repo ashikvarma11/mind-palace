@@ -13,3 +13,10 @@ Step 03A additional planned paths: src/app/core/workspace-store.ts/spec.ts own a
 - THIRD_PARTY_NOTICES.md — actual locked icon license and separation of dependency/artwork/code licensing.
 - public/README.md — preserve the static-assets directory in public clones and explain omitted artwork.
 - .gitattributes — keep generated/source text consistently LF across Windows/macOS without changing global Git preferences.
+
+Step 02 packaging subset (not the complete model/Graphify gate):
+- tools/requirements-probe.txt — pin the three direct dependencies for isolated validation/locking/freezing experiments.
+- tools/requirements-probe-lock.txt — record exact resolved transitive versions for this Windows/Python probe environment.
+- tools/tests/test_runtime_probe.py — test source and optional frozen capability results, lock contention/release and invalid schema rejection.
+- tools/probe-runtime.py — extend the synthetic capability probe with real schema rejection and cross-process locking; keep it diagnostic-only, not a production worker.
+- .tools/probe-venv/ and .tools/probe-dist/ — ignored isolated environment and native diagnostic bundle, never release artifacts.
