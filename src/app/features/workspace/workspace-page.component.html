@@ -1,0 +1,576 @@
+@if (page() === 'welcome') {
+  <section class="opening">
+    <div class="opening-art">
+      @if (!logoMissing()) {
+        <img
+          src="brand/logo-original.png"
+          alt="Mind Palace: a brain-shaped palace with a glowing path"
+          (error)="logoMissing.set(true)"
+        />
+      } @else {
+        <span class="opening-fallback">Mind Palace</span>
+      }
+    </div>
+    <div>
+      <span class="eyebrow">Your personal memory</span>
+      <h1>{{ store.sampleActive() ? 'Welcome back to' : 'Welcome to' }}<br />Mind Palace.</h1>
+      <p class="sub">
+        Remember what mattered. Find the reason behind a decision. Continue where you left off.
+      </p>
+      <div class="actions">
+        @if (store.sampleActive()) {
+          <a class="button primary" routerLink="/today"
+            >See today’s priorities<svg [lucideIcon]="icons.arrow" aria-hidden="true"></svg></a
+          ><a class="button" routerLink="/resume">Resume work</a>
+        } @else {
+          <button type="button" class="button primary" (click)="activateSample()">
+            Explore sample workspace<svg [lucideIcon]="icons.arrow" aria-hidden="true"></svg>
+          </button>
+        }
+      </div>
+      <p class="small local-line">
+        <svg [lucideIcon]="icons.shield" aria-hidden="true"></svg>No cloud connection. Samples are
+        fictional.
+      </p>
+    </div>
+  </section>
+  @if (store.sampleActive()) {
+    <div class="columns">
+      <section class="panel">
+        <div class="section-title">
+          <h2>Your top three</h2>
+          <svg [lucideIcon]="icons.list" aria-hidden="true"></svg>
+        </div>
+        @for (task of store.priorities(); track task.id; let i = $index) {
+          <label class="task-row"
+            ><span class="rank">{{ i + 1 }}</span
+            ><span class="row-body"
+              ><strong>{{ task.title }}</strong
+              ><span class="sub">{{ task.reason }}</span></span
+            ><input
+              #taskCheck
+              type="checkbox"
+              [checked]="task.done"
+              (change)="store.setTaskDone(task.id, taskCheck.checked)"
+              [attr.aria-label]="'Mark ' + task.title + ' complete'"
+          /></label>
+        } @empty {
+          <p class="sub">All sample tasks are complete. No new priorities are invented.</p>
+        }
+      </section>
+      <section class="panel">
+        <span class="eyebrow">Your last sample conversation</span>
+        <h2 class="spaced">Checkout architecture</h2>
+        <p class="sub">You kept NgRx for shared state. {{ store.proposalDescription() }}</p>
+        <div class="actions">
+          <a class="button" routerLink="/sessions"
+            >Open session<svg [lucideIcon]="icons.arrow" aria-hidden="true"></svg
+          ></a>
+        </div>
+        <h3 class="spaced">No need to start over.</h3>
+        <p class="sub">Original messages and the next step belong together.</p>
+      </section>
+    </div>
+  } @else {
+    <section class="panel empty-state">
+      <span class="eyebrow">A truthful starting point</span>
+      <h2>No workspace is open yet.</h2>
+      <p class="sub">
+        Vault creation and the local memory service are being built next. Explore the sample to test
+        this interface without importing personal data.
+      </p>
+      <div class="capability-list">
+        <span class="badge">Native storage · pending</span
+        ><span class="badge">Local AI · pending</span
+        ><span class="badge">Desktop installer · pending</span>
+      </div>
+    </section>
+  }
+} @else if (page() === 'settings') {
+  <div class="page-heading">
+    <span class="eyebrow">Your palace, your rules</span>
+    <h1>Private by default.</h1>
+    <p class="sub">Clear controls, with honest capability status.</p>
+  </div>
+  <section class="panel settings-panel">
+    <div class="settings-row">
+      <div>
+        <h3>Appearance</h3>
+        <p class="sub">Follow your device or choose light or dark.</p>
+      </div>
+      <label
+        ><span class="sr-only">Appearance</span
+        ><select [ngModel]="theme" (ngModelChange)="setTheme($event)">
+          <option value="system">System</option>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select></label
+      >
+    </div>
+    <div class="settings-row">
+      <div>
+        <h3>Open at login</h3>
+        <p class="sub">
+          Planned default: enabled, with an off switch. Native registration is not implemented.
+        </p>
+      </div>
+      <input
+        type="checkbox"
+        disabled
+        aria-label="Open at login, unavailable in browser prototype"
+      />
+    </div>
+    <div class="settings-row">
+      <div>
+        <h3>Local memory service</h3>
+        <p class="sub">The browser does not write a vault or pretend to save your memory.</p>
+      </div>
+      <span class="badge pending">Not connected</span>
+    </div>
+    <div class="settings-row">
+      <div>
+        <h3>Cloud AI connections</h3>
+        <p class="sub">No hosted model or paid API is configured.</p>
+      </div>
+      <span class="badge">Off</span>
+    </div>
+    <div class="settings-row">
+      <div>
+        <h3>Sample workspace</h3>
+        <p class="sub">Fictional examples; changes reset on page reload.</p>
+      </div>
+      <button type="button" class="button" (click)="activateSample()">
+        {{ store.sampleActive() ? 'Reset sample' : 'Explore sample' }}
+      </button>
+    </div>
+  </section>
+} @else if (!store.sampleActive()) {
+  <div class="page-heading">
+    <span class="eyebrow">Personal memory</span>
+    <h1>No memory workspace is open.</h1>
+    <p class="sub">
+      This is the first interface build. The native memory service is not connected yet.
+    </p>
+  </div>
+  <section class="panel empty-state">
+    <h2>Explore without using personal data.</h2>
+    <p class="sub">
+      The sample contains a conversation, a confirmed choice, an unresolved suggestion, and recorded
+      tasks. It is not real AI or persistent storage.
+    </p>
+    <button type="button" class="button primary" (click)="activateSample()">
+      Explore sample workspace<svg [lucideIcon]="icons.arrow" aria-hidden="true"></svg>
+    </button>
+  </section>
+} @else {
+  @switch (page()) {
+    @case ('today') {
+      <div class="page-heading heading-with-action">
+        <div>
+          <span class="eyebrow">{{ day }}</span>
+          <h1>A little clarity for today.</h1>
+          <p class="sub">Your next steps, with the context that makes them useful.</p>
+        </div>
+        <div>
+          <button type="button" class="button" disabled>
+            <svg [lucideIcon]="icons.plus" aria-hidden="true"></svg>Add a memory</button
+          ><span class="small unavailable">Import service pending</span>
+        </div>
+      </div>
+      <div class="work-dashboard">
+        <section>
+          <article class="panel hero">
+            <span class="eyebrow">Pick up where you left off</span>
+            <h2>Checkout, without starting over.</h2>
+            <p>You kept NgRx for shared state. {{ store.proposalDescription() }}</p>
+            <div class="hero-footer">
+              <a class="button primary" routerLink="/resume"
+                >Resume this work<svg [lucideIcon]="icons.arrow" aria-hidden="true"></svg></a
+              ><span class="small">Fictional sample session</span>
+            </div>
+          </article>
+          <section class="panel spaced">
+            <h2>Recently remembered</h2>
+            <div class="content-row">
+              <div>
+                <h3>Checkout architecture</h3>
+                <p class="sub">Synthetic conversation</p>
+                <span class="badge">1 original confirmed choice</span>
+              </div>
+              <a class="text-link" routerLink="/sessions"
+                >Open<svg [lucideIcon]="icons.arrow" aria-hidden="true"></svg
+              ></a>
+            </div>
+            <div class="content-row">
+              <div>
+                <h3>Product review notes</h3>
+                <p class="sub">Synthetic task fixture</p>
+              </div>
+              <a class="text-link" routerLink="/connections"
+                >Explore<svg [lucideIcon]="icons.arrow" aria-hidden="true"></svg
+              ></a>
+            </div>
+          </section>
+        </section>
+        <section class="panel">
+          <div class="section-title">
+            <h2>Today’s focus</h2>
+            <span class="badge">Recorded sample tasks</span>
+          </div>
+          @for (task of store.priorities(); track task.id; let i = $index) {
+            <label class="task-row"
+              ><span class="rank">{{ i + 1 }}</span
+              ><span class="row-body"
+                ><strong>{{ task.title }}</strong
+                ><span class="sub">{{ task.reason }}</span></span
+              ><input
+                #taskCheck
+                type="checkbox"
+                [checked]="task.done"
+                (change)="store.setTaskDone(task.id, taskCheck.checked)"
+                [attr.aria-label]="'Mark ' + task.title + ' complete'"
+            /></label>
+          } @empty {
+            <p class="sub">
+              All sample tasks are complete. No tasks are invented to fill this view.
+            </p>
+          }
+          <div class="spaced">
+            <h3>
+              {{
+                store.decisionState() === 'proposed' ? 'Needs a decision' : 'Your reviewed decision'
+              }}
+            </h3>
+            <p class="sub">{{ store.proposalDescription() }}</p>
+            <a class="button spaced" routerLink="/decisions"
+              >Review proposal<svg [lucideIcon]="icons.arrow" aria-hidden="true"></svg
+            ></a>
+          </div>
+        </section>
+      </div>
+    }
+    @case ('sessions') {
+      <div class="page-heading">
+        <span class="eyebrow">Your memory library</span>
+        <h1>Every session has a place.</h1>
+        <p class="sub">Original conversations, reviewed summaries, and unfinished work.</p>
+      </div>
+      <div class="columns">
+        <section class="panel">
+          <span class="eyebrow">Fictional conversation</span>
+          <h2 class="spaced">Checkout architecture</h2>
+          <p class="sub">Shared state, delivery forms, and payment errors.</p>
+          <div class="capability-list">
+            <span class="badge">Session record</span
+            ><span class="badge" [class.pending]="!store.summaryReviewed()">{{
+              store.summaryReviewed() ? 'Summary reviewed' : 'Summary needs review'
+            }}</span>
+          </div>
+          <div class="notice-box">Reviewing a summary does not approve its proposed decisions.</div>
+          <button
+            type="button"
+            class="button"
+            (click)="store.reviewSummary()"
+            [disabled]="store.summaryReviewed()"
+          >
+            <svg [lucideIcon]="icons.check" aria-hidden="true"></svg
+            >{{ store.summaryReviewed() ? 'Summary reviewed' : 'Mark summary reviewed' }}
+          </button>
+        </section>
+        <section class="panel">
+          <span class="eyebrow">Session summary</span>
+          <h2 class="spaced">What happened</h2>
+          <h3 class="spaced">Originally confirmed</h3>
+          <p>Keep NgRx for shared checkout state.</p>
+          <h3>Original suggestion</h3>
+          <p>Use signals for isolated delivery-form state.</p>
+          <p class="sub">Current review state: {{ store.decisionState() }}.</p>
+          <div class="actions">
+            <button
+              type="button"
+              class="text-link"
+              (click)="evidenceOpen.set(!evidenceOpen())"
+              [attr.aria-expanded]="evidenceOpen()"
+              aria-controls="sample-evidence"
+            >
+              <svg [lucideIcon]="icons.quote" aria-hidden="true"></svg>View original sample messages</button
+            ><a class="button primary" routerLink="/resume">Build a handoff</a>
+          </div>
+        </section>
+      </div>
+    }
+    @case ('decisions') {
+      <div class="page-heading">
+        <span class="eyebrow">Proposals are not approvals</span>
+        <h1>Remember the reason, too.</h1>
+        <p class="sub">Every choice should retain its source and its review history.</p>
+      </div>
+      <div class="columns">
+        <section>
+          <article class="panel">
+            <span class="badge confirmed">Confirmed in the original sample</span>
+            <h2 class="spaced">Keep NgRx for shared checkout state</h2>
+            <p class="sub">
+              Event history helps diagnose payment issues. The isolated form-state proposal does not
+              replace this choice.
+            </p>
+            <button
+              type="button"
+              class="text-link spaced"
+              (click)="evidenceOpen.set(!evidenceOpen())"
+              [attr.aria-expanded]="evidenceOpen()"
+              aria-controls="sample-evidence"
+            >
+              <svg [lucideIcon]="icons.quote" aria-hidden="true"></svg>See original confirmation
+            </button>
+          </article>
+          <article class="panel spaced">
+            <span
+              class="badge"
+              [class.pending]="store.decisionState() === 'proposed'"
+              [class.confirmed]="store.decisionState() === 'confirmed'"
+              aria-live="polite"
+              >{{
+                store.decisionState() === 'proposed'
+                  ? 'Proposed · needs review'
+                  : store.decisionState() === 'confirmed'
+                    ? 'Confirmed during sample review'
+                    : 'Rejected during sample review'
+              }}</span
+            >
+            <h2 class="spaced">Use signals for delivery-form state</h2>
+            <p class="sub">This applies to isolated form state, not shared checkout state.</p>
+            <blockquote>“We could move the isolated delivery-form state to signals.”</blockquote>
+            <span class="small">Sample assistant message 15 · originally a suggestion</span>
+            <div class="actions">
+              <button
+                type="button"
+                class="button primary"
+                (click)="store.reviewDecision('confirmed')"
+                [disabled]="store.decisionState() === 'confirmed'"
+              >
+                <svg [lucideIcon]="icons.check" aria-hidden="true"></svg>Confirm decision</button
+              ><button
+                type="button"
+                class="button"
+                (click)="store.reviewDecision('rejected')"
+                [disabled]="store.decisionState() === 'rejected'"
+              >
+                Reject</button
+              ><button
+                type="button"
+                class="text-link"
+                (click)="store.reviewDecision('proposed')"
+                [disabled]="store.decisionState() === 'proposed'"
+              >
+                Leave unresolved
+              </button>
+            </div>
+          </article>
+        </section>
+        <aside class="panel">
+          <span class="eyebrow">Review history · this sample run</span>
+          <h2 class="spaced">No hidden approvals.</h2>
+          <p class="sub">
+            The original assistant suggestion stays unchanged. Your explicit review actions are
+            recorded separately.
+          </p>
+          @for (event of store.history(); track event.sequence) {
+            <div class="content-row">
+              <span class="rank">{{ event.sequence }}</span>
+              <div>
+                <h3>{{ event.from }} → {{ event.to }}</h3>
+                <p class="small">Explicit sample review action</p>
+              </div>
+            </div>
+          } @empty {
+            <div class="notice-box">No review action yet. The suggestion remains proposed.</div>
+          }
+          <a class="button spaced" routerLink="/resume"
+            >Inspect current handoff<svg [lucideIcon]="icons.arrow" aria-hidden="true"></svg
+          ></a>
+        </aside>
+      </div>
+    }
+    @case ('ask') {
+      <div class="page-heading">
+        <span class="eyebrow">Find an answer in your history</span>
+        <h1>Ask your memory.</h1>
+        <p class="sub">Useful answers show evidence — and admit when it is missing.</p>
+      </div>
+      <section class="panel">
+        <span class="eyebrow">Preset sample questions · not a running AI model</span>
+        <div class="actions">
+          <button type="button" class="button" (click)="ask('Why did we keep NgRx?')">
+            Why did we keep NgRx?</button
+          ><button type="button" class="button" (click)="ask('What should I do next?')">
+            What should I do next?</button
+          ><button type="button" class="button" (click)="ask('What did I decide about pricing?')">
+            A question without evidence
+          </button>
+        </div>
+        <form class="ask-form" (ngSubmit)="ask()">
+          <label class="sr-only" for="memory-question">Question for your memory</label
+          ><input
+            id="memory-question"
+            name="question"
+            type="text"
+            [(ngModel)]="question"
+            maxlength="2000"
+            placeholder="Ask about a decision, task, or conversation…"
+          /><button type="submit" class="button primary">
+            Ask<svg [lucideIcon]="icons.sparkle" aria-hidden="true"></svg>
+          </button>
+        </form>
+      </section>
+      <section class="panel spaced" aria-live="polite">
+        @if (answer(); as result) {
+          <h2>{{ submittedQuestion() }}</h2>
+          <p class="answer-text">{{ result.text }}</p>
+          <span class="badge" [class.pending]="result.status === 'insufficient_evidence'">{{
+            result.status === 'sample_answer' ? 'Preset sample answer' : 'Insufficient evidence'
+          }}</span>
+          <div class="actions">
+            @for (reference of result.evidence; track reference) {
+              <button
+                type="button"
+                class="text-link"
+                (click)="evidenceOpen.set(true)"
+                aria-controls="sample-evidence"
+              >
+                <svg [lucideIcon]="icons.quote" aria-hidden="true"></svg>{{ reference }}
+              </button>
+            }
+          </div>
+        } @else {
+          <div class="empty-state">
+            <h2>A useful answer has a source.</h2>
+            <p class="sub">Choose a sample question to inspect its answer and evidence.</p>
+          </div>
+        }
+      </section>
+    }
+    @case ('resume') {
+      <div class="page-heading">
+        <span class="eyebrow">Continue with context intact</span>
+        <h1>The next session starts here.</h1>
+        <p class="sub">Inspect and edit what the next assistant should know.</p>
+      </div>
+      <div class="columns">
+        <section class="panel">
+          <div class="section-title">
+            <h2>Checkout handoff</h2>
+            <span class="badge">Editable sample</span>
+          </div>
+          <label class="field" for="handoff-context">Context package</label
+          ><textarea
+            #handoff
+            id="handoff-context"
+            class="handoff-text"
+            [ngModel]="draft()"
+            (ngModelChange)="updateDraft($event)"
+            maxlength="12000"
+          ></textarea>
+          <div class="actions">
+            <button type="button" class="button primary" (click)="selectDraft(handoff)">
+              Select text to copy</button
+            ><button type="button" class="text-link" (click)="restoreDraft()">
+              Refresh from current state
+            </button>
+          </div>
+          <p class="small spaced">
+            Manual edits stay in this view until navigation or reload. Nothing is saved or sent
+            automatically.
+          </p>
+        </section>
+        <aside>
+          <section class="panel">
+            <span class="eyebrow">What’s included</span>
+            <h3 class="spaced">Confirmed choices</h3>
+            <p class="sub">NgRx for shared checkout state, with its original reason.</p>
+            <h3 class="spaced">Proposal review</h3>
+            <p class="sub">{{ store.proposalDescription() }}</p>
+            <h3 class="spaced">Next recorded action</h3>
+            <p class="sub">
+              {{ store.priorities()[0]?.title ?? 'No unfinished sample task remains.' }}
+            </p>
+            <a class="button spaced" routerLink="/decisions">Review decisions</a>
+          </section>
+          <div class="notice-box">
+            Copying this package into Claude, ChatGPT, or another cloud service shares it with that
+            provider. This prototype makes no such connection.
+          </div>
+        </aside>
+      </div>
+    }
+    @case ('connections') {
+      <div class="page-heading">
+        <span class="eyebrow">Connected, not scattered</span>
+        <h1>Follow a thought.</h1>
+        <p class="sub">A sample relationship list with keyboard-accessible selection.</p>
+      </div>
+      <div class="columns">
+        <section class="panel connection-list" aria-label="Sample relationships">
+          @for (item of nodes; track item.id) {
+            <button
+              type="button"
+              class="connection-node"
+              [class.selected]="selectedNode() === item.id"
+              [attr.aria-pressed]="selectedNode() === item.id"
+              (click)="selectedNode.set(item.id)"
+            >
+              <svg [lucideIcon]="item.icon" aria-hidden="true"></svg
+              ><span
+                >{{ item.title }}<small>{{ item.type }}</small></span
+              >
+            </button>
+          }
+        </section>
+        <section class="panel" aria-live="polite">
+          <span class="eyebrow">{{ node().type }}</span>
+          <h2 class="spaced">{{ node().title }}</h2>
+          <p class="sub">{{ node().detail }}</p>
+          <div class="notice-box">
+            Graphify repository scanning and the Three.js graph are not implemented. This is an
+            illustrative relationship fixture, not extracted code.
+          </div>
+          <a class="button" routerLink="/sessions"
+            >View sample session<svg [lucideIcon]="icons.arrow" aria-hidden="true"></svg
+          ></a>
+        </section>
+      </div>
+    }
+  }
+}
+@if (evidenceOpen() && store.sampleActive()) {
+  <section
+    id="sample-evidence"
+    class="panel evidence-panel spaced"
+    aria-label="Original fictional sample messages"
+  >
+    <div class="section-title">
+      <div>
+        <span class="eyebrow">Original sample evidence</span>
+        <h2>Checkout architecture</h2>
+      </div>
+      <button type="button" class="text-link" (click)="evidenceOpen.set(false)">
+        Close evidence
+      </button>
+    </div>
+    <p class="small">
+      These are synthetic fixtures, not the user's actual conversations. Hash-verified source
+      storage is pending.
+    </p>
+    <p class="source-label">Sample message 14 · User</p>
+    <blockquote>
+      “Keep NgRx for the shared checkout state. We need its event history while debugging payment
+      issues.”
+    </blockquote>
+    <p class="source-label">Sample message 15 · Assistant suggestion</p>
+    <blockquote>“We could move the isolated delivery-form state to signals.”</blockquote>
+    <p class="small">Later review actions do not rewrite these original messages.</p>
+  </section>
+}
+@if (notice()) {
+  <div class="local-notice" role="status">{{ notice() }}</div>
+}

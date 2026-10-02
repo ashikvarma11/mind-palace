@@ -1,0 +1,54 @@
+<a class="skip-link" href="#main-content">Skip to content</a>
+<div class="app-window">
+  <div class="prototype-bar">
+    <span>Mind Palace · Browser prototype</span>
+    @if (store.sampleActive()) {
+      <span
+        >Fictional sample · resets on reload
+        <button type="button" (click)="store.closeSample()">Exit sample</button></span
+      >
+    } @else {
+      <span>Memory service not connected</span>
+    }
+  </div>
+  <header class="app-header">
+    <a class="brand" routerLink="/welcome" aria-label="Mind Palace home">
+      @if (!logoMissing()) {
+        <img
+          src="brand/logo-preview.png"
+          alt="Mind Palace brain-and-palace logo"
+          (error)="logoMissing.set(true)"
+        />
+      } @else {
+        <span class="brand-fallback" aria-hidden="true">MP</span>
+      }
+      <span
+        >Mind Palace<small>{{
+          store.sampleActive()
+            ? 'Sample palace · local prototype'
+            : 'Your personal memory workspace'
+        }}</small></span
+      >
+    </a>
+    <a class="search-control" routerLink="/ask"
+      ><svg [lucideIcon]="icons.search" aria-hidden="true"></svg>Find a memory</a
+    >
+  </header>
+  <nav class="app-navigation" aria-label="Main navigation">
+    @for (item of navigation; track item.path) {
+      <a [routerLink]="item.path" routerLinkActive="active" ariaCurrentWhenActive="page"
+        ><svg [lucideIcon]="item.icon" aria-hidden="true"></svg>{{ item.title }}
+        @if (
+          item.path === '/decisions' && store.sampleActive() && store.decisionState() === 'proposed'
+        ) {
+          <span class="nav-count">1<span class="sr-only"> unresolved proposal</span></span>
+        }
+      </a>
+    }
+  </nav>
+  <main id="main-content"><router-outlet /></main>
+  <footer class="app-footer">
+    <span><svg [lucideIcon]="icons.shield" aria-hidden="true"></svg>No cloud AI connected</span
+    ><span>Development build · no installer yet</span>
+  </footer>
+</div>
