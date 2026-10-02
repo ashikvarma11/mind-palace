@@ -1,13 +1,19 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { test } from 'node:test';
-import { validateSessionMetadata, validateSessionRead, validateSessionList, validateSessionCreated } from '../../src/app/core/validators.generated.ts';
+import { validateSessionMetadata, validateSessionRead, validateSessionList, validateSessionCreated, validateVaultStatus } from '../../src/app/core/validators.generated.ts';
 
 const metadata = {
   schema_version: 1, id: '11111111-1111-4111-8111-111111111111', kind: 'session',
   title: 'Synthetic', source_id: '22222222-2222-4222-8222-222222222222',
   review_status: 'unreviewed', created_at: '2026-10-02T12:00:00.123456Z',
 };
+test('vault status never claims AI or accepts unexpected fields', () => {
+  assert.equal(validateVaultStatus({ connected: true, ai_enabled: false }), true);
+  for (const value of [{ connected: true, ai_enabled: true }, { connected: 1, ai_enabled: false }, { connected: false, ai_enabled: false, path: 'secret' }]) {
+    assert.equal(validateVaultStatus(value), false);
+  }
+});
 test('valid generated session contracts accept original Unicode text', () => {
   assert.equal(validateSessionMetadata(metadata), true);
   assert.equal(validateSessionRead({ metadata, body: 'Summary', source_text: 'Original\r\nதமிழ்' }), true);
@@ -38,5 +44,5 @@ test('response sizes and integer pagination are bounded', () => {
 test('standalone browser validators have static imports and no code evaluation', async () => {
   const source = await readFile(new URL('../../src/app/core/validators.generated.ts', import.meta.url), 'utf8');
   assert.doesNotMatch(source, /\beval\s*\(|\bnew Function\b|\brequire\s*\(/);
-  assert.match(source, /import runtime0 from/);
+  assert.match(source, /import \* as runtime0 from/);
 });

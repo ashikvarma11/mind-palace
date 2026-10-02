@@ -2,7 +2,7 @@
 
 Read `docs/implementation-plan.md`, `docs/decisions.md`, `docs/implementation-status.md`, and relevant source/tests before every step. Preserve existing user work.
 
-- Follow the approved local-first Angular/Tauri/Python architecture and Workspace design. Distinguish approved requirements from proposals and measurements.
+- Follow the approved local-first Angular/Tauri/Python architecture and latest choice in docs/design-review.md (Library; existing tested UI is still Workspace). Distinguish approved requirements from proposals and measurements.
 - Consult current official documentation and installed package source for library APIs; record versions, dates, URLs, and probes in `docs/research.md`. Ask the user when evidence cannot resolve product intent, privacy/cost, or machine changes.
 - Record every new path and its one-line responsibility in `docs/file-ledger.md` before creating it. Use strict types and validated external boundaries.
 - Keep conversation sources immutable. Suggestions are never approvals; summary review never confirms decisions. Changes to supporting code only flag review.

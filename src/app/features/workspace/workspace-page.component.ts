@@ -17,10 +17,12 @@ import {
   LucideSparkles,
 } from '@lucide/angular';
 import { PageKey, SampleAnswer, WorkspaceStore } from '../../core/workspace-store';
+import { VaultPanel } from '../vault/vault-panel.component';
+import { LocalVault } from '../../core/local-vault';
 
 @Component({
   selector: 'app-workspace-page',
-  imports: [RouterLink, FormsModule, LucideDynamicIcon],
+  imports: [RouterLink, FormsModule, LucideDynamicIcon, VaultPanel],
   templateUrl: './workspace-page.component.html',
   styleUrl: './workspace-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -28,6 +30,7 @@ import { PageKey, SampleAnswer, WorkspaceStore } from '../../core/workspace-stor
 export class WorkspacePage {
   readonly page = input.required<PageKey>();
   readonly store = inject(WorkspaceStore);
+  readonly vault = inject(LocalVault);
   readonly evidenceOpen = signal(false);
   readonly selectedNode = signal('project');
   readonly answer = signal<SampleAnswer | null>(null);

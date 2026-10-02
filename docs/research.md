@@ -1,5 +1,11 @@
 # Implementation research
 
+## Desktop vault integration — 2 October 2026
+
+Rechecked [official Tauri commands](https://v2.tauri.app/develop/calling-rust/) and inspected pinned Tauri 2.12.1 app.rs/path/desktop.rs: managed State, App::run, RunEvent::ExitRequested/Exit and app_local_data_dir/resource_dir. The docs.rs versioned RunEvent page could not be retrieved; installed official crate source supplied the exact API instead. Normal exit owns child control separately from asynchronous IO; no generic process/file plugin was added.
+
+Actual browser/native integration revealed generated CJS default-import differences not caught by Node contract tests. Inspected pinned ajv 8.20.0 runtime/ucs2length.js and ajv-formats 3.0.1 formats.js/d.ts: namespace imports plus normalization of the inspected exports.default shape work in Node and Angular/WebView. No runtime schema compilation/eval or CSP relaxation. Unit tests and real WebView now exercise the helpers. Preferred agent-browser executable is absent; browser skills were followed using the existing Playwright 1.63.0 fallback. Initial browser regression launch lacked Chromium headless shell 1243; rerun uses the already installed chromium-1234 via process-local MP_BROWSER_EXECUTABLE, with no global installation.
+
 ## Private native worker transport — 2 October 2026
 
 Rechecked official [Tauri command documentation](https://v2.tauri.app/develop/calling-rust/) and [resource documentation](https://v2.tauri.app/develop/resources/). The pinned Tokio 1.53.1 docs URL was unavailable through browsing; inspected the downloaded official crate's process/mod.rs, process/windows.rs, io/blocking.rs and io/util/take.rs instead, including creation_flags, kill_on_drop, start_kill, wait and AsyncBufRead for Take. Direct versions match the existing lock: serde 1.0.229, serde_json 1.0.151, sha2 0.10.9, uuid 1.26.1 and tokio 1.53.1. Required process/IO/runtime/time features added errno 0.3.14 and signal-hook-registry 1.4.8 to the lock. No provider SDK or network transport was added.

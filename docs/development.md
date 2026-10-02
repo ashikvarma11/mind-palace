@@ -1,5 +1,13 @@
 # Development
 
+## Local vault development flow
+
+Use `npm run build:desktop`, then `npm run open:desktop`. On Welcome/Sessions, choose Create local vault once or Open existing vault afterward. Storage is under the device's local app-data/dev.mindpalace.local/vault directory; closing preserves it. The browser sample never writes personal memory. No AI/cloud/key integration is enabled yet.
+
+Run `npm run test:rust` and `npm run verify:desktop` sequentially after building, not concurrently with native builds. Desktop QA accepts only a debug canonical UUID test selector and uses ignored `.tools/native/verification/vault-<UUID>/vault` plus an isolated WebView profile, never real app data. Its two app lifetimes exercise save/reopen/restart and owned-worker shutdown. Generated validators require `npm run generate:contracts` after schema changes, and `npm run check:contracts` detects drift.
+
+An uncertain save retains an unchanged draft/operation ID only while the app remains open. Reopen and explicitly retry that draft; do not reload/restart before resolving it. If already restarted, inspect saved sessions before importing again. Original storage preserves submitted text, while HTML textareas may normalize clipboard line endings. Full recovery/dialog/job/AI gates remain pending.
+
 ## Shared session contracts
 
 Run `npm run generate:contracts` after editing schemas/native-memory.schema.json; never hand-edit the generated types/validators. `npm run check:contracts` checks drift and runs offline validation tests; `npm run check` includes this gate. Node 24 runs the generated TypeScript validators directly for these tests. The generated browser validators use static imports, not runtime schema compilation. Native supervision and the real vault interface remain the next step.

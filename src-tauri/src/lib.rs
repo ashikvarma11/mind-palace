@@ -1,22 +1,32 @@
-#[allow(dead_code)] // Internal transport is tested before exposing vault commands.
 mod worker;
+mod paths;
+mod commands;
+use tauri::Manager;
 
 #[tauri::command]
 fn native_health() -> &'static str {
-    "desktop_shell_only: storage_disconnected, ai_disabled"
+    "desktop_local_storage_available: ai_disabled"
 }
 
 pub fn run() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![native_health])
-        .run(tauri::generate_context!())
-        .expect("Mind Palace desktop shell failed to start");
+        .manage(commands::VaultState::default())
+        .invoke_handler(tauri::generate_handler![native_health, commands::vault_status,
+            commands::vault_open, commands::vault_close, commands::sessions_create,
+            commands::sessions_list, commands::sessions_read])
+        .build(tauri::generate_context!())
+        .expect("Mind Palace desktop shell failed to start")
+        .run(|app, event| {
+            if matches!(event, tauri::RunEvent::ExitRequested { .. } | tauri::RunEvent::Exit) {
+                app.state::<commands::VaultState>().shutdown();
+            }
+        });
 }
 
 #[cfg(test)]
 mod tests {
     #[test]
-    fn health_does_not_claim_storage_or_ai() {
-        assert_eq!(super::native_health(), "desktop_shell_only: storage_disconnected, ai_disabled");
+    fn health_declares_storage_capability_not_an_open_vault_or_ai() {
+        assert_eq!(super::native_health(), "desktop_local_storage_available: ai_disabled");
     }
 }

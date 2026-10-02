@@ -1,0 +1,140 @@
+<section
+  class="panel vault-panel"
+  aria-label="Local conversation storage"
+  [attr.aria-busy]="vault.busy()"
+>
+  <span class="eyebrow">On this device · no cloud calls</span>
+  <h2>Your local conversations</h2>
+  @if (!vault.native) {
+    <p class="sub">
+      Local storage is available in the desktop app. This browser preview never saves personal data.
+    </p>
+  } @else {
+    <p class="sub">
+      Development vault: your device’s local app-data folder, under dev.mindpalace.local/vault.
+      Opening is manual; closing never deletes saved files.
+    </p>
+    @if (!vault.connected()) {
+      <div class="actions">
+        <button
+          class="button primary"
+          type="button"
+          [disabled]="vault.busy()"
+          (click)="vault.open(true)"
+        >
+          Create local vault
+        </button>
+        <button class="button" type="button" [disabled]="vault.busy()" (click)="vault.open(false)">
+          Open existing vault
+        </button>
+        <button class="button" type="button" [disabled]="vault.busy()" (click)="vault.close()">
+          Close local vault
+        </button>
+      </div>
+      <p class="small">
+        Create only works for an empty new vault. Existing files are not overwritten.
+      </p>
+    } @else {
+      <div class="actions">
+        <button class="button" type="button" [disabled]="vault.busy()" (click)="vault.reload()">
+          Refresh conversations
+        </button>
+        <button class="button" type="button" [disabled]="vault.busy()" (click)="vault.close()">
+          Close local vault
+        </button>
+      </div>
+      <div class="vault-columns">
+        <form (ngSubmit)="vault.save()">
+          <h3>Save a pasted conversation</h3>
+          <label
+            >Conversation title (up to 200 characters)<input
+              name="title"
+              required
+              maxlength="200"
+              [(ngModel)]="vault.draft.title"
+              [disabled]="vault.busy() || vault.draftLocked()"
+          /></label>
+          <label
+            >Original conversation (up to 65,536 characters)<textarea
+              name="source"
+              required
+              maxlength="65536"
+              rows="7"
+              [(ngModel)]="vault.draft.source_text"
+              [disabled]="vault.busy() || vault.draftLocked()"
+            ></textarea>
+          </label>
+          <label
+            >Your notes (optional, up to 32,768 characters)<textarea
+              name="body"
+              maxlength="32768"
+              rows="3"
+              [(ngModel)]="vault.draft.body"
+              [disabled]="vault.busy() || vault.draftLocked()"
+            ></textarea>
+          </label>
+          <p class="small">
+            Original text is stored unchanged and checked when read. Your notes are not an AI
+            summary or confirmed decisions.
+          </p>
+          @if (vault.draftLocked()) {
+            <p class="notice-box">
+              The previous save is uncertain. This draft is kept unchanged; retry uses the same
+              operation ID to avoid a duplicate. Reopen the vault first if disconnected. Do not
+              reload the app before resolving this draft.
+            </p>
+          }
+          <button class="button primary" type="submit" [disabled]="vault.busy()">
+            {{ vault.draftLocked() ? 'Retry unchanged save' : 'Save conversation locally' }}
+          </button>
+        </form>
+        <div>
+          <h3>Saved conversations ({{ vault.list().total }})</h3>
+          <ul class="conversation-list">
+            @for (item of vault.list().items; track item.id) {
+              <li>
+                <button
+                  class="button"
+                  type="button"
+                  [disabled]="vault.busy()"
+                  [attr.aria-pressed]="vault.selected()?.metadata?.id === item.id"
+                  (click)="vault.read(item.id)"
+                >
+                  {{ item.title }}</button
+                ><small>Unreviewed · {{ item.created_at }}</small>
+              </li>
+            } @empty {
+              <li class="sub">
+                No conversations saved yet. Nothing has been captured automatically.
+              </li>
+            }
+          </ul>
+          @if (vault.list().next_offset !== null) {
+            <button class="button" type="button" [disabled]="vault.busy()" (click)="vault.more()">
+              Load more conversations
+            </button>
+          }
+        </div>
+      </div>
+      @if (vault.selected(); as session) {
+        <section class="saved-source" aria-label="Saved original conversation">
+          <h3>{{ session.metadata.title }}</h3>
+          <span class="badge">Unreviewed · original source checked</span>
+          <h4>Your notes</h4>
+          <pre>{{ session.body || 'No notes provided.' }}</pre>
+          <h4>Original conversation</h4>
+          <pre>{{ session.source_text }}</pre>
+        </section>
+      }
+    }
+  }
+  @if (vault.busy()) {
+    <p role="status">Working locally…</p>
+  }
+  @if (vault.error()) {
+    <p class="notice-box" role="alert">{{ vault.error() }}</p>
+  }
+  @if (vault.notice()) {
+    <p class="small" role="status">{{ vault.notice() }}</p>
+  }
+</section>

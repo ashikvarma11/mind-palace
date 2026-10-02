@@ -1,0 +1,72 @@
+:host {
+  display: block;
+  margin-top: 20px;
+}
+.vault-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+  margin-top: 24px;
+}
+form,
+label {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+form {
+  gap: 16px;
+}
+label {
+  font-size: 12px;
+}
+input,
+textarea {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+textarea {
+  resize: vertical;
+}
+.conversation-list {
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 12px;
+}
+li {
+  min-width: 0;
+}
+li .button {
+  width: 100%;
+  justify-content: flex-start;
+  overflow-wrap: anywhere;
+}
+small {
+  display: block;
+  color: var(--muted);
+  margin-top: 4px;
+  overflow-wrap: anywhere;
+}
+.saved-source {
+  margin-top: 28px;
+  border-top: 1px solid var(--line);
+  padding-top: 20px;
+}
+pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font: inherit;
+  font-size: 13px;
+  max-height: 400px;
+  overflow: auto;
+  background: var(--soft);
+  padding: 16px;
+  border-radius: 8px;
+}
+@media (max-width: 850px) {
+  .vault-columns {
+    grid-template-columns: 1fr;
+  }
+}

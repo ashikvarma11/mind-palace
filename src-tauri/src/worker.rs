@@ -36,7 +36,7 @@ struct Manifest { schema_version: u32, platform: String, executable: String, fil
 #[serde(deny_unknown_fields)]
 struct Resource { path: String, bytes: u64, sha256: String }
 
-fn no_links(path: &Path) -> Result<(), Error> {
+pub(crate) fn no_links(path: &Path) -> Result<(), Error> {
     for parent in path.ancestors() {
         match fs::symlink_metadata(parent) {
             Ok(metadata) => {
@@ -180,15 +180,40 @@ async fn read_frame<R: tokio::io::AsyncRead + Unpin>(output: &mut BufReader<R>) 
 }
 
 pub(crate) struct Worker {
-    child: Option<Child>,
+    child: Option<std::sync::Arc<std::sync::Mutex<Child>>>,
     input: Option<ChildStdin>,
     output: Option<BufReader<ChildStdout>>,
     usable: bool,
 }
 
+pub(crate) async fn stop_owned(child: &std::sync::Arc<std::sync::Mutex<Child>>) -> Result<(), Error> {
+    {
+        let mut owned = child.lock().map_err(|_| Error::shutdown())?;
+        if owned.try_wait().map_err(|_| Error::shutdown())?.is_some() { return Ok(()); }
+        owned.start_kill().map_err(|_| Error::shutdown())?;
+    }
+    timeout(Duration::from_secs(3), async {
+        loop {
+            // Never hold a blocking guard over an await.
+            if child.lock().map_err(|_| Error::shutdown())?.try_wait()
+                .map_err(|_| Error::shutdown())?.is_some() { return Ok::<(), Error>(()); }
+            tokio::time::sleep(Duration::from_millis(10)).await;
+        }
+    }).await.map_err(|_| Error::shutdown())?
+}
+
 impl Worker {
+    pub(crate) fn is_usable(&self) -> bool { self.usable }
     // The resource root is native-owned; callers may not supply an executable.
+    #[cfg(test)]
     pub(crate) async fn start(bundle: &Path, vault: &Path, create: bool) -> Result<Self, Error> {
+        Self::start_supervised(bundle, vault, create, |_| Ok(())).await
+    }
+
+    pub(crate) async fn start_supervised(
+        bundle: &Path, vault: &Path, create: bool,
+        register: impl FnOnce(std::sync::Arc<std::sync::Mutex<Child>>) -> Result<(), Error>,
+    ) -> Result<Self, Error> {
         let executable = verify_bundle(bundle)?;
         no_links(vault)?;
         if !vault.is_absolute() || vault.parent().is_none() { return Err(Error::resources()); }
@@ -207,6 +232,9 @@ impl Worker {
         let mut child = command.spawn().map_err(|_| Error::transport())?;
         let input = child.stdin.take().ok_or_else(Error::transport)?;
         let output = BufReader::new(child.stdout.take().ok_or_else(Error::transport)?);
+        let child = std::sync::Arc::new(std::sync::Mutex::new(child));
+        // Register before the first await: exit can stop an opening or busy worker.
+        register(child.clone())?;
         let mut worker = Self { child: Some(child), input: Some(input), output: Some(output), usable: true };
         let health = worker.request("health", json!({})).await?;
         if health != json!({"version":"0.1.0","storage":"foundation","ai_enabled":false}) {
@@ -224,7 +252,9 @@ impl Worker {
         if !matches!(method, "health" | "sessions.create" | "sessions.read" | "sessions.list") {
             return Err(Error { code: "VALIDATION_ERROR", message: "This worker operation is not available.", retryable: false });
         }
-        if !self.usable { return Err(Error::transport()); }
+        if !self.usable {
+            return Err(if self.child.is_some() { Error::shutdown() } else { Error::transport() });
+        }
         let id = uuid::Uuid::new_v4().to_string();
         let mut request = serde_json::to_vec(&json!({"protocol_version":1,"id":id,"method":method,"params":params}))
             .map_err(|_| Error::transport())?;
@@ -249,12 +279,12 @@ impl Worker {
         // A new vault must not inherit pipes from a previously stopped child.
         drop(self.input.take());
         drop(self.output.take());
-        let Some(mut child) = self.child.take() else { return Ok(()); };
-        if child.try_wait().map_err(|_| Error::shutdown())?.is_some() { return Ok(()); }
-        child.start_kill().map_err(|_| Error::shutdown())?;
-        timeout(Duration::from_secs(3), child.wait()).await.map_err(|_| Error::shutdown())?
-            .map_err(|_| Error::shutdown())?;
-        Ok(())
+        let Some(child) = self.child.take() else { return Ok(()); };
+        let result = stop_owned(&child).await;
+        // Failed shutdown retains the owned control for another explicit close
+        // or app exit, never presenting it as a successfully stopped worker.
+        if result.is_err() { self.child = Some(child); }
+        result
     }
 }
 

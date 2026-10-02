@@ -74,17 +74,18 @@
   } @else {
     <section class="panel empty-state">
       <span class="eyebrow">A truthful starting point</span>
-      <h2>No workspace is open yet.</h2>
+      <h2>{{ vault.connected() ? 'Your local vault is open.' : 'No workspace is open yet.' }}</h2>
       <p class="sub">
-        Vault creation and the local memory service are being built next. Explore the sample to test
-        this interface without importing personal data.
+        Open a local vault in the desktop app to save conversations. Or explore the separate
+        fictional sample.
       </p>
       <div class="capability-list">
-        <span class="badge">Native storage · pending</span
+        <span class="badge">Local conversation storage · desktop only</span
         ><span class="badge">Local AI · pending</span
         ><span class="badge">Desktop installer · pending</span>
       </div>
     </section>
+    <app-vault-panel />
   }
 } @else if (page() === 'settings') {
   <div class="page-heading">
@@ -123,9 +124,13 @@
     <div class="settings-row">
       <div>
         <h3>Local memory service</h3>
-        <p class="sub">The browser does not write a vault or pretend to save your memory.</p>
+        <p class="sub">
+          Desktop vault controls are on Welcome and Sessions. The browser never writes a vault.
+        </p>
       </div>
-      <span class="badge pending">Not connected</span>
+      <span class="badge pending">{{
+        vault.connected() ? 'Local vault open' : 'Not connected'
+      }}</span>
     </div>
     <div class="settings-row">
       <div>
@@ -144,12 +149,22 @@
       </button>
     </div>
   </section>
+} @else if (page() === 'sessions' && !store.sampleActive() && vault.native) {
+  <div class="page-heading">
+    <span class="eyebrow">Your personal memory</span>
+    <h1>Local conversations.</h1>
+    <p class="sub">
+      Save and reopen original text. AI extraction and decision review are still pending.
+    </p>
+  </div>
+  <app-vault-panel />
 } @else if (!store.sampleActive()) {
   <div class="page-heading">
     <span class="eyebrow">Personal memory</span>
     <h1>No memory workspace is open.</h1>
     <p class="sub">
-      This is the first interface build. The native memory service is not connected yet.
+      This page is not connected to real memory yet. Local conversation storage is available on
+      Welcome and Sessions in the desktop app.
     </p>
   </div>
   <section class="panel empty-state">

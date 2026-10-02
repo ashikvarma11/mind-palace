@@ -88,7 +88,7 @@ fn actual_frozen_worker_persists_reopens_and_stops() {
         fs::create_dir(&temporary).unwrap();
         let vault = temporary.join("vault");
         let mut worker = Worker::start(&bundle, &vault, true).await.unwrap();
-        assert!(worker.child.as_ref().unwrap().id().is_some());
+        assert!(worker.child.as_ref().unwrap().lock().unwrap().id().is_some());
         let receipt = worker.request("sessions.create", json!({"op_id":uuid::Uuid::new_v4().to_string(),"title":"Synthetic Rust test","body":"Summary","source_text":"Original\r\nதமிழ்"})).await.unwrap();
         assert!(worker.request("cloud.preview", json!({})).await.is_err());
         worker.stop().await.unwrap();
@@ -102,6 +102,16 @@ fn actual_frozen_worker_persists_reopens_and_stops() {
         reopened.stop().await.unwrap();
         assert!(reopened.child.is_none() && reopened.input.is_none() && reopened.output.is_none());
         assert!(reopened.request("health", json!({})).await.is_err());
+        // A separately held owned-child control can cancel startup before the
+        // health await completes; it does not need the IO/request mutex.
+        let mut control = None;
+        let cancelled = Worker::start_supervised(&bundle, &vault, false, |child| {
+            child.lock().unwrap().start_kill().unwrap();
+            control = Some(child);
+            Ok(())
+        }).await;
+        assert!(cancelled.is_err());
+        assert!(control.unwrap().lock().unwrap().try_wait().unwrap().is_some());
         // Only this test's UUID-created temporary fixture is removed.
         assert_eq!(temporary.parent(), Some(std::env::temp_dir().as_path()));
         assert!(temporary.file_name().unwrap().to_str().unwrap().starts_with("mp-rust-"));

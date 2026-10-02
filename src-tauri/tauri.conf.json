@@ -25,6 +25,7 @@
   },
   "bundle": {
     "active": false,
+    "resources": {"resources/memory-worker/": "memory-worker/"},
     "icon": ["icons/icon.png", "icons/icon.ico"]
   }
 }

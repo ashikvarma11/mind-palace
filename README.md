@@ -2,15 +2,15 @@
 
 A private, local-first memory workspace for notes, conversations, decisions, and unfinished work.
 
-**Early development. Not an installable product yet.** The approved Workspace interface is the first milestone. Local memory storage, bundled AI, repository mapping, and native installers are still pending; the browser prototype uses clearly labelled fictional examples, not real AI or durable memory.
+**Early development. Not an installable product yet.** Windows desktop development builds now save and reopen pasted conversations locally. AI, repository mapping and installers remain pending. The browser sample is fictional, not durable memory. Library is the latest design preference; the existing interface is still Workspace.
 
-Backend progress: portable storage and a packaged Windows worker are tested separately; offline OpenAI/Anthropic API adapters and sharing previews are implemented. They are not connected to this interface and cannot send requests yet. Secure native key handling and transport remain pending. See [the latest verification](docs/verification/cloud-foundation-01.md).
+AI progress: offline OpenAI/Anthropic API adapters and sharing previews are implemented, but are not connected to this interface and cannot send requests yet. Secure native key handling and HTTPS transport remain pending. See [cloud foundation verification](docs/verification/cloud-foundation-01.md).
 
-Desktop progress: a Windows native development shell now builds and renders the approved interface with your local artwork. Native health/navigation/reload/close checks pass; it still uses sample-only state. See [native verification](docs/verification/step-03b.md) and [local toolchain setup](docs/development.md#project-local-windows-desktop-development).
+Desktop progress: Welcome/Sessions offer create/open/close for one local vault, pasted conversation saving, manual notes and source-checked reading. WebView reload, app restart and owned-worker exit checks pass with isolated synthetic data. No AI or cloud calls. See [desktop vault verification](docs/verification/native-vault-01.md) and [local development setup](docs/development.md#project-local-windows-desktop-development).
 
-Storage continuation: bounded saved-session listing, strict generated contracts and a checked development worker-resource copy now pass their tests. The desktop-to-worker connection and real vault interface are still pending. See [storage verification](docs/verification/native-storage-01.md).
+The first vault is under your device's local app-data/dev.mindpalace.local/vault directory. Opening is manual; closing preserves files. Original saved text is hash-checked when read; manual notes are not confirmed decisions. Custom folder selection/full recovery UI remain pending.
 
-Internal Rust-to-worker save/reopen/list/read and shutdown now pass native tests, with checked resources and bounded private transport. This is not connected to the interface yet. See [native transport verification](docs/verification/native-transport-01.md).
+Uncertain saves are never automatically retried. An unchanged draft retains its operation ID while the app is open: reopen the vault and explicitly retry it. Do not reload before resolving it; durable retry drafts across app restart are still pending. Other real-memory pages remain unconnected; sample mode stays separate.
 
 ## Development
 

@@ -2,6 +2,11 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:mind-palace:native-memory:v1",
   "$defs": {
+    "VaultStatus": {
+      "title": "VaultStatus", "type": "object",
+      "properties": {"connected": {"type": "boolean"}, "ai_enabled": {"const": false}},
+      "required": ["connected", "ai_enabled"], "additionalProperties": false
+    },
     "SessionMetadata": {
       "title": "SessionMetadata",
       "type": "object",

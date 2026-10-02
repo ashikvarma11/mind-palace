@@ -1,7 +1,9 @@
 # File ledger — planned before creation
 
 Native storage connection subset (one app-managed vault, no AI):
-- schemas/native-memory.schema.json — strict public session metadata/list/read/create-result contracts shared by validators and generated UI types.
+- src-tauri/src/paths.rs — resolve fixed native resource/vault paths and UUID-only debug test isolation, rejecting linked ancestors.
+- docs/verification/native-vault-01.md — record real command/UI persistence and shutdown results, with remaining release gates.
+- schemas/native-memory.schema.json — strict public session metadata/list/read/create-result and truthful vault status contracts shared by validators and generated UI types.
 - tools/generate-contracts.mjs — generate schema-derived TypeScript and precompiled validators, with drift checking and no runtime schema-code evaluation.
 - src/app/core/contracts.generated.ts/validators.generated.ts — generated native-session types and offline runtime validators; never hand-edit.
 - tools/stage-worker.py — stage the existing frozen worker and produce a bounded SHA-256 resource manifest; refuse redirected paths.

@@ -14,6 +14,7 @@ import {
   LucideShieldCheck,
 } from '@lucide/angular';
 import { WorkspaceStore } from './core/workspace-store';
+import { LocalVault } from './core/local-vault';
 
 @Component({
   selector: 'app-root',
@@ -26,6 +27,7 @@ export class App {
   readonly environmentLabel =
     '__TAURI_INTERNALS__' in globalThis ? 'Desktop prototype' : 'Browser prototype';
   readonly store = inject(WorkspaceStore);
+  readonly vault = inject(LocalVault);
   readonly logoMissing = signal(false);
   readonly icons = { search: LucideSearch, shield: LucideShieldCheck };
   readonly navigation = [
