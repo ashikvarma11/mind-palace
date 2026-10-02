@@ -1,6 +1,8 @@
 mod worker;
 mod paths;
 mod commands;
+#[allow(dead_code)] // Internal foundation only; no credential command/UI until cancellation is verified.
+mod credentials;
 use tauri::Manager;
 
 #[tauri::command]

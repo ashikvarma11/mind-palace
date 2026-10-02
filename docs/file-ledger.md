@@ -1,5 +1,10 @@
 # File ledger — planned before creation
 
+Native credential foundation (internal only, fake-key tests, no WebView commands):
+- src-tauri/src/credentials.rs — allowlisted provider targets, secret-redacted/zeroizing ownership, fail-closed Windows Credential Manager save/read/status/remove; no plaintext or network fallback.
+- src-tauri/src/credentials_tests.rs — synthetic validation/redaction tests and fresh UUID-scoped real Windows write/read/replace/remove, with cleanup and no access to production targets.
+- docs/verification/native-credentials-01.md — record native credential API and actual fake-key checks separately from pending key-entry/cancellation/HTTPS/macOS gates.
+
 Native storage connection subset (one app-managed vault, no AI):
 - src-tauri/src/paths.rs — resolve fixed native resource/vault paths and UUID-only debug test isolation, rejecting linked ancestors.
 - docs/verification/native-vault-01.md — record real command/UI persistence and shutdown results, with remaining release gates.

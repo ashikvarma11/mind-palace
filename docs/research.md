@@ -1,5 +1,11 @@
 # Implementation research
 
+## Native Windows credential foundation — 2 October 2026
+
+Inspected Microsoft [CredWriteW](https://learn.microsoft.com/en-us/windows/win32/api/wincred/nf-wincred-credwritew), [CredReadW](https://learn.microsoft.com/en-us/windows/win32/api/wincred/nf-wincred-credreadw), [CREDENTIALW](https://learn.microsoft.com/en-us/windows/win32/api/wincred/ns-wincred-credentialw), [CredDeleteW](https://learn.microsoft.com/en-us/windows/win32/api/wincred/nf-wincred-creddeletew) and [CredFree](https://learn.microsoft.com/en-us/windows/win32/api/wincred/nf-wincred-credfree). Generic blobs are application-defined, at most 2560 bytes; local-machine persistence stays on this computer but is visible to the same user's sessions. CredWrite replaces an existing matching target and has no atomic compare-and-swap. CredRead returns one allocation freed with CredFree. This is not an app-exclusive same-user security boundary.
+
+Inspected installed windows-sys 0.61.2 Credentials bindings/CREDENTIALW layout. Added the already locked version as a Windows-only direct dependency with Foundation/Credentials features; Cargo reused it for dirs-sys too. Registry reports zeroize stable 1.9.0; pinned it and inspected downloaded Zeroizing Drop, Vec capacity wiping and volatile slice writes plus [RustCrypto documentation](https://docs.rs/zeroize/1.9.0/zeroize/). No derive/serde features requested; checksum locked. Wiping owned buffers is not protection against previous copies, swap, dumps, OS/admin or same-user access. Provider HTTP libraries/models remain unselected; no real keys/inference used.
+
 ## Desktop vault integration — 2 October 2026
 
 Rechecked [official Tauri commands](https://v2.tauri.app/develop/calling-rust/) and inspected pinned Tauri 2.12.1 app.rs/path/desktop.rs: managed State, App::run, RunEvent::ExitRequested/Exit and app_local_data_dir/resource_dir. The docs.rs versioned RunEvent page could not be retrieved; installed official crate source supplied the exact API instead. Normal exit owns child control separately from asynchronous IO; no generic process/file plugin was added.

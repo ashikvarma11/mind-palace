@@ -4,6 +4,8 @@
 
 ## Implementation sequence
 
+Native credential foundation update: internal Windows backend supports owned provider targets, explicit replacement, validated read/status/remove and redacted zeroizing secrets, tested only with fresh UUID-scoped fake keys. No Tauri credential commands, real-key input or provider calls are enabled. This is internal work before item 1's full request-cancellation gate, not authority to accept real credentials early. Non-Windows fails closed, with no plaintext fallback.
+
 Engineering subset: implement provider request/response contracts and exact local excerpt previews in the Python worker first, with no credential fields, HTTP client or send method. These pure helpers prepare data for the planned native HTTPS owner; they do not replace it. Preview/preparation may be tested offline before the native prerequisite. Keys, sending, cancellation of actual HTTP and UI enablement remain blocked until the native gateway and OS-backed credentials are verified. This narrows the offline work safely rather than adding a browser proxy.
 
 1. Complete the trusted native-to-worker gateway and request cancellation before accepting credentials. The present browser prototype must not accept or retain real keys.

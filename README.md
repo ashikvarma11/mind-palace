@@ -4,7 +4,7 @@ A private, local-first memory workspace for notes, conversations, decisions, and
 
 **Early development. Not an installable product yet.** Windows desktop development builds now save and reopen pasted conversations locally. AI, repository mapping and installers remain pending. The browser sample is fictional, not durable memory. Library is the latest design preference; the existing interface is still Workspace.
 
-AI progress: offline OpenAI/Anthropic API adapters and sharing previews are implemented, but are not connected to this interface and cannot send requests yet. Secure native key handling and HTTPS transport remain pending. See [cloud foundation verification](docs/verification/cloud-foundation-01.md).
+AI progress: offline OpenAI/Anthropic adapters/previews and an internal Windows credential backend are implemented. Fake-key tests pass, but key entry, request cancellation and HTTPS integration are not ready; the interface cannot make AI requests. No real keys or paid calls were used. See [credential verification](docs/verification/native-credentials-01.md) and [cloud foundation verification](docs/verification/cloud-foundation-01.md).
 
 Desktop progress: Welcome/Sessions offer create/open/close for one local vault, pasted conversation saving, manual notes and source-checked reading. WebView reload, app restart and owned-worker exit checks pass with isolated synthetic data. No AI or cloud calls. See [desktop vault verification](docs/verification/native-vault-01.md) and [local development setup](docs/development.md#project-local-windows-desktop-development).
 

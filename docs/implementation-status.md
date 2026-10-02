@@ -1,5 +1,7 @@
 # Implementation status
 
+Latest credential subset: internal Windows backend implemented; four credential checks pass within the twelve-test native suite. Fake UUID-scoped OS entries are saved/read/replaced/removed; malformed entries are preserved. No production targets, real keys, credential commands or provider calls used. Next is verified per-request cancellation before key-entry/consented HTTPS. See verification/native-credentials-01.md; full cloud AI remains unavailable.
+
 Updated: 2 October 2026.
 
 | Step | Status | Actual result |
