@@ -1,5 +1,7 @@
 # Optional cloud AI — approved direction, offline foundation only
 
+Latest priority: D022 automatic session capture now takes precedence over this optional API-inference track. Do not continue HTTPS/key-entry work before the capture milestone without revisiting the user's scope. Preserve existing preview UI; capture receiver/coverage work is described in automatic-capture.md. Transcript storage is not inference and does not require a paid API call.
+
 2 October 2026. User request: “we need AI model integration like chatgpt or claude … let user integrate them using api keys.” This authorizes an optional bring-your-own-key feature, not access to existing chat accounts/history or paid calls during development. Local-first remains the default; cloud inference necessarily shares selected input with the chosen provider. No automatic fallback from a failing local model.
 
 ## Implementation sequence

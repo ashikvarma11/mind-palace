@@ -1,5 +1,7 @@
 # Personal memory application — detailed implementation plan
 
+Priority change, 2 October 2026: user explicitly prioritizes automatic access to all Claude, Codex and ChatGPT conversation sessions, including ongoing work, over manual imports and optional API inference. Preserve the paste UI. Promote Step 26 capture research into the active implementation track described in automatic-capture.md. First subset is an opt-in local hook receiver tested with synthetic transcripts; this is not all-client coverage, live registration or completed inference.
+
 Scope update, 2 October 2026: D013 approves optional user-key OpenAI/Anthropic inference. Follow `cloud-ai-plan.md` for consent, credential and cost boundaries. This supersedes G08's unresolved status and Step 26's deferral of direct API inference, but not Jev's deferral or existing chat-history/MCP constraints. Default remains local-first; no cloud feature or live paid development call is enabled yet.
 
 Plan revision: 1.1. Updated: 2 October 2026. Application: **Mind Palace**. Repository: `ashikvarma11/mind-palace` (public, MIT code). Status: implementation started; Workspace UI approved.

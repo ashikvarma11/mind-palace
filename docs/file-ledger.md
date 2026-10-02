@@ -1,5 +1,12 @@
 # File ledger — planned before creation
 
+Automatic capture receiver 01 (development subset; no assistant registration or private-data reads):
+- sidecar/memory_worker/session_capture.py — consent-file-gated hook receiver, scoped bounded transcript reads, immutable idempotent local snapshots and redacted errors.
+- sidecar/tests/test_session_capture.py — synthetic hook process/storage tests for both provider labels, append/resume, duplicates, partial writes, pause, scope escape and malformed data.
+- docs/automatic-capture.md — revised priority, exact capture contract/setup prerequisites, provider coverage and remaining app/normalization/history gates.
+- docs/verification/session-capture-01.md — actual receiver checks and explicit distinction from live assistant capture and AI inference.
+
+
 Offline request-preview UI 01:
 - schemas/native-ai-preview.schema.json — strict credential-free request/result/prompt/discard contracts, fixed provider endpoint/body shapes and can_send:false.
 - tools/generate-contracts.mjs and core/contracts.generated.ts/validators.generated.ts — merge inspected preview definitions into generated types/static validators; no runtime evaluation.

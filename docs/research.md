@@ -1,5 +1,9 @@
 # Implementation research
 
+## Automatic capture priority — 2 October 2026
+
+Opened https://learn.chatgpt.com/docs/hooks and https://code.claude.com/docs/en/hooks. Both document stdin lifecycle envelopes with session_id/transcript_path; Codex explicitly warns transcript format is unstable and concurrent hooks may finish out of order. The source-only receiver preserves raw syntactically valid JSONL without assuming a normalized producer schema, using immutable content-addressed revisions and no mutable latest pointer. Hook stdout is kept empty. No hooks installed or real conversations read. https://learn.chatgpt.com/docs/enterprise/cloud-local-access distinguishes local-only hook support from cloud orchestration; coverage must remain client-specific. Pinned existing Python 3.12 / portalocker 4.4.0 reused, no new dependency, paid API or account endpoint. Current app vault accepts pasted_text sources only; do not relabel captured transcripts or connect canonical ingestion without a provenance migration. Details in automatic-capture.md.
+
 ## Offline preview UI — 2 October 2026
 
 Opened https://angular.dev/guide/forms/template-driven-forms and https://angular.dev/guide/components/lifecycle for FormsModule/ngModel/ngSubmit and DestroyRef cleanup; inspected existing pinned Angular 22.2.1 app/config/forms usage. Retain native form controls, scoped SCSS and safe text interpolation; no remote UI/font dependency or generated HTML. Interval updates only receipt age and is removed on component destruction, never triggers AI work.

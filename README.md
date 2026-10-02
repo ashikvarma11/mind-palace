@@ -2,6 +2,8 @@
 
 A private, local-first memory workspace for notes, conversations, decisions, and unfinished work.
 
+Current priority: automatically capture original conversations from Claude, Codex and ChatGPT, rather than require manual pasting. A consent-gated local hook receiver now exists in source, tested with synthetic transcripts; it is not connected to installed assistants or the desktop app yet. Complete account history, background monitoring and inference are not available. See [automatic capture](docs/automatic-capture.md). Manual paste remains a fallback.
+
 **Early development. Not an installable product yet.** Windows desktop development builds now save and reopen pasted conversations locally. AI, repository mapping and installers remain pending. The browser sample is fictional, not durable memory. Library is the latest design preference; the existing interface is still Workspace.
 
 AI progress: Ask memory now previews one explicitly selected original passage and the complete credential-free provider request, with discard/expiry and cancellation. Nothing is sent. Key entry and HTTPS sending remain pending; the interface cannot produce real AI answers. Native request control and internal Windows credential foundations are separate verified subsets. No real keys or paid calls were used. See [preview UI verification](docs/verification/ai-preview-ui-01.md), [AI request verification](docs/verification/ai-requests-01.md) and [credential verification](docs/verification/native-credentials-01.md).
