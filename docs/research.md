@@ -25,6 +25,12 @@ Scaffold generated safely in ignored `.tools/scaffold` because the generator ref
 
 # Step 02 diagnostic packaging research — 2 October 2026
 
+## Local generation follow-up — 2 October 2026
+
+Inspected official llama.cpp b11342 release API/digest and executed downloaded Windows CPU binary version/help. Pinned docs https://raw.githubusercontent.com/ggml-org/llama.cpp/b11342/tools/server/README.md establish host binding, LLAMA_API_KEY, disabled webui/agent/proxy flags, schema-constrained response_format and chat_template_kwargs.enable_thinking. No OpenAI SDK/cloud provider is used; compatible endpoint names are implemented by the local runtime. Official Qwen cards https://huggingface.co/Qwen/Qwen3-0.6B-GGUF and https://huggingface.co/Qwen/Qwen3-1.7B-GGUF identify Apache-2.0; model API blobs supply exact revisions/size/LFS SHA256, independently checked after download. Metadata/artifact locks are in config/models.json.
+
+Windows peak working-set implementation follows https://learn.microsoft.com/en-us/windows/win32/api/psapi/nf-psapi-getprocessmemoryinfo and https://learn.microsoft.com/en-us/windows/win32/api/psapi/ns-psapi-process_memory_counters, with a limited-query process handle and explicit CloseHandle. Measurements/evidence grading limits are in verification/step-02-models.md; low prototype case scores are preserved and neither candidate is selected. No recommendation or release-quality claim is inferred from local runtime startup.
+
 ## MCP follow-up — 2 October 2026
 
 Official https://github.com/modelcontextprotocol/python-sdk and https://py.sdk.modelcontextprotocol.io/run/ describe v2 MCPServer.run(transport="stdio"). https://py.sdk.modelcontextprotocol.io/client/transports/ documents Client(StdioServerParameters(...)); https://py.sdk.modelcontextprotocol.io/get-started/testing/ distinguishes in-memory tests from real stdio. Inspected installed 2.2.0 signatures and mcp_types/version.py before coding. Actual source stdio negotiations: legacy 2025-11-25, auto 2026-07-28; frozen test exercises legacy only. Registry wheel SHA256 was independently verified after download; GitHub v2.2.0 resolves to 9972c21aa42054fb1450c5fc614761ed11847ec6, without whole-tree equivalence claims. Dependencies installed as binary wheels into the isolated environment; exact versions recorded. No SDK CLI/provider/assistant install path used; OpenTelemetry disabled with exporters none. This is a synthetic compatibility probe, not Step 20 memory integration.

@@ -1,0 +1,10 @@
+{"id":"proposal","text":"Assistant: We should use SQLite for local storage. User: What alternatives exist?","question":"Was SQLite approved?","expected":"proposed"}
+{"id":"approval","text":"Assistant: I suggest SQLite. User: Yes, use SQLite for this project.","question":"Was SQLite approved?","expected":"confirmed"}
+{"id":"rejection","text":"Assistant: Let's use a hosted database. User: No. Do not use a hosted database.","question":"What happened to the hosted database suggestion?","expected":"rejected"}
+{"id":"ambiguous","text":"Assistant: Shall we use Rust? User: Interesting. Let me think about it.","question":"Did the user approve Rust?","expected":"unclear"}
+{"id":"summary-not-approval","text":"Assistant: Here is a summary of the GraphQL proposal. User: This summary is accurate. I have not decided whether to use GraphQL.","question":"Was GraphQL approved?","expected":"proposed"}
+{"id":"replacement","text":"User: Use REST. Later user: Replace REST with GraphQL. REST is no longer our chosen approach.","question":"What is the current status of REST?","expected":"superseded"}
+{"id":"task","text":"User: Tomorrow, add unit tests for the importer. This work has not been done.","question":"What kind of record is the request to add tests?","expected":"task"}
+{"id":"missing-recall","text":"User: Use SQLite for local storage. Assistant: Noted.","question":"What is the approval status of NgRx? It is not mentioned in this source.","expected":"unclear"}
+{"id":"assistant-claim","text":"Assistant: We decided to use Angular. User: I did not approve Angular; it is still only your proposal.","question":"What is the status of Angular?","expected":"proposed"}
+{"id":"explicit-recall","text":"User: Keep NgRx because the existing selectors are already well tested. Assistant: I will retain NgRx.","question":"Was retaining NgRx confirmed by the user?","expected":"confirmed"}

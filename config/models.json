@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "selected": null,
+  "status": "Both candidates run locally; first probe quality insufficient. No production selection; held-out release evaluation pending.",
+  "runtime": {
+    "tag": "b11342",
+    "archive_url": "https://github.com/ggml-org/llama.cpp/releases/download/b11342/llama-b11342-bin-win-cpu-x64.zip",
+    "archive_sha256": "cc6f3ac938988f6ed4ce204b119d6d1ffe59342cb3157adef20e8132681acd8d",
+    "archive_bytes": 19274166,
+    "server_sha256": "9ac18a37e1e2c970ec474b99b3dc8be51c7fce0d59fb2bfce2098f42260e5a12",
+    "target": "Windows x64 CPU",
+    "license": "MIT; bundled LLVM OpenMP license retained separately"
+  },
+  "candidates": [
+    {
+      "id": "qwen3-0.6b-q8",
+      "repository": "Qwen/Qwen3-0.6B-GGUF",
+      "revision": "23749fefcc72300e3a2ad315e1317431b06b590a",
+      "filename": "Qwen3-0.6B-Q8_0.gguf",
+      "sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031",
+      "bytes": 639446688,
+      "license": "Apache-2.0"
+    },
+    {
+      "id": "qwen3-1.7b-q8",
+      "repository": "Qwen/Qwen3-1.7B-GGUF",
+      "revision": "90862c4b9d2787eaed51d12237eafdfe7c5f6077",
+      "filename": "Qwen3-1.7B-Q8_0.gguf",
+      "sha256": "061b54daade076b5d3362dac252678d17da8c68f07560be70818cace6590cb1a",
+      "bytes": 1834426016,
+      "license": "Apache-2.0"
+    }
+  ],
+  "probe_settings": {
+    "context_tokens": 2048,
+    "threads": 4,
+    "max_output_tokens": 128,
+    "temperature": 0,
+    "thinking": false,
+    "host": "127.0.0.1",
+    "authentication": "random process-local key via environment; never logged",
+    "tools": "disabled",
+    "release_eval": "separate held-out set required"
+  }
+}

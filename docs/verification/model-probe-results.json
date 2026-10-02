@@ -1,0 +1,416 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-02",
+  "scope": "Synthetic ten-case diagnostic only. Scores combine expected state and substring evidence, not semantic entailment; not release accuracy.",
+  "settings": {
+    "threads": 4,
+    "context_tokens": 2048,
+    "temperature": 0,
+    "seed": 42,
+    "max_output_tokens": 128,
+    "thinking": false
+  },
+  "load_measurement": "Fresh server process with OS disk cache not cleared; cold_load_seconds is not cold-disk latency.",
+  "results": [
+    {
+      "candidate": "qwen3-0.6b-q8",
+      "artifact_verified": true,
+      "cold_load_seconds": 1.187,
+      "peak_working_set_bytes": 982011904,
+      "unauthenticated_status": 401,
+      "cpu_threads": 4,
+      "passed_cases": 2,
+      "total_cases": 10,
+      "median_request_seconds": 1.0155,
+      "results": [
+        {
+          "id": "proposal",
+          "expected": "proposed",
+          "output": {
+            "state": "confirmed",
+            "evidence": "SQLite"
+          },
+          "passed": false,
+          "seconds": 1.553,
+          "usage": {
+            "completion_tokens": 22,
+            "prompt_tokens": 147,
+            "total_tokens": 169,
+            "prompt_tokens_details": {
+              "cached_tokens": 0
+            }
+          }
+        },
+        {
+          "id": "approval",
+          "expected": "confirmed",
+          "output": {
+            "state": "confirmed",
+            "evidence": "User: Yes, use SQLite for this project."
+          },
+          "passed": true,
+          "seconds": 1.228,
+          "usage": {
+            "completion_tokens": 30,
+            "prompt_tokens": 147,
+            "total_tokens": 177,
+            "prompt_tokens_details": {
+              "cached_tokens": 115
+            }
+          }
+        },
+        {
+          "id": "rejection",
+          "expected": "rejected",
+          "output": {
+            "state": "rejected",
+            "evidence": null
+          },
+          "passed": false,
+          "seconds": 1.052,
+          "usage": {
+            "completion_tokens": 21,
+            "prompt_tokens": 155,
+            "total_tokens": 176,
+            "prompt_tokens_details": {
+              "cached_tokens": 115
+            }
+          }
+        },
+        {
+          "id": "ambiguous",
+          "expected": "unclear",
+          "output": {
+            "state": "unclear",
+            "evidence": null
+          },
+          "passed": false,
+          "seconds": 0.958,
+          "usage": {
+            "completion_tokens": 22,
+            "prompt_tokens": 150,
+            "total_tokens": 172,
+            "prompt_tokens_details": {
+              "cached_tokens": 115
+            }
+          }
+        },
+        {
+          "id": "summary-not-approval",
+          "expected": "proposed",
+          "output": {
+            "state": "unclear",
+            "evidence": null
+          },
+          "passed": false,
+          "seconds": 0.947,
+          "usage": {
+            "completion_tokens": 22,
+            "prompt_tokens": 158,
+            "total_tokens": 180,
+            "prompt_tokens_details": {
+              "cached_tokens": 115
+            }
+          }
+        },
+        {
+          "id": "replacement",
+          "expected": "superseded",
+          "output": {
+            "state": "task",
+            "evidence": null
+          },
+          "passed": false,
+          "seconds": 0.95,
+          "usage": {
+            "completion_tokens": 21,
+            "prompt_tokens": 156,
+            "total_tokens": 177,
+            "prompt_tokens_details": {
+              "cached_tokens": 113
+            }
+          }
+        },
+        {
+          "id": "task",
+          "expected": "task",
+          "output": {
+            "state": "confirmed",
+            "evidence": "add unit tests for the importer"
+          },
+          "passed": false,
+          "seconds": 1.14,
+          "usage": {
+            "completion_tokens": 27,
+            "prompt_tokens": 156,
+            "total_tokens": 183,
+            "prompt_tokens_details": {
+              "cached_tokens": 115
+            }
+          }
+        },
+        {
+          "id": "missing-recall",
+          "expected": "unclear",
+          "output": {
+            "state": "rejected",
+            "evidence": null
+          },
+          "passed": false,
+          "seconds": 0.968,
+          "usage": {
+            "completion_tokens": 21,
+            "prompt_tokens": 157,
+            "total_tokens": 178,
+            "prompt_tokens_details": {
+              "cached_tokens": 115
+            }
+          }
+        },
+        {
+          "id": "assistant-claim",
+          "expected": "proposed",
+          "output": {
+            "state": "rejected",
+            "evidence": null
+          },
+          "passed": false,
+          "seconds": 0.979,
+          "usage": {
+            "completion_tokens": 21,
+            "prompt_tokens": 157,
+            "total_tokens": 178,
+            "prompt_tokens_details": {
+              "cached_tokens": 113
+            }
+          }
+        },
+        {
+          "id": "explicit-recall",
+          "expected": "confirmed",
+          "output": {
+            "state": "confirmed",
+            "evidence": "Assistant: I will retain NgRx."
+          },
+          "passed": true,
+          "seconds": 1.556,
+          "usage": {
+            "completion_tokens": 28,
+            "prompt_tokens": 158,
+            "total_tokens": 186,
+            "prompt_tokens_details": {
+              "cached_tokens": 113
+            }
+          }
+        }
+      ],
+      "pending": [
+        "embeddings",
+        "cancellation",
+        "held-out release evaluation",
+        "native app integration",
+        "native external-network audit"
+      ]
+    },
+    {
+      "candidate": "qwen3-1.7b-q8",
+      "artifact_verified": true,
+      "cold_load_seconds": 1.623,
+      "peak_working_set_bytes": 2176876544,
+      "unauthenticated_status": 401,
+      "cpu_threads": 4,
+      "passed_cases": 4,
+      "total_cases": 10,
+      "median_request_seconds": 3.0545,
+      "results": [
+        {
+          "id": "proposal",
+          "expected": "proposed",
+          "output": {
+            "state": "unclear",
+            "evidence": "Assistant: We should use SQLite for local storage."
+          },
+          "passed": false,
+          "seconds": 4.379,
+          "usage": {
+            "completion_tokens": 24,
+            "prompt_tokens": 147,
+            "total_tokens": 171,
+            "prompt_tokens_details": {
+              "cached_tokens": 0
+            }
+          }
+        },
+        {
+          "id": "approval",
+          "expected": "confirmed",
+          "output": {
+            "state": "confirmed",
+            "evidence": "User: Yes, use SQLite for this project."
+          },
+          "passed": true,
+          "seconds": 2.015,
+          "usage": {
+            "completion_tokens": 23,
+            "prompt_tokens": 147,
+            "total_tokens": 170,
+            "prompt_tokens_details": {
+              "cached_tokens": 115
+            }
+          }
+        },
+        {
+          "id": "rejection",
+          "expected": "rejected",
+          "output": {
+            "state": "unclear",
+            "evidence": "Do not use a hosted database."
+          },
+          "passed": false,
+          "seconds": 2.477,
+          "usage": {
+            "completion_tokens": 24,
+            "prompt_tokens": 155,
+            "total_tokens": 179,
+            "prompt_tokens_details": {
+              "cached_tokens": 115
+            }
+          }
+        },
+        {
+          "id": "ambiguous",
+          "expected": "unclear",
+          "output": {
+            "state": "unclear",
+            "evidence": null
+          },
+          "passed": false,
+          "seconds": 2.866,
+          "usage": {
+            "completion_tokens": 22,
+            "prompt_tokens": 150,
+            "total_tokens": 172,
+            "prompt_tokens_details": {
+              "cached_tokens": 115
+            }
+          }
+        },
+        {
+          "id": "summary-not-approval",
+          "expected": "proposed",
+          "output": {
+            "state": "unclear",
+            "evidence": "User: This summary is accurate. I have not decided whether to use GraphQL."
+          },
+          "passed": false,
+          "seconds": 3.787,
+          "usage": {
+            "completion_tokens": 30,
+            "prompt_tokens": 158,
+            "total_tokens": 188,
+            "prompt_tokens_details": {
+              "cached_tokens": 115
+            }
+          }
+        },
+        {
+          "id": "replacement",
+          "expected": "superseded",
+          "output": {
+            "state": "task",
+            "evidence": "REST is no longer our chosen approach."
+          },
+          "passed": false,
+          "seconds": 3.094,
+          "usage": {
+            "completion_tokens": 21,
+            "prompt_tokens": 156,
+            "total_tokens": 177,
+            "prompt_tokens_details": {
+              "cached_tokens": 113
+            }
+          }
+        },
+        {
+          "id": "task",
+          "expected": "task",
+          "output": {
+            "state": "task",
+            "evidence": "User: Tomorrow, add unit tests for the importer. This work has not been done."
+          },
+          "passed": true,
+          "seconds": 3.973,
+          "usage": {
+            "completion_tokens": 31,
+            "prompt_tokens": 156,
+            "total_tokens": 187,
+            "prompt_tokens_details": {
+              "cached_tokens": 115
+            }
+          }
+        },
+        {
+          "id": "missing-recall",
+          "expected": "unclear",
+          "output": {
+            "state": "unclear",
+            "evidence": null
+          },
+          "passed": true,
+          "seconds": 2.287,
+          "usage": {
+            "completion_tokens": 14,
+            "prompt_tokens": 157,
+            "total_tokens": 171,
+            "prompt_tokens_details": {
+              "cached_tokens": 115
+            }
+          }
+        },
+        {
+          "id": "assistant-claim",
+          "expected": "proposed",
+          "output": {
+            "state": "task",
+            "evidence": "User: I did not approve Angular; it is still only your proposal."
+          },
+          "passed": false,
+          "seconds": 3.796,
+          "usage": {
+            "completion_tokens": 28,
+            "prompt_tokens": 157,
+            "total_tokens": 185,
+            "prompt_tokens_details": {
+              "cached_tokens": 113
+            }
+          }
+        },
+        {
+          "id": "explicit-recall",
+          "expected": "confirmed",
+          "output": {
+            "state": "confirmed",
+            "evidence": "I will retain NgRx"
+          },
+          "passed": true,
+          "seconds": 3.015,
+          "usage": {
+            "completion_tokens": 18,
+            "prompt_tokens": 158,
+            "total_tokens": 176,
+            "prompt_tokens_details": {
+              "cached_tokens": 113
+            }
+          }
+        }
+      ],
+      "pending": [
+        "embeddings",
+        "cancellation",
+        "held-out release evaluation",
+        "native app integration",
+        "native external-network audit"
+      ]
+    }
+  ]
+}

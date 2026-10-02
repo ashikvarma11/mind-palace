@@ -30,3 +30,10 @@ Step 02 packaging subset (not the complete model/Graphify gate):
 - tools/probe-mcp.py — synthetic local MCP stdio server exposing one diagnostic-only read tool, no vault or cloud access.
 - tools/tests/test_mcp_probe.py — run real local stdio initialization/tool checks against source and optional frozen diagnostic server.
 - .tools/mcp-artifact/ — ignored registry-hash-verified SDK wheel retained for diagnostic provenance, not release distribution.
+- .tools/llama-b11342/ and .tools/models/ — ignored checksum-verified official CPU runtime and candidate GGUF downloads for local-only measurement.
+- config/models.json — lock candidate model revisions, artifact sizes/hashes/licenses and evaluation status; no unsupported production selection.
+- tools/probe-models.py — start an authenticated loopback-only CPU runtime, run labelled synthetic cases and record actual timing/results with guaranteed cleanup.
+- tools/fixtures/probe-cases.jsonl — ten explicit proposal/approval/rejection/recall cases for candidate comparison, not a held-out release evaluation.
+- tools/tests/test_model_probe.py — validate fixture/measurement parsing and local-runtime safety settings without treating unit tests as real inference.
+- docs/verification/step-02-models.md — record runtime/model artifact verification, measured performance/quality and missing gates.
+- docs/verification/model-probe-results.json — preserve exact synthetic benchmark outputs and evaluation limitations, no runtime credentials or personal data.

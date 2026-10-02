@@ -47,3 +47,15 @@ $env:MP_FROZEN_MCP_PROBE = (Resolve-Path .tools/probe-dist/mind-palace-mcp-probe
 ```
 
 Enable all three MP_FROZEN_* environment variables to run all 11 checks without skips. The MCP server waits for stdio protocol messages; launching it interactively is not an app preview. It exposes no search_memory/save_session tool and does not share memory. Real permission-scoped integration is deferred until storage/evidence contracts exist.
+
+## Local model diagnostic
+
+The official runtime is in ignored .tools/llama-b11342/bin; candidate GGUFs are in ignored .tools/models. Exact download origins/revisions/hashes are in config/models.json. Runtime/model artifacts are development prerequisites, not bundled release assets yet. Never use an arbitrary executable/model or a cloud fallback. These model files total about 2.47 GB; verify free disk space before downloading.
+
+```powershell
+./.tools/probe-venv/Scripts/python.exe tools/probe-models.py --candidate qwen3-0.6b-q8
+./.tools/probe-venv/Scripts/python.exe tools/probe-models.py --candidate qwen3-1.7b-q8
+./.tools/probe-venv/Scripts/python.exe -m unittest discover -s tools/tests -v
+```
+
+Run candidates sequentially to limit memory/CPU use. The diagnostic validates artifact bytes/hashes, starts a hidden CPU-only authenticated loopback process and cleans it up in finally; it emits synthetic benchmark JSON only. Its successful process exit means the measurement ran, NOT that model quality passed. Inspect passed_cases; neither candidate passed the initial ten-case checks. All 16 helper/transport tests can pass while model quality still fails. Dedicated embedding/cancellation/native-network tests remain pending. The browser still has preset sample answers, not this runtime.
