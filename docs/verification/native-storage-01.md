@@ -14,4 +14,10 @@ Timing caveat: a subsequent 40-test run took 121.987 seconds and hit existing 20
 
 Final rerun against the latest rebuilt worker: **40 passed, no skips, 15.419 seconds**. The timing caveat above remains recorded even though the final regression is green.
 
+## Continuation after the requested push
+
+Committed/pushed the session-contract and prior native-shell code as f65b1e5; local HEAD and GitHub main matched afterward. Continued with a fixed worker-staging helper: **9 tests passed**, actual staging/inventory check passed (**109 files, 23,673,882 bytes**), and **2 real staged-worker process tests passed** (create/read/reopen/list and offline sharing-preview preparation without sending). Changed staging inputs require explicit refresh; the old verified copy is retained in ignored development backups. Tampered/unrecognized trees are never overwritten or moved. A Windows cached-stat bug in the initial hard-link guard was caught by tests and fixed using Path.stat; the final nine checks pass. No worker files or artwork are published.
+
+The staged runtime is still not configured as a Tauri resource or supervised by Rust. The next implementation step must pin/embed the expected inventory, resolve the fixed native resource directory, verify files before execution and test private JSONL correlation/limits/timeouts/shutdown. Only then connect native vault commands and the real session interface. Staging success does not pass this pending transport gate.
+
 Pending: Rust trusted worker-resource resolution, framing/timeouts/shutdown, actual native app-data vault commands, create/save/list/read/close/reopen interface and isolated WebView end-to-end verification. No native storage gateway, AI provider connection, real keys, paid calls, folder picker or release installer is added in this subset.

@@ -4,6 +4,12 @@
 
 Run `npm run generate:contracts` after editing schemas/native-memory.schema.json; never hand-edit the generated types/validators. `npm run check:contracts` checks drift and runs offline validation tests; `npm run check` includes this gate. Node 24 runs the generated TypeScript validators directly for these tests. The generated browser validators use static imports, not runtime schema compilation. Native supervision and the real vault interface remain the next step.
 
+## Development worker staging
+
+After building the existing frozen worker in `.tools/probe-dist/mind-palace-memory-worker`, run `npm run stage:worker`, then `npm run check:worker`. These commands only use that fixed build input and `src-tauri/resources/memory-worker`; they do not launch the worker or open a vault. Both trees are ignored generated artifacts, not public release packages.
+
+If the build input intentionally changes, `python tools/stage-worker.py --refresh` first verifies the existing staged tree, prepares and verifies a fresh copy, and moves the previous verified tree into ignored `.tools/worker-stage-backups/<random UUID>`. Unrecognized or tampered staging content is refused, not overwritten or moved. A failed preparation may leave an ignored `.worker-stage-*` temporary directory for inspection; the helper never recursively deletes it. No global installation, credentials or provider requests are involved.
+
 ## Project-local Windows desktop development
 
 Verified only on the current Windows x64 machine with an existing Windows SDK 10.0.20348.0. Python 3.12 is needed for development helpers; neither developer toolchains nor a Python installation will be required by the future packaged product.

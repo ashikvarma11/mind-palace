@@ -5,6 +5,8 @@ Native storage connection subset (one app-managed vault, no AI):
 - tools/generate-contracts.mjs — generate schema-derived TypeScript and precompiled validators, with drift checking and no runtime schema-code evaluation.
 - src/app/core/contracts.generated.ts/validators.generated.ts — generated native-session types and offline runtime validators; never hand-edit.
 - tools/stage-worker.py — stage the existing frozen worker and produce a bounded SHA-256 resource manifest; refuse redirected paths.
+- tools/tests/test_stage_worker.py — prove fixed staging paths, bounded inventories, tamper refusal and recoverable refresh using synthetic bundles.
+- .tools/worker-stage-backups/ — ignored recoverable copies of previously verified generated staging bundles; never user vaults.
 - src-tauri/resources/memory-worker/worker-manifest.json — ignored staged frozen runtime and generated integrity inventory, not source or a release package.
 - src-tauri/src/worker.rs — supervise only the fixed verified worker with bounded correlated JSONL, single-flight requests, timeout and shutdown.
 - src-tauri/src/commands.rs — create/open/close/status and allowlisted session calls for one native app-data vault, never WebView-supplied paths/executables.

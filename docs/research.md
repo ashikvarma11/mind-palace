@@ -1,5 +1,13 @@
 # Implementation research
 
+## Worker resource staging — 2 October 2026
+
+Rechecked [Tauri resources](https://v2.tauri.app/develop/resources/): non-frontend runtime resources preserve directory structure with a directory mapping and should be resolved natively. No bundle.resources entry is enabled yet; the next Rust step must embed a trusted expected inventory and validate resource paths before launching the fixed executable. Staging is a prerequisite, not completed supervision or an installer.
+
+The fixed worker copy contains 109 files / 23,673,882 bytes. Inventories are bounded (512 files, 2048 entries, 64 MiB/file, 128 MiB total, 16 path components), with bounded streaming hashes, case-collision/path/link rejection and a manifest that exactly matches the generated inventory. Refresh retains the previous verified generated copy; it does not touch a user vault. These hashes are development integrity checks, not publisher signatures or protection against an attacker who controls all local build inputs.
+
+Hard-link tests exposed Windows DirEntry.stat reporting st_nlink=0 even for ordinary files. [Python 3.12 os documentation](https://docs.python.org/3.12/library/os.html#os.DirEntry.stat) explicitly requires os.stat for this field on Windows; the measured Path.stat returns 1 for the same file. The helper now uses the actual OS query. Nine staging tests and two actual staged-worker reopen/list process tests pass. Junction rejection is injected in a unit test to avoid requiring Windows symlink privileges; no claim of a live junction attack simulation is made.
+
 ## Session contracts and listing — 2 October 2026
 
 Inspected installed json-schema-to-typescript 16.0.0 README/API and Ajv 8.20.0 standalone generation, plus ajv-formats 3.0.1 runtime helpers. Official [Ajv standalone documentation](https://ajv.js.org/standalone.html) explicitly supports build-time generation to avoid runtime Function evaluation under CSP. The upstream [type generator repository](https://github.com/bcherny/json-schema-to-typescript) fetch timed out; the locked installed package README establishes compile(schema, name, options). Types and validators come from native-memory.schema.json, with drift checking. Only inspected ucs2length/formats CommonJS helper references are converted to static imports; an unknown helper fails generation. Calendar date validation and UTC-only patterns are tested, not disabled to silence schema errors.
