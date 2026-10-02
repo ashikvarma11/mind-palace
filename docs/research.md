@@ -1,5 +1,11 @@
 # Implementation research
 
+## Offline preview UI — 2 October 2026
+
+Opened https://angular.dev/guide/forms/template-driven-forms and https://angular.dev/guide/components/lifecycle for FormsModule/ngModel/ngSubmit and DestroyRef cleanup; inspected existing pinned Angular 22.2.1 app/config/forms usage. Retain native form controls, scoped SCSS and safe text interpolation; no remote UI/font dependency or generated HTML. Interval updates only receipt age and is removed on component destruction, never triggers AI work.
+
+Opened https://ajv.js.org/standalone.html and reused inspected Ajv 8.20.0/json-schema-to-typescript 16.0.0 generation/normalization. New UI-only schema is merged into static frontend contracts; the worker's existing cloud schema and frozen resources are unchanged. Credential headers/custom URLs/can_send:true are rejected, and returned question/model/provider/cap/source range/text are bound to the captured input. No provider API/model lookup is required for a local-only preview; model IDs remain user-entered and explicitly unverified. Source baseline 33f9497c93ec1d971a19fbc5e70a669b5453c208.
+
 ## Native Windows credential foundation — 2 October 2026
 
 Inspected Microsoft [CredWriteW](https://learn.microsoft.com/en-us/windows/win32/api/wincred/nf-wincred-credwritew), [CredReadW](https://learn.microsoft.com/en-us/windows/win32/api/wincred/nf-wincred-credreadw), [CREDENTIALW](https://learn.microsoft.com/en-us/windows/win32/api/wincred/ns-wincred-credentialw), [CredDeleteW](https://learn.microsoft.com/en-us/windows/win32/api/wincred/nf-wincred-creddeletew) and [CredFree](https://learn.microsoft.com/en-us/windows/win32/api/wincred/nf-wincred-credfree). Generic blobs are application-defined, at most 2560 bytes; local-machine persistence stays on this computer but is visible to the same user's sessions. CredWrite replaces an existing matching target and has no atomic compare-and-swap. CredRead returns one allocation freed with CredFree. This is not an app-exclusive same-user security boundary.

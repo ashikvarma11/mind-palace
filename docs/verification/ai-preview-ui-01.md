@@ -1,0 +1,31 @@
+# Offline AI request-preview screen — 2 October 2026
+
+Source baseline 33f9497c93ec1d971a19fbc5e70a669b5453c208. Windows x64, Angular 22.2.1, Ajv 8.20.0, json-schema-to-typescript 16.0.0, existing Tauri 2.12.1/frozen Python worker. No keys, new provider SDK, HTTPS/send command or paid call. Current UI is Workspace, not the pending Library redesign.
+
+## Delivered subset
+
+Non-sample Ask route shows a native-only request-review panel. Explicitly load one session, enter code-point start/end range (end excluded, simple emoji one point; combined emoji can contain several), select provider and enter an unverified model identifier/question. No default full-source selection. Cap is 8000 points/32KB selected text, 2000 question points and fixed 512 output tokens, not a spending cap. Manual notes and other conversations are not included.
+
+Generated types/precompiled validators use a separate UI-only schema merged by the inspected generator; worker schemas/runtime are unchanged. Provider URL/header/body shapes are strict, reject unknown credential fields/custom endpoints/mixed provider bodies/can_send:true. Gateway additionally checks returned model/provider/cap, parsed prompt/question/exact selected text, source ID and offsets against a captured immutable request. It does not validate provider model availability or semantic truth.
+
+Exact credential-free request is rendered through text interpolation, not HTML. Expiry is measured conservatively from before request start; one-second UI clock has component cleanup and performs no native/provider work. Discard required before edits/new preview. Session close invalidates the root in-memory receipt even when the panel is offscreen. Reload does not persist a draft or receipt; unused native receipts expire/cap at eight. Only explicit user actions call preview/discard/cancel. No send/key controls or automatic capture/retry.
+
+Cancellation acknowledgement keeps busy state until original native operation confirms cleanup; then gateway refreshes vault status and clears stale source/list on disconnection. Reopen remains explicit. Sample answers remain separately fictional; browser-only mode cannot preview real memory. Native startup intermittency from ai-requests-01.md remains a limitation, not fixed here.
+
+## Actual checks
+
+`npm run check`: static contract drift + seven Node contract checks, 21 Angular tests and production build pass. Eight new gateway/component tests cover Unicode ranges, bounds, required discard, both provider shapes, endpoint/header/unknown fields and changed source rejection, frozen caller input, safe error redaction, targeted cancellation/cleanup/status reset, inert script-like display/disabled send and no native call in browser mode. Prior 13 interface tests remain included. A final added overlong-Unicode-question assertion is rerun below; checks above preceded that extra assertion.
+
+Native verification and final checks are recorded below after execution. Preferred agent-browser executable is absent; browser skill uses the existing Playwright native WebView verifier instead, with synthetic UUID vault/profile and owned processes only. No real vault or credentials. Worker inventory unchanged at 109 files / 23,673,882 bytes. Installer/live provider/HTTP cancellation/AI quality/macOS remain pending.
+
+Desktop build succeeded. First desktop check again failed before preview assertions: Create local vault remained Working locally at the unchanged 35-second UI limit. This matches the prior milestone's recorded intermittent startup limitation. No deadline/security setting was changed. Further desktop results follow below.
+
+Second unchanged desktop run created/saved the synthetic conversation, but failed waiting for it after explicit vault close/reopen (same 35-second limit, Working locally). It also did not reach the new preview assertions. Source-load review added a separate guard/test: failed loading of a newly selected conversation clears the prior original, so it cannot be mistaken for the new selection. Further unit/build/UI results follow; repeated startup failures are preserved.
+
+Final unit run after overlong-question/source-load guards: **22 passed, no failures**, 21.14 seconds. Rebuilt desktop succeeds with unchanged worker inventory, frontend production output and locked native compile. No Rust/worker/schema behavior changes; their prior tests are not relabelled as rerun. Complete browser sample suite and Python suite were not rerun in this UI-only slice. Third real desktop check follows below.
+
+Third desktop run reached the new Ask heading, but exact Saved conversation label selection timed out. Installed Playwright 1.63.0 injected getElementLabels uses elementText on associated labels; a wrapping label included option text. Corrected both selects to explicit id/for labels outside their options, retaining exact-label verification rather than weakening it. This run did not pass review/discard/cancel UI assertions. Further final rebuild/check follows below.
+
+Final rebuilt checks: **22 Angular tests passed**, 12.52 seconds; desktop build passed. Final `npm run verify:desktop` **passed** the real UI→native→frozen-worker preview: select/load original, explicit 0–8 code-point range, user-entered synthetic model/question, complete exact request display, disabled send, explicit discard and editable fields afterward. Native send/key commands remain denied. Second app lifetime used the actual Create/Cancel UI while a helper held the synthetic vault lock: another UUID could not cancel it, UI cancellation showed cleanup completion, native status was disconnected, and explicit Welcome/reopen restored saved sessions. Existing create/save/read/reopen/reload/native restart/inert source/CSP nonce/idle and busy exit passed with zero console errors. Both exit-owned workers stopped. Native-ai-preview.png visually inspected; readable two-column source/request layout and explicit nothing-sent/send-disabled labels. No private user memory/keys/provider requests.
+
+`git diff --check` and native verifier JavaScript syntax check passed. Existing npm configuration, AJV CommonJS optimization, Node module-type and linker informational warnings remain. Earlier startup/locator failures above are retained; final pass is not a claim that startup reliability or full cloud AI is solved.

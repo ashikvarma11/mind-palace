@@ -1,5 +1,14 @@
 # File ledger — planned before creation
 
+Offline request-preview UI 01:
+- schemas/native-ai-preview.schema.json — strict credential-free request/result/prompt/discard contracts, fixed provider endpoint/body shapes and can_send:false.
+- tools/generate-contracts.mjs and core/contracts.generated.ts/validators.generated.ts — merge inspected preview definitions into generated types/static validators; no runtime evaluation.
+- src/app/core/ai-gateway.ts/spec.ts — native-only preview/discard/cancel, validate exact selected source/question binding, expiry and safe errors; no key/send API or browser persistence.
+- src/app/features/ask/ai-preview-panel.component.ts/html/scss — explicit session/range/question/provider/model selection, inert complete payload review, expiry, discard and cancellation; sending visibly disabled.
+- src/app/features/workspace/workspace-page.component.ts/html — mount real preview panel on non-sample Ask route while preserving fictional sample answers.
+- tools/tests/test-contracts.mjs and tools/verify-native-shell.mjs — malformed preview contracts and real desktop review/discard/cancel/reopen checks using synthetic data.
+- docs/verification/ai-preview-ui-01.md — actual generated-contract/unit/build/native UI results and remaining HTTPS/key gates.
+
 AI request boundary 01 (offline native previews; no HTTPS or key-entry UI):
 - src-tauri/src/ai_requests.rs — single-flight UUID-targeted cancellation with RAII cleanup and bounded deadline, independent of worker IO locks.
 - src-tauri/src/ai_requests_tests.rs — mocked pending/completed/timeout/drop/race tests proving cancellation cannot affect another request.

@@ -1,0 +1,193 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "AiIdentifier": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "AiModel": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$" },
+    "AiCap": { "type": "integer", "minimum": 128, "maximum": 1024 },
+    "AiHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "AiPrompt": {
+      "title": "AiPrompt",
+      "type": "object",
+      "properties": {
+        "question": { "type": "string", "minLength": 1, "maxLength": 2000 },
+        "sources": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 5,
+          "items": {
+            "type": "object",
+            "properties": {
+              "source_id": { "type": "string", "pattern": "^S[1-5]$" },
+              "text": { "type": "string", "minLength": 1, "maxLength": 8000 }
+            },
+            "required": ["source_id", "text"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["question", "sources"],
+      "additionalProperties": false
+    },
+    "AiPreviewRequest": {
+      "title": "AiPreviewRequest",
+      "type": "object",
+      "properties": {
+        "provider": { "enum": ["openai", "anthropic"] },
+        "model": { "$ref": "#/$defs/AiModel" },
+        "question": { "type": "string", "minLength": 1, "maxLength": 2000 },
+        "max_output_tokens": { "$ref": "#/$defs/AiCap" },
+        "selections": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "properties": {
+              "kind": { "const": "session" },
+              "id": { "$ref": "#/$defs/AiIdentifier" },
+              "start": { "type": "integer", "minimum": 0, "maximum": 65535 },
+              "end": { "type": "integer", "minimum": 1, "maximum": 65536 }
+            },
+            "required": ["kind", "id", "start", "end"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["provider", "model", "question", "max_output_tokens", "selections"],
+      "additionalProperties": false
+    },
+    "AiMessage": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "role": { "const": "user" },
+          "content": { "type": "string", "minLength": 1, "maxLength": 262144 }
+        },
+        "required": ["role", "content"],
+        "additionalProperties": false
+      }
+    },
+    "AiProviderRequest": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "provider": { "const": "openai" },
+            "endpoint": { "const": "https://api.openai.com/v1/responses" },
+            "headers": {
+              "type": "object",
+              "properties": { "Content-Type": { "const": "application/json" } },
+              "required": ["Content-Type"],
+              "additionalProperties": false
+            },
+            "body": {
+              "type": "object",
+              "properties": {
+                "model": { "$ref": "#/$defs/AiModel" },
+                "instructions": { "type": "string", "minLength": 1, "maxLength": 2000 },
+                "input": { "$ref": "#/$defs/AiMessage" },
+                "max_output_tokens": { "$ref": "#/$defs/AiCap" },
+                "store": { "const": false },
+                "stream": { "const": false }
+              },
+              "required": [
+                "model",
+                "instructions",
+                "input",
+                "max_output_tokens",
+                "store",
+                "stream"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": ["provider", "endpoint", "headers", "body"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "provider": { "const": "anthropic" },
+            "endpoint": { "const": "https://api.anthropic.com/v1/messages" },
+            "headers": {
+              "type": "object",
+              "properties": {
+                "Content-Type": { "const": "application/json" },
+                "anthropic-version": { "const": "2023-06-01" }
+              },
+              "required": ["Content-Type", "anthropic-version"],
+              "additionalProperties": false
+            },
+            "body": {
+              "type": "object",
+              "properties": {
+                "model": { "$ref": "#/$defs/AiModel" },
+                "system": { "type": "string", "minLength": 1, "maxLength": 2000 },
+                "messages": { "$ref": "#/$defs/AiMessage" },
+                "max_tokens": { "$ref": "#/$defs/AiCap" },
+                "stream": { "const": false }
+              },
+              "required": ["model", "system", "messages", "max_tokens", "stream"],
+              "additionalProperties": false
+            }
+          },
+          "required": ["provider", "endpoint", "headers", "body"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "AiPreviewResult": {
+      "title": "AiPreviewResult",
+      "type": "object",
+      "properties": {
+        "preview_id": { "$ref": "#/$defs/AiIdentifier" },
+        "payload_sha256": { "$ref": "#/$defs/AiHash" },
+        "expires_in_seconds": { "const": 300 },
+        "can_send": { "const": false },
+        "sharing_warning": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "request": { "$ref": "#/$defs/AiProviderRequest" },
+        "local_references": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "properties": {
+              "kind": { "const": "session" },
+              "id": { "$ref": "#/$defs/AiIdentifier" },
+              "start": { "type": "integer", "minimum": 0, "maximum": 65535 },
+              "end": { "type": "integer", "minimum": 1, "maximum": 65536 },
+              "source_id": { "const": "S1" },
+              "snapshot_sha256": { "$ref": "#/$defs/AiHash" }
+            },
+            "required": ["kind", "id", "start", "end", "source_id", "snapshot_sha256"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "preview_id",
+        "payload_sha256",
+        "expires_in_seconds",
+        "can_send",
+        "sharing_warning",
+        "request",
+        "local_references"
+      ],
+      "additionalProperties": false
+    },
+    "AiDiscardResult": {
+      "title": "AiDiscardResult",
+      "type": "object",
+      "properties": { "discarded": { "const": true } },
+      "required": ["discarded"],
+      "additionalProperties": false
+    }
+  }
+}

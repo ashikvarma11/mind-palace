@@ -1,0 +1,65 @@
+:host {
+  display: block;
+}
+.preview-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+  margin-top: 24px;
+}
+label,
+fieldset {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+label {
+  margin: 12px 0;
+  font-size: 12px;
+}
+fieldset {
+  border: 0;
+  padding: 0;
+  margin: 18px 0 0;
+}
+legend {
+  font-size: 14px;
+  font-weight: 600;
+}
+.range-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+input,
+select,
+textarea {
+  width: 100%;
+  box-sizing: border-box;
+}
+input[type='number'] {
+  background: var(--background);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 11px 13px;
+}
+pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font: inherit;
+  font-size: 12px;
+  max-height: 480px;
+  overflow: auto;
+  padding: 16px;
+  border-radius: 8px;
+  background: var(--soft);
+}
+.spaced {
+  margin-top: 20px;
+}
+@media (max-width: 900px) {
+  .preview-columns {
+    grid-template-columns: 1fr;
+  }
+}

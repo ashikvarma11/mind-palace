@@ -189,6 +189,23 @@ try {
     );
   });
   expect(rejected).toEqual([true, true, true, true]);
+  await page.getByRole('navigation').getByRole('link', { name: 'Ask memory', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Choose what an AI would see.' })).toBeVisible();
+  await page.getByLabel('Saved conversation', { exact: true }).selectOption({ label: 'Synthetic desktop conversation' });
+  await page.getByRole('button', { name: 'Load original conversation', exact: true }).click();
+  await expect(page.getByLabel('Original source for preview')).toContainText('Original Tamil');
+  await page.getByLabel('Start character', { exact: true }).fill('0');
+  await page.getByLabel('End character', { exact: true }).fill('8');
+  await page.getByLabel('Model identifier', { exact: true }).fill('synthetic-model');
+  await page.getByLabel('Your question', { exact: true }).fill('What is recorded here?');
+  await page.getByRole('button', { name: 'Create local request preview', exact: true }).click();
+  await expect(page.getByLabel('Exact provider request')).toContainText('What is recorded here?');
+  await expect(page.getByRole('button', { name: 'Send to AI · not available yet', exact: true })).toBeDisabled();
+  await page.screenshot({ path: path.join(out, 'native-ai-preview.png'), fullPage: true });
+  await page.getByRole('button', { name: 'Discard preview and edit', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'No request preview yet' })).toBeVisible();
+  await expect(page.getByLabel('Your question', { exact: true })).toBeEnabled();
+  await page.getByRole('navigation').getByRole('link', { name: 'Sessions', exact: true }).click();
   const previewCheck = await page.evaluate(async () => {
     const invoke = window.__TAURI_INTERNALS__.invoke;
     const sessions = await invoke('sessions_list', { limit: 50, offset: 0 });
@@ -222,11 +239,13 @@ try {
     'Original Tamil தமிழ்',
   );
 
-  // Hold only the synthetic vault lock to prove exit during an active request.
-  const cancelSource = await app.page.evaluate(async () => {
-    const listed = await window.__TAURI_INTERNALS__.invoke('sessions_list', { limit: 50, offset: 0 });
-    return listed.items[0].id;
-  });
+  // Select the source through the real UI before holding the synthetic lock.
+  await app.page.getByRole('navigation').getByRole('link', { name: 'Ask memory', exact: true }).click();
+  await app.page.getByRole('button', { name: 'Load original conversation', exact: true }).click();
+  await expect(app.page.getByLabel('Original source for preview')).toContainText('Original Tamil');
+  await app.page.getByLabel('End character', { exact: true }).fill('8');
+  await app.page.getByLabel('Model identifier', { exact: true }).fill('synthetic-model');
+  await app.page.getByLabel('Your question', { exact: true }).fill('Cancellation test');
   const lockPath = path.join(out, `vault-${id}`, 'vault/.memory/locks/write.lock');
   lock = spawn(
     path.join(root, '.tools/probe-venv/Scripts/python.exe'),
@@ -243,32 +262,26 @@ try {
       throw new Error('Synthetic lock setup timed out');
     }),
   ]);
-  const cancelCheck = await app.page.evaluate(async (source) => {
+  await app.page.getByRole('button', { name: 'Create local request preview', exact: true }).click();
+  await expect(app.page.getByRole('button', { name: 'Cancel preview request', exact: true })).toBeVisible();
+  const targeting = await app.page.evaluate(async () => {
     const invoke = window.__TAURI_INTERNALS__.invoke;
-    // Read the saved source ID before taking the test's vault lock.
-    const requestId = crypto.randomUUID();
-    const pending = invoke('ai_preview', { requestId, input: {
-      provider: 'anthropic', model: 'synthetic-model', question: 'What is recorded?',
-      max_output_tokens: 128, selections: [{ kind: 'session', id: source, start: 0, end: 1 }],
-    } }).then(() => 'unexpected_success', error => error.code);
-    // Native commands dispatch asynchronously; wait until it owns the IO lock.
     let busy = false;
-    for (let attempt = 0; attempt < 100 && !busy; attempt++) {
-      try { await invoke('vault_status'); } catch (error) { busy = error.code === 'BUSY'; }
-      if (!busy) await new Promise(resolve => setTimeout(resolve, 5));
-    }
+    try { await invoke('vault_status'); } catch (error) { busy = error.code === 'BUSY'; }
     const wrong = await invoke('ai_cancel', { requestId: crypto.randomUUID() });
-    const accepted = await invoke('ai_cancel', { requestId });
-    const result = await pending;
-    const status = await invoke('vault_status');
-    return { busy, wrong, accepted, result, connected: status.connected };
-  }, cancelSource);
-  expect(cancelCheck).toEqual({ busy: true, wrong: false, accepted: true, result: 'AI_CANCELLED', connected: false });
+    return { busy, wrong };
+  });
+  expect(targeting).toEqual({ busy: true, wrong: false });
+  await app.page.getByRole('button', { name: 'Cancel preview request', exact: true }).click();
+  await expect(app.page.getByRole('alert')).toContainText('Preview cancelled. Reopen the local vault to continue.');
+  const cancelledStatus = await app.page.evaluate(() => window.__TAURI_INTERNALS__.invoke('vault_status'));
+  expect(cancelledStatus.connected).toBe(false);
+  const cancelCheck = { ...targeting, connected: cancelledStatus.connected, ui_cleanup_message: true };
   lock.stdin.end();
   await new Promise(resolve => lock.once('exit', resolve));
   lock = null;
-  // Refresh the UI's connection state after the native cancellation probe.
-  await app.page.getByRole('button', { name: 'Close local vault', exact: true }).click();
+  // The gateway refreshes connection state only after confirmed cleanup.
+  await app.page.getByRole('navigation').getByRole('link', { name: 'Welcome', exact: true }).click();
   await app.page.getByRole('button', { name: 'Open existing vault', exact: true }).click();
   await expect(app.page.getByRole('button', { name: 'Synthetic desktop conversation', exact: true })).toBeEnabled({ timeout: 35000 });
   lock = spawn(path.join(root, '.tools/probe-venv/Scripts/python.exe'), [
@@ -310,6 +323,7 @@ try {
       isolated_vault: id,
       offline_ai_preview: previewCheck,
       targeted_ai_cancellation: cancelCheck,
+      ai_preview_ui_review_discard: true,
     }),
   );
 } finally {

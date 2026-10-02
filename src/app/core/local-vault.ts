@@ -86,6 +86,10 @@ export class LocalVault {
       const status = await this.checked<VaultStatus>('vault_status', {}, validateVaultStatus);
       this.connected.set(status.connected);
       if (status.connected) await this.loadList(0);
+      else {
+        this.list.set({ items: [], total: 0, next_offset: null });
+        this.selected.set(null);
+      }
     });
   }
   async open(create: boolean): Promise<void> {

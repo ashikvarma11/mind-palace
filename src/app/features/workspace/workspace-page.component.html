@@ -158,6 +158,8 @@
     </p>
   </div>
   <app-vault-panel />
+} @else if (page() === 'ask' && !store.sampleActive()) {
+  <app-ai-preview-panel />
 } @else if (!store.sampleActive()) {
   <div class="page-heading">
     <span class="eyebrow">Personal memory</span>

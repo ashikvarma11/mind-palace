@@ -4,6 +4,8 @@
 
 ## Implementation sequence
 
+Preview UI update: non-sample Ask can now explicitly load one original session, choose Unicode code-point offsets/question/provider/unverified model, review the exact credential-free request and discard/cancel it. Generated static validation binds the response to selected input; no send/key command or browser persistence. Defaults do not select the whole conversation. Real desktop preview/discard/cancel/reopen checks pass; startup reliability remains a recorded limitation. Native HTTPS/consent-owned authenticated transport is next, using mocks/fake keys before enabling key entry. Nothing is shared by this screen.
+
 AI request boundary subset: native offline preview/discard commands and UUID-targeted cancellation are being connected to the frozen worker. No send/prepare/key command is exposed. A cancelled or dropped JSONL operation makes the connection unusable; explicit cancellation confirms worker shutdown and requires reopening the vault. Request IDs are single-use per app lifetime (bounded at 4096). This is not HTTP cancellation or the full provider gate. Next: strict frontend preview contracts/UI, then native consent-owned HTTPS and mock-provider tests.
 
 Native credential foundation update: internal Windows backend supports owned provider targets, explicit replacement, validated read/status/remove and redacted zeroizing secrets, tested only with fresh UUID-scoped fake keys. No Tauri credential commands, real-key input or provider calls are enabled. This is internal work before item 1's full request-cancellation gate, not authority to accept real credentials early. Non-Windows fails closed, with no plaintext fallback.
