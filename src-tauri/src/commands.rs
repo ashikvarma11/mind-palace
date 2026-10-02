@@ -11,6 +11,7 @@ struct Supervisor { exiting: bool, child: Option<Arc<Mutex<Child>>> }
 pub(crate) struct VaultState {
     worker: tokio::sync::Mutex<Option<Worker>>,
     supervisor: Mutex<Supervisor>,
+    ai: crate::ai_requests::Requests,
 }
 #[derive(Serialize)]
 pub(crate) struct Status { connected: bool, ai_enabled: bool }
@@ -33,6 +34,16 @@ impl VaultState {
         let mut worker = self.worker.try_lock().map_err(|_| busy())?;
         let result = worker.as_mut().ok_or_else(unavailable)?.request(method, params).await;
         if result.as_ref().is_err_and(|e| e.code == "WORKER_DISCONNECTED") { *worker = None; }
+        result
+    }
+    async fn ai_call(&self, id: &str, method: &str, params: Value) -> Result<Value, Error> {
+        let mut control = self.ai.begin(id)?;
+        let mut worker = self.worker.try_lock().map_err(|_| busy())?;
+        let result = worker.as_mut().ok_or_else(unavailable)?
+            .request_cancellable(method, params, &mut control).await;
+        if result.as_ref().is_err_and(|e| matches!(e.code, "AI_CANCELLED" | "AI_TIMEOUT" | "WORKER_DISCONNECTED")) {
+            *worker = None;
+        }
         result
     }
 }
@@ -105,6 +116,46 @@ pub(crate) async fn sessions_read(state: tauri::State<'_, VaultState>, id: Strin
     state.call("sessions.read", json!({"id":id})).await
 }
 
+#[derive(Deserialize, Serialize)]
+#[serde(rename_all = "snake_case")]
+enum SelectionKind { Session, Decision }
+#[derive(Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+struct Selection { kind: SelectionKind, id: String, start: u32, end: u32 }
+#[derive(Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub(crate) struct Preview {
+    provider: crate::credentials::Provider, model: String, question: String,
+    max_output_tokens: u32, selections: Vec<Selection>,
+}
+impl Preview {
+    fn valid(&self) -> bool {
+        (1..=100).contains(&self.model.len())
+            && self.model.as_bytes()[0].is_ascii_alphanumeric()
+            && self.model.bytes().all(|b| b.is_ascii_alphanumeric() || b"._:-".contains(&b))
+            && (1..=2000).contains(&self.question.chars().count())
+            && (128..=1024).contains(&self.max_output_tokens)
+            && (1..=5).contains(&self.selections.len())
+            && self.selections.iter().all(|s| identifier(&s.id) && s.end > s.start && s.end - s.start <= 8000)
+    }
+}
+#[tauri::command]
+pub(crate) async fn ai_preview(state: tauri::State<'_, VaultState>, request_id: String, input: Preview) -> Result<Value, Error> {
+    if !input.valid() { return Err(invalid()); }
+    // This generates a local preview only. No credentials or provider calls.
+    state.ai_call(&request_id, "cloud.preview", serde_json::to_value(input).map_err(|_| invalid())?).await
+}
+#[tauri::command]
+pub(crate) async fn ai_discard(state: tauri::State<'_, VaultState>, request_id: String, preview_id: String) -> Result<Value, Error> {
+    if !identifier(&preview_id) { return Err(invalid()); }
+    state.ai_call(&request_id, "cloud.discard", json!({"preview_id":preview_id})).await
+}
+#[tauri::command]
+pub(crate) fn ai_cancel(state: tauri::State<'_, VaultState>, request_id: String) -> Result<bool, Error> {
+    if !identifier(&request_id) { return Err(invalid()); }
+    state.ai.cancel(&request_id)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -122,5 +173,23 @@ mod tests {
         assert!(state.worker.try_lock().is_err());
         state.shutdown();
         assert!(state.supervisor.lock().unwrap().exiting);
+    }
+    #[test]
+    fn preview_request_has_no_key_endpoint_or_unbounded_text_fields() {
+        let good = json!({"provider":"openai","model":"synthetic-model","question":"Why?",
+            "max_output_tokens":128,"selections":[{"kind":"session","id":uuid::Uuid::new_v4().to_string(),"start":0,"end":10}]});
+        assert!(serde_json::from_value::<Preview>(good.clone()).unwrap().valid());
+        for field in ["api_key", "endpoint", "body", "accept_sharing_and_api_charges"] {
+            let mut bad = good.clone(); bad[field] = json!("not allowed");
+            assert!(serde_json::from_value::<Preview>(bad).is_err());
+        }
+        let mut bad = good.clone(); bad["provider"] = json!("unknown");
+        assert!(serde_json::from_value::<Preview>(bad).is_err());
+        for model in ["", "https://other", "model\nsecret"] {
+            let mut bad = good.clone(); bad["model"] = json!(model);
+            assert!(!serde_json::from_value::<Preview>(bad).unwrap().valid());
+        }
+        let mut bad = good; bad["selections"][0]["end"] = json!(8001);
+        assert!(!serde_json::from_value::<Preview>(bad).unwrap().valid());
     }
 }

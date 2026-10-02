@@ -248,8 +248,25 @@ impl Worker {
         self.request_with_deadline(method, params, Duration::from_secs(30)).await
     }
 
+    pub(crate) async fn request_cancellable(&mut self, method: &str, params: Value,
+        control: &mut crate::ai_requests::Request<'_>) -> Result<Value, Error> {
+        if !matches!(method, "cloud.preview" | "cloud.prepare" | "cloud.discard") {
+            return Err(Error { code: "VALIDATION_ERROR", message: "Only offline AI requests can be cancelled here.", retryable: false });
+        }
+        match control.run(self.request(method, params), Duration::from_secs(30)).await {
+            Ok(result) => result,
+            Err(error) => {
+                // Dropping a partially written/read JSONL operation is not safe
+                // to resume. Confirm shutdown before exposing cancellation.
+                self.stop().await?;
+                Err(error)
+            }
+        }
+    }
+
     async fn request_with_deadline(&mut self, method: &str, params: Value, deadline: Duration) -> Result<Value, Error> {
-        if !matches!(method, "health" | "sessions.create" | "sessions.read" | "sessions.list") {
+        if !matches!(method, "health" | "sessions.create" | "sessions.read" | "sessions.list"
+            | "cloud.preview" | "cloud.prepare" | "cloud.discard") {
             return Err(Error { code: "VALIDATION_ERROR", message: "This worker operation is not available.", retryable: false });
         }
         if !self.usable {
@@ -260,6 +277,9 @@ impl Worker {
             .map_err(|_| Error::transport())?;
         request.push(b'\n');
         if request.len() > FRAME_LIMIT { return Err(Error { code: "LIMIT_EXCEEDED", message: "The request is too large.", retryable: false }); }
+        // If the owning future is dropped mid-frame, retained state must be
+        // unusable rather than feeding its late response to a later request.
+        self.usable = false;
         let result = timeout(deadline, async {
             let input = self.input.as_mut().ok_or_else(Error::transport)?;
             input.write_all(&request).await.map_err(|_| Error::transport())?;
@@ -269,6 +289,8 @@ impl Worker {
         }).await.unwrap_or_else(|_| Err(Error::transport()));
         if result.as_ref().is_err_and(|error| error.code == "WORKER_DISCONNECTED") {
             self.stop().await?;
+        } else {
+            self.usable = true;
         }
         result
     }

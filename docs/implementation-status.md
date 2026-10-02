@@ -1,5 +1,7 @@
 # Implementation status
 
+Latest AI request subset: native offline preview/discard and UUID-targeted cancellation work through the real desktop command boundary. All 17 native tests pass serially; build and final isolated WebView preview/cancel/reopen/storage/restart/exit check pass. Concurrent-suite and initial WebView startup timeouts are preserved as known reliability limitations. No send/key command, HTTPS call or AI answer UI. Next: generated preview contracts and actual review/cancel screen, then native consent-owned HTTPS using fake keys/mocks. See verification/ai-requests-01.md.
+
 Latest credential subset: internal Windows backend implemented; four credential checks pass within the twelve-test native suite. Fake UUID-scoped OS entries are saved/read/replaced/removed; malformed entries are preserved. No production targets, real keys, credential commands or provider calls used. Next is verified per-request cancellation before key-entry/consented HTTPS. See verification/native-credentials-01.md; full cloud AI remains unavailable.
 
 Updated: 2 October 2026.
@@ -19,7 +21,7 @@ Updated: 2 October 2026.
 | 03–26 | mixed / full gates pending | Several native/storage/UI subsets exist; the full numbered exit gates and later features remain incomplete. |
 | Local desktop vault | verified development subset | Real UI→Rust→frozen Python create/save/list/read/close/reopen, WebView reload and native restart pass with isolated synthetic storage. Eight Rust, thirteen Angular, six contract checks pass; idle/busy-request exit stops owned workers. See native-vault-01.md; no AI/installer/full-vault gate claim. |
 
-Next: safe OS-backed credentials and opt-in provider integration under cloud-ai-plan.md, starting with fake credentials/mocked responses; no paid live calls. Real storage now works on desktop Welcome/Sessions. Other real-memory pages, folder dialogs, durable retry drafts across app restart, full cancellable jobs, decision-review UI and Library redesign remain pending. Earlier subset rows describe historical scope; native-vault-01.md supersedes their disconnected-interface status. Full Step 02/03/04/05 gates remain unpassed; Graphify/MCP remain diagnostics and local model selection is pending.
+Next: frontend exact request-preview contracts/review/cancel screen and opt-in native provider integration under cloud-ai-plan.md, with fake credentials/mocked responses; no paid live calls. Internal OS credentials and offline request cancellation now have verified subsets, not enabled cloud inference. Real storage works on desktop Welcome/Sessions. Other real-memory pages, folder dialogs, durable retry drafts across app restart, full cancellable jobs, decision-review UI and Library redesign remain pending. Earlier subset rows describe historical scope; latest verification documents supersede their disconnected-interface status. Full Step 02/03/04/05 gates remain unpassed; Graphify/MCP remain diagnostics and local model selection is pending.
 
 Browser preview: `http://127.0.0.1:4200/welcome`. Sample changes are in-memory, not persistent user memory. Appearance works in the browser session. Artwork is present locally but excluded from public Git history pending redistribution provenance.
 

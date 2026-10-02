@@ -90,7 +90,25 @@ fn actual_frozen_worker_persists_reopens_and_stops() {
         let mut worker = Worker::start(&bundle, &vault, true).await.unwrap();
         assert!(worker.child.as_ref().unwrap().lock().unwrap().id().is_some());
         let receipt = worker.request("sessions.create", json!({"op_id":uuid::Uuid::new_v4().to_string(),"title":"Synthetic Rust test","body":"Summary","source_text":"Original\r\nதமிழ்"})).await.unwrap();
-        assert!(worker.request("cloud.preview", json!({})).await.is_err());
+        assert_eq!(worker.request("cloud.preview", json!({})).await.unwrap_err().code, "VALIDATION_ERROR");
+        let controls = crate::ai_requests::Requests::default();
+        let mut control = controls.begin(&uuid::Uuid::new_v4().to_string()).unwrap();
+        let preview = worker.request_cancellable("cloud.preview", json!({"provider":"openai",
+            "model":"synthetic-model","question":"What is recorded?","max_output_tokens":128,
+            "selections":[{"kind":"session","id":receipt["id"],"start":0,"end":8}]}), &mut control).await.unwrap();
+        assert_eq!(preview["can_send"], false);
+        assert_eq!(preview["request"]["endpoint"], "https://api.openai.com/v1/responses");
+        assert_eq!(preview["request"]["body"]["store"], false);
+        let prepare = json!({"preview_id":preview["preview_id"],"payload_sha256":preview["payload_sha256"],
+            "accept_sharing_and_api_charges":false});
+        assert_eq!(worker.request("cloud.prepare", prepare.clone()).await.unwrap_err().code, "VALIDATION_ERROR");
+        let mut prepare = prepare; prepare["accept_sharing_and_api_charges"] = json!(true);
+        let prepared = worker.request("cloud.prepare", prepare.clone()).await.unwrap();
+        assert_eq!(prepared["can_send"], false);
+        assert_eq!(prepared["request"], preview["request"]);
+        assert_eq!(worker.request("cloud.prepare", prepare).await.unwrap_err().code, "CONFLICT");
+        assert!(worker.request("cloud.send", json!({})).await.is_err());
+        drop(control);
         worker.stop().await.unwrap();
         assert!(worker.child.is_none() && worker.input.is_none() && worker.output.is_none());
         assert!(worker.request("health", json!({})).await.is_err());
@@ -99,9 +117,21 @@ fn actual_frozen_worker_persists_reopens_and_stops() {
         assert_eq!(listed["items"][0]["id"], receipt["id"]);
         let read = reopened.request("sessions.read", json!({"id":receipt["id"]})).await.unwrap();
         assert_eq!(read["source_text"], "Original\r\nதமிழ்");
-        reopened.stop().await.unwrap();
+        // Use this already-reopened worker for cancellation, rather than
+        // starting a redundant third worker just for the new assertion.
+        let child = reopened.child.as_ref().unwrap().clone();
+        let request_id = uuid::Uuid::new_v4().to_string();
+        let mut cancel = controls.begin(&request_id).unwrap();
+        controls.cancel(&request_id).unwrap();
+        let cancelled = reopened.request_cancellable("cloud.discard",
+            json!({"preview_id":preview["preview_id"]}), &mut cancel).await.unwrap_err();
+        assert_eq!(cancelled.code, "AI_CANCELLED");
+        assert!(child.lock().unwrap().try_wait().unwrap().is_some());
+        assert!(!reopened.is_usable());
         assert!(reopened.child.is_none() && reopened.input.is_none() && reopened.output.is_none());
         assert!(reopened.request("health", json!({})).await.is_err());
+        reopened.stop().await.unwrap();
+        drop(cancel);
         // A separately held owned-child control can cancel startup before the
         // health await completes; it does not need the IO/request mutex.
         let mut control = None;

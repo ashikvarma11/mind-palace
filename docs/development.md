@@ -1,5 +1,11 @@
 # Development
 
+## Test the already-built local app (no installer)
+
+On this prepared machine, open `D:/Projects/mind-palace/src-tauri/target/debug/mind-palace.exe` in File Explorer. Keep it at this location: debug builds resolve the verified worker from this project, not a self-contained portable package. Choose Create local vault once or Open existing vault, save synthetic conversation text, inspect Sessions, close/reopen and verify persistence. No Node/Python/compiler command is needed just to launch the existing executable. WebView2 is already installed on this tested machine; other-machine installation is unverified. Native request previews are an offline command boundary, not an AI answer screen or enabled cloud service. No API key/payment is needed for local storage tests.
+
+Lower sections preserve earlier development/probe history. The current local vault flow supersedes their old disconnected-storage statements; see implementation-status.md for current capability.
+
 ## Local vault development flow
 
 Use `npm run build:desktop`, then `npm run open:desktop`. On Welcome/Sessions, choose Create local vault once or Open existing vault afterward. Storage is under the device's local app-data/dev.mindpalace.local/vault directory; closing preserves it. The browser sample never writes personal memory. No AI/cloud/key integration is enabled yet.

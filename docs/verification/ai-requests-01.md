@@ -1,0 +1,29 @@
+# Native offline AI requests — 2 October 2026
+
+Development subset only. No HTTP client, send command, API-key screen, credential lookup or paid inference. Current UI still shows AI off. Source baseline 8074f2886eb9380443bb68f652f787a590584efe; Windows x64, project-local Rust 1.99.0/Tokio 1.53.1, existing frozen worker inventory unchanged (109 files, 23,673,882 bytes).
+
+## Implemented
+
+- Typed native preview inputs: only OpenAI/Anthropic, bounded ASCII model identifier, 1–2000-character question, 128–1024 output-token cap, 1–5 explicit local source ranges of at most 8000 Unicode code points. Unknown credential/endpoint/body fields rejected. Worker independently validates selections, aggregate byte bounds, duplicates and source snapshots.
+- Only ai_preview, ai_discard and ai_cancel added to the native command/permission list. Offline cloud.prepare is internal worker-test functionality; no prepare/send WebView command. Existing Python receipts expire after 300 seconds, cap eight pending previews, bind exact payload/source hashes and consume once only. Preparation still returns can_send:false.
+- Independent watch-based UUID-targeted cancellation, cancellation-first polling, single-flight until cleanup, dropped-future RAII control release, no automatic retry/detached jobs. Request IDs cannot be reused during an app lifetime; bounded at 4096, then restart required.
+- Cancelled/timed-out offline request confirms owned-worker shutdown, releases pipes and requires explicit vault reopen. Dropping a mid-frame future marks retained Worker unusable; explicit close or app exit owns cleanup. Cancellation acknowledgement means the signal was accepted, not that cleanup already completed; the original request completes after shutdown confirmation.
+- Cancel does not affect a different UUID or concurrent session write. No generic worker execution, arbitrary paths, credential reads or network access from the WebView.
+
+## Actual verification
+
+Initial native suite: 15 passed / 1 failed of 16; new control/boundary/offline receipt flow passed, but the pre-existing synchronous launch control did not receive health within its unchanged 30-second limit. Full rerun after bounded-ID test: 16 passed / 1 failed of 17; synchronous control passed, but a redundant third worker startup in the persistence test hit WORKER_DISCONNECTED. The new cancellation assertions now use the already-reopened worker, retaining save/read/reopen and handle-release checks without an unnecessary extra launch. No timeout raised, security exception added, or failure erased. Final checks are recorded below when run.
+
+After reducing redundant launches, the default concurrent suite again passed 16/17 but synchronous control timed out (52.68 seconds total). The unchanged control test then passed alone in 2.36 seconds. Full suite with `-- --test-threads=1`: **17 passed, 0 failed, no skips**, 9.97 seconds. All tests and deadlines retained; sequential scheduling avoids concurrent OS credential/framing/process probes on this machine. This establishes a passing serialized regression, not the cause or resolution of the default concurrent startup failure. Default npm test script is unchanged; reliability investigation remains pending.
+
+Preferred agent-browser executable is absent. The browser skill prompted real native WebView regression using the existing Playwright fallback with a UUID-isolated synthetic vault/profile and only owned processes. Updated verifier exercises offline preview/discard, forbidden send/key commands, cancellation during actual locked-vault IO, explicit reopen and prior storage/CSP/restart/exit checks. No real user vault or credentials.
+
+Desktop build succeeded, including Angular production output and locked native compilation. Initial real-WebView check failed before reaching AI assertions: Create local vault was still displaying Working locally at the unchanged 35-second UI deadline. Preserve this startup failure separately from the passing serialized native tests; no UI/worker deadline was increased. A further unchanged desktop check is recorded below.
+
+Final unchanged `npm run verify:desktop` **passed**: actual native preview/discard with can_send:false and fixed endpoint, ai_send/read_api_key denied, original text inert, CSP nonce/styles intact, zero console errors. While a separate helper held only the synthetic vault lock, an AI preview held the native IO mutex; cancellation with a different UUID returned false, matching UUID true, original request completed AI_CANCELLED, and vault status became disconnected. Explicit close/reopen restored saved sessions. Prior native create/save/read/reopen/reload/restart and idle/busy exit checks passed; both exit-owned workers stopped. Screenshot native-vault.png visually inspected; source/list/forms and approved logo remain intact. No preview UI is present yet.
+
+`git diff --check` passed. Frontend/schema/Python source unchanged; Angular unit/browser suites and complete Python suite were not rerun in this native-only slice. Angular production build was rerun. Existing npm precommit/config, AJV CommonJS optimization and linker informational warnings remain. Serial native test pass and desktop rerun do not erase intermittent startup failures above.
+
+## Remaining gates
+
+Frontend preview schema/types/validator/gateway and actual preview/cancel screen remain pending. Native HTTPS, authenticated fixed endpoint, consent-owned send, bounded response/citation verification and mocked HTTP cancellation still pending; do not accept real keys or infer full AI availability. Actual provider billing may continue after HTTP cancellation. No macOS/installer/live-provider/AI-quality claim. Intermittent frozen-worker startup reliability remains a recorded development limitation, not solved by a successful rerun.

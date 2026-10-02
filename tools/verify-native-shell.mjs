@@ -189,6 +189,21 @@ try {
     );
   });
   expect(rejected).toEqual([true, true, true, true]);
+  const previewCheck = await page.evaluate(async () => {
+    const invoke = window.__TAURI_INTERNALS__.invoke;
+    const sessions = await invoke('sessions_list', { limit: 50, offset: 0 });
+    const source = sessions.items[0].id;
+    const preview = await invoke('ai_preview', { requestId: crypto.randomUUID(), input: {
+      provider: 'openai', model: 'synthetic-model', question: 'What did I record?',
+      max_output_tokens: 128, selections: [{ kind: 'session', id: source, start: 0, end: 8 }],
+    } });
+    const discarded = await invoke('ai_discard', { requestId: crypto.randomUUID(), previewId: preview.preview_id });
+    let sendDenied = false;
+    try { await invoke('ai_send', {}); } catch { sendDenied = true; }
+    return { noSend: preview.can_send === false, endpoint: preview.request.endpoint,
+      discarded: discarded.discarded, sendDenied };
+  });
+  expect(previewCheck).toEqual({ noSend: true, endpoint: 'https://api.openai.com/v1/responses', discarded: true, sendDenied: true });
   await page.screenshot({ path: path.join(out, 'native-vault.png'), fullPage: true });
   expect(errors).toEqual([]);
   const idleWorkers = await close(app);
@@ -208,6 +223,10 @@ try {
   );
 
   // Hold only the synthetic vault lock to prove exit during an active request.
+  const cancelSource = await app.page.evaluate(async () => {
+    const listed = await window.__TAURI_INTERNALS__.invoke('sessions_list', { limit: 50, offset: 0 });
+    return listed.items[0].id;
+  });
   const lockPath = path.join(out, `vault-${id}`, 'vault/.memory/locks/write.lock');
   lock = spawn(
     path.join(root, '.tools/probe-venv/Scripts/python.exe'),
@@ -223,6 +242,41 @@ try {
     delay(5000).then(() => {
       throw new Error('Synthetic lock setup timed out');
     }),
+  ]);
+  const cancelCheck = await app.page.evaluate(async (source) => {
+    const invoke = window.__TAURI_INTERNALS__.invoke;
+    // Read the saved source ID before taking the test's vault lock.
+    const requestId = crypto.randomUUID();
+    const pending = invoke('ai_preview', { requestId, input: {
+      provider: 'anthropic', model: 'synthetic-model', question: 'What is recorded?',
+      max_output_tokens: 128, selections: [{ kind: 'session', id: source, start: 0, end: 1 }],
+    } }).then(() => 'unexpected_success', error => error.code);
+    // Native commands dispatch asynchronously; wait until it owns the IO lock.
+    let busy = false;
+    for (let attempt = 0; attempt < 100 && !busy; attempt++) {
+      try { await invoke('vault_status'); } catch (error) { busy = error.code === 'BUSY'; }
+      if (!busy) await new Promise(resolve => setTimeout(resolve, 5));
+    }
+    const wrong = await invoke('ai_cancel', { requestId: crypto.randomUUID() });
+    const accepted = await invoke('ai_cancel', { requestId });
+    const result = await pending;
+    const status = await invoke('vault_status');
+    return { busy, wrong, accepted, result, connected: status.connected };
+  }, cancelSource);
+  expect(cancelCheck).toEqual({ busy: true, wrong: false, accepted: true, result: 'AI_CANCELLED', connected: false });
+  lock.stdin.end();
+  await new Promise(resolve => lock.once('exit', resolve));
+  lock = null;
+  // Refresh the UI's connection state after the native cancellation probe.
+  await app.page.getByRole('button', { name: 'Close local vault', exact: true }).click();
+  await app.page.getByRole('button', { name: 'Open existing vault', exact: true }).click();
+  await expect(app.page.getByRole('button', { name: 'Synthetic desktop conversation', exact: true })).toBeEnabled({ timeout: 35000 });
+  lock = spawn(path.join(root, '.tools/probe-venv/Scripts/python.exe'), [
+    '-c', 'import portalocker,sys; f=open(sys.argv[1],"a"); portalocker.lock(f,portalocker.LOCK_EX); print("ready",flush=True); sys.stdin.read()', lockPath,
+  ], { windowsHide: true, stdio: ['pipe', 'pipe', 'ignore'] });
+  await Promise.race([
+    new Promise(resolve => lock.stdout.once('data', resolve)),
+    delay(5000).then(() => { throw new Error('Synthetic lock setup timed out'); }),
   ]);
   await app.page.evaluate(() => {
     window.pendingVaultRequest = window.__TAURI_INTERNALS__
@@ -254,6 +308,8 @@ try {
       owned_workers_stopped: idleWorkers + activeWorkers,
       screenshot: path.join(out, 'native-vault.png'),
       isolated_vault: id,
+      offline_ai_preview: previewCheck,
+      targeted_ai_cancellation: cancelCheck,
     }),
   );
 } finally {

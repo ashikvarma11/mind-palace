@@ -1,5 +1,13 @@
 # File ledger — planned before creation
 
+AI request boundary 01 (offline native previews; no HTTPS or key-entry UI):
+- src-tauri/src/ai_requests.rs — single-flight UUID-targeted cancellation with RAII cleanup and bounded deadline, independent of worker IO locks.
+- src-tauri/src/ai_requests_tests.rs — mocked pending/completed/timeout/drop/race tests proving cancellation cannot affect another request.
+- src-tauri/src/commands.rs — strict typed local excerpt preview/discard commands and targeted cancellation; cancellation closes the worker connection, never retries.
+- src-tauri/src/worker.rs/worker_tests.rs — allow only offline preview/prepare/discard methods and cancel-safe framing; exercise frozen-worker receipts, consent/replay and cancellation.
+- src-tauri/src/lib.rs/build.rs/capabilities/default.json — enumerate only offline AI preview/discard/cancel permissions; still no key or network commands.
+- docs/verification/ai-requests-01.md — record offline native request tests/build and remaining UI/HTTPS gates honestly.
+
 Native credential foundation (internal only, fake-key tests, no WebView commands):
 - src-tauri/src/credentials.rs — allowlisted provider targets, secret-redacted/zeroizing ownership, fail-closed Windows Credential Manager save/read/status/remove; no plaintext or network fallback.
 - src-tauri/src/credentials_tests.rs — synthetic validation/redaction tests and fresh UUID-scoped real Windows write/read/replace/remove, with cleanup and no access to production targets.
