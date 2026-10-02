@@ -1,3 +1,6 @@
+#[allow(dead_code)] // Internal transport is tested before exposing vault commands.
+mod worker;
+
 #[tauri::command]
 fn native_health() -> &'static str {
     "desktop_shell_only: storage_disconnected, ai_disabled"

@@ -9,6 +9,8 @@ Native storage connection subset (one app-managed vault, no AI):
 - .tools/worker-stage-backups/ — ignored recoverable copies of previously verified generated staging bundles; never user vaults.
 - src-tauri/resources/memory-worker/worker-manifest.json — ignored staged frozen runtime and generated integrity inventory, not source or a release package.
 - src-tauri/src/worker.rs — supervise only the fixed verified worker with bounded correlated JSONL, single-flight requests, timeout and shutdown.
+- src-tauri/src/worker_tests.rs — test private response framing, resource guards and real frozen-worker save/list/read/reopen/stop using synthetic vaults.
+- docs/verification/native-transport-01.md — separate verified internal Rust-to-worker behavior and startup failures from the pending desktop command/UI/lifecycle gates.
 - src-tauri/src/commands.rs — create/open/close/status and allowlisted session calls for one native app-data vault, never WebView-supplied paths/executables.
 - src/app/core/local-vault.ts/spec.ts — validate native responses and own loading/error/connection/session state without browser persistence.
 - src/app/features/vault/vault-panel.component.ts/html/scss — render explicitly real local session storage separately from fictional sample screens.

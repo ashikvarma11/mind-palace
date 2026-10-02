@@ -1,5 +1,11 @@
 # Implementation research
 
+## Private native worker transport — 2 October 2026
+
+Rechecked official [Tauri command documentation](https://v2.tauri.app/develop/calling-rust/) and [resource documentation](https://v2.tauri.app/develop/resources/). The pinned Tokio 1.53.1 docs URL was unavailable through browsing; inspected the downloaded official crate's process/mod.rs, process/windows.rs, io/blocking.rs and io/util/take.rs instead, including creation_flags, kill_on_drop, start_kill, wait and AsyncBufRead for Take. Direct versions match the existing lock: serde 1.0.229, serde_json 1.0.151, sha2 0.10.9, uuid 1.26.1 and tokio 1.53.1. Required process/IO/runtime/time features added errno 0.3.14 and signal-hook-registry 1.4.8 to the lock. No provider SDK or network transport was added.
+
+The Rust module embeds the generated local manifest before launching the fixed worker; callers cannot select an executable. This is developer-build integrity, not publisher signing or a same-user attacker-proof sandbox. Resource-path resolution by Tauri remains the next integration task. Failed starts/reopens, handle cleanup changes, single-worker test constraint and final six-test plus repeated-process results are recorded in verification/native-transport-01.md. Persistent Python controls reply without stdin EOF; deadline values were not relaxed. The release startup/performance gate is still unverified.
+
 ## Worker resource staging — 2 October 2026
 
 Rechecked [Tauri resources](https://v2.tauri.app/develop/resources/): non-frontend runtime resources preserve directory structure with a directory mapping and should be resolved natively. No bundle.resources entry is enabled yet; the next Rust step must embed a trusted expected inventory and validate resource paths before launching the fixed executable. Staging is a prerequisite, not completed supervision or an installer.

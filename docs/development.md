@@ -6,6 +6,8 @@ Run `npm run generate:contracts` after editing schemas/native-memory.schema.json
 
 ## Development worker staging
 
+Native compilation now embeds the staged worker manifest. Build/freeze and stage the worker before running Cargo; `npm run build:desktop` and `npm run test:rust` first check that staging matches the frozen build input. Browser development does not need these resources. Native resource packaging and real vault controls are still pending.
+
 After building the existing frozen worker in `.tools/probe-dist/mind-palace-memory-worker`, run `npm run stage:worker`, then `npm run check:worker`. These commands only use that fixed build input and `src-tauri/resources/memory-worker`; they do not launch the worker or open a vault. Both trees are ignored generated artifacts, not public release packages.
 
 If the build input intentionally changes, `python tools/stage-worker.py --refresh` first verifies the existing staged tree, prepares and verifies a fresh copy, and moves the previous verified tree into ignored `.tools/worker-stage-backups/<random UUID>`. Unrecognized or tampered staging content is refused, not overwritten or moved. A failed preparation may leave an ignored `.worker-stage-*` temporary directory for inspection; the helper never recursively deletes it. No global installation, credentials or provider requests are involved.

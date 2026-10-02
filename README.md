@@ -10,6 +10,8 @@ Desktop progress: a Windows native development shell now builds and renders the 
 
 Storage continuation: bounded saved-session listing, strict generated contracts and a checked development worker-resource copy now pass their tests. The desktop-to-worker connection and real vault interface are still pending. See [storage verification](docs/verification/native-storage-01.md).
 
+Internal Rust-to-worker save/reopen/list/read and shutdown now pass native tests, with checked resources and bounded private transport. This is not connected to the interface yet. See [native transport verification](docs/verification/native-transport-01.md).
+
 ## Development
 
 Angular 22 on compatible Node.js, Tauri 2, and a bundled Python memory service are the approved architecture. See the [implementation plan](docs/implementation-plan.md), [current status](docs/implementation-status.md), and [research](docs/research.md).
