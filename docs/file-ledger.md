@@ -37,3 +37,32 @@ Step 02 packaging subset (not the complete model/Graphify gate):
 - tools/tests/test_model_probe.py — validate fixture/measurement parsing and local-runtime safety settings without treating unit tests as real inference.
 - docs/verification/step-02-models.md — record runtime/model artifact verification, measured performance/quality and missing gates.
 - docs/verification/model-probe-results.json — preserve exact synthetic benchmark outputs and evaluation limitations, no runtime credentials or personal data.
+
+Steps 04A/05A foundation subset, planned before creation:
+- schemas/ipc.schema.json — strict bounded private request/response envelopes and allowlisted foundation methods.
+- schemas/vault.schema.json — versioned vault identity with a UUID and explicit local format.
+- schemas/memory-record.schema.json — manual-only decision snapshots with proposed/confirmed states, revision and explicit provenance; other kinds remain unavailable.
+- sidecar/pyproject.toml — package the worker with exact validated schema/OS-lock dependencies.
+- sidecar/memory_worker/__init__.py/__main__.py — version and explicit private UI-mode launch against a trusted CLI-selected vault.
+- sidecar/memory_worker/contracts.py — load local bundled schemas and reject invalid/unknown external fields without content logging.
+- sidecar/memory_worker/errors.py — safe structured worker failures with no raw content/paths in messages.
+- sidecar/memory_worker/paths.py — validate root and generated internal paths, rejecting traversal/reparse points and broad root targets.
+- sidecar/memory_worker/atomic_io.py — flushed sibling writes with expected hashes and replace, preserving conflicts.
+- sidecar/memory_worker/journal.py — persist bounded transaction intents, validate recovery targets and apply idempotently without overwriting external changes.
+- sidecar/memory_worker/vault.py — create/open foundations, preserve text sources, create/read sessions and manual decisions, confirm decisions with audit events.
+- sidecar/memory_worker/service.py/protocol.py — central method/parameter validation and bounded UTF-8 JSONL dispatch; no generic filesystem/shell functions.
+- sidecar/tests/test_foundation.py — verify temporary-vault persistence, immutable-source checks, approval separation, revision/idempotency and interrupted recovery.
+- sidecar/tests/test_protocol.py — verify real source/frozen stdio, malformed frames, UTF-8, envelope limits and safe errors.
+- tools/worker-entry.py — frozen worker entry point, never a diagnostic pretending to be the app.
+- docs/verification/step-04a-05a.md — record actual Python transport/storage tests separately from unimplemented native UI/cache/import/model features.
+- docs/cloud-ai-plan.md — specify user-approved optional OpenAI/Anthropic API-key mode, cost disclosure, secure credentials, scoped consent and no-spend development checks.
+
+Cloud foundation 01 (offline subset; no credentials or network):
+- schemas/cloud-ai.schema.json — strict bounded preview selections, consent, and answer/citation contracts; no API-key fields.
+- sidecar/memory_worker/retrieval.py — select only explicit character ranges from validated local source snapshots under the vault lock.
+- sidecar/memory_worker/cloud_contracts.py — build credential-free OpenAI/Anthropic request bodies and safely parse bounded responses with exact-quote checks.
+- sidecar/memory_worker/cloud_preview.py — maintain short-lived, bounded, single-use preview receipts bound to exact payload hashes; preparation is not sending.
+- sidecar/tests/test_cloud_foundation.py — synthetic no-network selection/consent/provider/citation/usage/error tests, not live AI quality verification.
+- docs/verification/cloud-foundation-01.md — report offline adapter and frozen-worker verification with native/key/live-call limitations.
+- tools/probe-credentials.py — test Windows Credential Manager only with a fresh diagnostic target and random fake bytes, cleaning up in finally; never enumerate existing credentials.
+- tools/tests/test_credential_probe.py — verify diagnostic target restrictions and real write/read/remove with fake data, no providers or production keys.

@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "protocol_version": { "const": 1 },
+    "id": { "type": "string", "minLength": 1, "maxLength": 64 },
+    "method": {
+      "enum": [
+        "health",
+        "sessions.create",
+        "sessions.read",
+        "decisions.create",
+        "decisions.read",
+        "decisions.confirm",
+        "cloud.preview",
+        "cloud.prepare",
+        "cloud.discard"
+      ]
+    },
+    "params": { "type": "object" }
+  },
+  "required": ["protocol_version", "id", "method", "params"],
+  "additionalProperties": false,
+  "$defs": {
+    "response": {
+      "type": "object",
+      "properties": {
+        "protocol_version": { "const": 1 },
+        "id": { "type": ["string", "null"], "minLength": 1, "maxLength": 64 },
+        "result": { "type": "object" },
+        "error": {
+          "type": "object",
+          "properties": {
+            "code": { "type": "string" },
+            "message": { "type": "string" },
+            "retryable": { "type": "boolean" }
+          },
+          "required": ["code", "message", "retryable"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["protocol_version", "id"],
+      "additionalProperties": false,
+      "oneOf": [
+        { "required": ["result"], "not": { "required": ["error"] } },
+        { "required": ["error"], "not": { "required": ["result"] } }
+      ]
+    }
+  }
+}

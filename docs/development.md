@@ -1,5 +1,21 @@
 # Development
 
+## Storage and offline cloud contracts
+
+Using the existing isolated diagnostic environment, from the repository root:
+
+```powershell
+$env:PYTHONPATH = (Resolve-Path sidecar).Path
+./.tools/probe-venv/Scripts/python.exe -m PyInstaller --noconfirm --onedir --noupx --name mind-palace-memory-worker --distpath .tools/probe-dist --workpath .tools/probe-build --specpath .tools --paths (Resolve-Path sidecar).Path --add-data "$((Resolve-Path schemas).Path):schemas" tools/worker-entry.py
+$env:MP_FROZEN_WORKER = (Resolve-Path .tools/probe-dist/mind-palace-memory-worker/mind-palace-memory-worker.exe).Path
+./.tools/probe-venv/Scripts/python.exe -m unittest discover -s sidecar/tests -v
+./.tools/probe-venv/Scripts/python.exe tools/probe-credentials.py
+```
+
+Environment changes above are process-local. Build outputs are ignored development artifacts, not installers. `--noconfirm` rebuilds only the named worker bundle. Worker CLI: `--mode ui --vault <dedicated-directory> --create-vault` initializes an empty directory; omit create-vault to reopen. Communicate with bounded JSONL on stdin/stdout. Never point development tests at a real personal vault. Use synthetic temporary fixtures; do not copy credentials into frames or invoke a provider API.
+
+cloud.preview takes provider/model/question/output cap and explicit local selections; cloud.prepare consumes a matching preview digest plus sharing/cost acceptance, but returns can_send:false. No network/send/key-storage operation exists. Pure provider parsing is tested with synthetic responses, not AI generation. The Windows credential probe temporarily stores and removes only random fake data at a fresh diagnostic target. It never accepts a custom target or reads existing keys. Native Rust credentials/HTTPS/UI remain pending; see verification/cloud-foundation-01.md.
+
 Project root: `D:/Projects/mind-palace`. Browser foundation: Angular 22.2.1 with strict TypeScript and templates, standalone routes, signals, system fonts, and a local Lucide subset.
 
 Use compatible Node (tested 24.16.0) and npm (tested 11.17.0), `npm ci`, and `npm run dev:web`. The server binds only 127.0.0.1:4200. Open Welcome and explicitly choose the fictional sample. Reload resets sample state; do not use it to store personal memory.

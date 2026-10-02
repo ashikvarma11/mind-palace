@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "uuid": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "selection": {
+      "type": "object",
+      "properties": {
+        "kind": { "enum": ["session", "decision"] },
+        "id": { "$ref": "#/$defs/uuid" },
+        "start": { "type": "integer", "minimum": 0 },
+        "end": { "type": "integer", "minimum": 1 }
+      },
+      "required": ["kind", "id", "start", "end"],
+      "additionalProperties": false
+    },
+    "preview": {
+      "type": "object",
+      "properties": {
+        "provider": { "enum": ["openai", "anthropic"] },
+        "model": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$" },
+        "question": { "type": "string", "minLength": 1, "maxLength": 2000 },
+        "max_output_tokens": { "type": "integer", "minimum": 128, "maximum": 1024 },
+        "selections": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 5,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/selection" }
+        }
+      },
+      "required": ["provider", "model", "question", "max_output_tokens", "selections"],
+      "additionalProperties": false
+    },
+    "prepare": {
+      "type": "object",
+      "properties": {
+        "preview_id": { "$ref": "#/$defs/uuid" },
+        "payload_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "accept_sharing_and_api_charges": { "const": true }
+      },
+      "required": ["preview_id", "payload_sha256", "accept_sharing_and_api_charges"],
+      "additionalProperties": false
+    },
+    "discard": {
+      "type": "object",
+      "properties": { "preview_id": { "$ref": "#/$defs/uuid" } },
+      "required": ["preview_id"],
+      "additionalProperties": false
+    },
+    "answer": {
+      "type": "object",
+      "properties": {
+        "status": { "enum": ["answered", "insufficient_evidence"] },
+        "answer": { "type": "string", "minLength": 1, "maxLength": 16000 },
+        "sources": {
+          "type": "array",
+          "maxItems": 10,
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "properties": {
+              "source_id": { "type": "string", "pattern": "^S[1-5]$" },
+              "quote": { "type": "string", "minLength": 1, "maxLength": 8000 }
+            },
+            "required": ["source_id", "quote"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["status", "answer", "sources"],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": { "properties": { "status": { "const": "answered" } } },
+          "then": { "properties": { "sources": { "minItems": 1 } } },
+          "else": { "properties": { "sources": { "maxItems": 0 } } }
+        }
+      ]
+    }
+  }
+}

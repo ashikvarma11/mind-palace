@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schema_version": { "const": 1 },
+    "id": { "type": "string", "format": "uuid" },
+    "kind": { "const": "vault" },
+    "format": { "const": "mind-palace-foundation-v1" }
+  },
+  "required": ["schema_version", "id", "kind", "format"],
+  "additionalProperties": false
+}

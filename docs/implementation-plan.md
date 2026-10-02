@@ -1,5 +1,7 @@
 # Personal memory application — detailed implementation plan
 
+Scope update, 2 October 2026: D013 approves optional user-key OpenAI/Anthropic inference. Follow `cloud-ai-plan.md` for consent, credential and cost boundaries. This supersedes G08's unresolved status and Step 26's deferral of direct API inference, but not Jev's deferral or existing chat-history/MCP constraints. Default remains local-first; no cloud feature or live paid development call is enabled yet.
+
 Plan revision: 1.1. Updated: 2 October 2026. Application: **Mind Palace**. Repository: `ashikvarma11/mind-palace` (public, MIT code). Status: implementation started; Workspace UI approved.
 
 ## Approved implementation update — 2 October 2026
@@ -9,6 +11,7 @@ Plan revision: 1.1. Updated: 2 October 2026. Application: **Mind Palace**. Repos
 - G01: the user explicitly selected the proposed Angular + Tauri + bundled Python + local AI baseline, Windows tested first and macOS verified later.
 - G10: public repository, authenticated owner ashikvarma11, local root D:/Projects/mind-palace, MIT code license. Publisher/bundle identity and signing remain unresolved release gates.
 - Step 03A: implement and verify the approved Angular **browser shell / synthetic gateway** while Step 02 native/model probes are pending. This is a development subset, not the Step 03 desktop exit gate. Show unavailable native/AI capabilities explicitly, default to an empty workspace, and let users opt into labelled fictional samples. No browser localStorage is substituted for durable vault storage.
+- Steps 04A/05A: implement and freeze a model-independent Python stdio/storage subset with temporary synthetic vaults while model/native gates remain pending under G05. Verify bounded validated transport, immutable text sources, manual session/decision creation, explicit confirmation and interrupted-write recovery. This does not pass full Step 04/05 native UI/jobs/import-format gates. Session frontmatter initially uses a JSON object between YAML delimiters (JSON is a YAML flow mapping); ordinary Markdown body remains authoritative. No provider parser, inferred speaker/date, general YAML editing or decision extraction is implied.
 - UI prototype icons use a locally bundled Lucide Angular subset to match the reviewed design; Material/CDK remain the planned accessible interaction foundation. Do not use runtime CDN fonts or assets.
 - Do not run an administrator installer or reconfigure system-wide build tooling without user direction. Read-only prerequisite checks can proceed.
 

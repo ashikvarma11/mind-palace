@@ -1,5 +1,17 @@
 # Implementation research
 
+## Cloud/storage foundation — 2 October 2026
+
+OpenAI Docs skill used to search/fetch current official text generation, response fields, token limits and data policies before the provider contracts. No platform-key tool was available and no real key was read/requested. Direct adapters fit the approved native/Python architecture; inspected the AI SDK skill but did not add its JavaScript SDK, gateway or agent loop for these pure contracts.
+
+Fetched sources: https://developers.openai.com/api/docs/guides/text (input/instructions/output message traversal), https://developers.openai.com/api/reference/cli/resources/responses/methods/create (store, max_output_tokens, status/usage), https://developers.openai.com/api/docs/guides/token-counting (output includes hidden reasoning tokens), https://developers.openai.com/api/docs/guides/your-data (store:false is not universal zero retention). The raw HTTP reference exceeded the fetch tool's size limit; fetched official guide/CLI reference instead. No CLI/provider executable was invoked. Model IDs are synthetic in tests; actual model selection remains pending.
+
+Fetched https://platform.claude.com/docs/en/api/messages/create and overview for messages/system/max_tokens/content/stop_reason/usage and anthropic-version 2023-06-01. Requests have no tools, cache-control directives, streaming, credentials or HTTP transport. Providers receive only explicit snippets when a later native sending implementation is enabled; tests currently send nothing.
+
+Fetched Microsoft https://learn.microsoft.com/en-us/windows/win32/api/wincred/nf-wincred-credwritew, nf-wincred-credreadw, ns-wincred-credentialw and nf-wincred-creddeletew; inspected structure fields, generic/session constants and required CredFree cleanup. Real diagnostic touched only its newly generated target with fake random bytes, then verified removal. No credential enumeration or existing provider key access. This Python diagnostic does not replace the planned Rust production backend.
+
+Rechecked https://v2.tauri.app/start/prerequisites/: Windows requires Rust, C++ tools and WebView2. cargo/rustc unavailable; vswhere reports no C++ tool component. No admin/global installer activated. Inspected installed jsonschema 4.26.0 FormatChecker.checks and discovered optional date-time checker absent; registered local UTC-Z validation with calendar checks. PyInstaller 6.22.3 help confirmed add-data SOURCE:DEST and source/schema bundle paths; verified frozen behavior. See verification/cloud-foundation-01.md for measured checks and pending gates.
+
 Checked: 2 October 2026. Versions below come from registry/tool output, not memory.
 
 | Source                                       | Finding and use                                                                                                                                                                      |
