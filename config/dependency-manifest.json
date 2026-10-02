@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "purpose": "Step 02 diagnostic provenance; not a production release manifest",
+  "graphify": {
+    "package": "graphifyy",
+    "version": "0.9.73",
+    "wheel": "graphifyy-0.9.73-py3-none-any.whl",
+    "url": "https://files.pythonhosted.org/packages/70/96/053837d48d89dadbe275414fc9e850a0b0e85c77cc11f0bf16af069dd95d/graphifyy-0.9.73-py3-none-any.whl",
+    "sha256": "ebf525ce442176710a5f9137a2b5d17244916bfbdf7150b90f446851ecd227be",
+    "tag": "v0.9.73",
+    "source_commit": "ef4450d9c28acb2b8cdc22d369c1777b77148eef",
+    "extract_py_sha256": "3b890815cb679cbe052e74d23af20af6e38dd88fd26409f289b462d632d9fee6",
+    "source_match_scope": "Tagged extract.py and wheel extract.py hashes match; whole-tree equivalence not asserted",
+    "license_expression": "Apache-2.0",
+    "retained_upstream_files": ["LICENSE", "LICENSE-MIT", "NOTICE"],
+    "tested_target": "Windows AMD64 / Python 3.12.10",
+    "tested_api": "graphify.extract.extract(paths, root=fixture, cache_root=temporary_stage, parallel=False)",
+    "tested_languages": ["TypeScript synthetic two-file fixture"],
+    "production_status": "pending production adapter, full licensing and platform checks"
+  }
+}

@@ -6,4 +6,6 @@ Windows diagnostic packaging subset: isolated Python 3.12.10 environment with pi
 
 Pending: artifact hashes/release dependency notices, production frozen worker including MCP/Graphify, local-only Graphify adapter, model selection/speed/RAM/disk, Rust/MSVC native compilation, WebView2/offline packaging, Mac native tests, clean-machine and signing/distribution checks. No paid service or cloud model is a fallback.
 
+Graphify subset: verified wheel hash and tagged extract.py equivalence for 0.9.73; source and frozen direct AST extraction of a synthetic TypeScript fixture returned 7 nodes / 9 edges, zero model tokens, and the known inferred cross-file call at its exact source line. Frozen diagnostic: 146 files / 110,026,269 bytes. Network/process audit guard enabled; provider credentials removed and query logging disabled. This Python-level guard is not an operating-system sandbox or proof for native network operations. Broader language/repository coverage, production adapter and app integration remain pending.
+
 Safe engineering default: keep developing tested local foundations; avoid global/admin machine changes or unsupported release claims. User delegated safe/no-cost choices. Use actual measurements before selecting a model or advertising platform support.

@@ -6,4 +6,4 @@ Approved: Mind Palace name, public MIT code repository, Workspace design, suppli
 
 Scope and step checks are in `implementation-plan.md`. Use synthetic data for development. Never publish the user's attached conversation, actual imported memory, private paths, or credentials as sample data. Jev and direct cloud connectors are deferred.
 
-Current stage: initial repository and browser-shell foundation. Native/toolchain/model gates remain pending; see `implementation-status.md` for actual evidence and next action.
+Current stage: verified browser-shell foundation plus Windows frozen runtime and Graphify diagnostic probes. Graphify mapped a synthetic TypeScript fixture locally; Connections is still sample-only. Native/toolchain/MCP/model gates remain pending; see `implementation-status.md` for actual evidence and next action. Local commits after initial publication are not automatically public releases.

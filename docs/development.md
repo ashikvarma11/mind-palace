@@ -23,3 +23,16 @@ $env:MP_FROZEN_PROBE = (Resolve-Path .tools/probe-dist/mind-palace-runtime-probe
 ```
 
 If a generated output already exists, PyInstaller can request overwrite permission; inspect that exact diagnostic output before replacing it. Tests without MP_FROZEN_PROBE explicitly skip packaged execution. Frozen tests run from a temporary folder with Python-specific environment variables removed and PATH limited to Windows System32; this is stronger local isolation, not proof on a clean machine without Python installed. Production storage, transport, MCP/Graphify, AI and native UI are not implemented by this probe.
+
+Graphify diagnostic (same environment, updated version lock):
+
+```powershell
+./.tools/probe-venv/Scripts/python.exe -m pip install --only-binary=:all: -r tools/requirements-probe-lock.txt
+./.tools/probe-venv/Scripts/python.exe tools/probe-graphify.py
+$graphProbeFixture = (Resolve-Path tools/fixtures/probe-repo).Path
+./.tools/probe-venv/Scripts/python.exe -m PyInstaller --onedir --noupx --name mind-palace-graphify-probe --distpath .tools/probe-dist --workpath .tools/probe-build --specpath .tools --hidden-import tree_sitter_typescript --hidden-import tree_sitter_javascript --add-data "$graphProbeFixture;fixtures/probe-repo" tools/probe-graphify.py
+$env:MP_FROZEN_GRAPHIFY_PROBE = (Resolve-Path .tools/probe-dist/mind-palace-graphify-probe/mind-palace-graphify-probe.exe).Path
+./.tools/probe-venv/Scripts/python.exe -m unittest discover -s tools/tests -v
+```
+
+Use the direct diagnostic script, not graphify CLI: inspection found that CLI startup can refresh installed assistant skills even before help. The diagnostic maps only its bundled synthetic fixture, blocks Python network/process calls and does not enable provider paths. It is not a production repository adapter. Upstream artifact LICENSE/NOTICE files are retained locally; complete release attribution and hashes for all transitive artifacts remain pending.

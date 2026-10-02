@@ -20,3 +20,10 @@ Step 02 packaging subset (not the complete model/Graphify gate):
 - tools/tests/test_runtime_probe.py — test source and optional frozen capability results, lock contention/release and invalid schema rejection.
 - tools/probe-runtime.py — extend the synthetic capability probe with real schema rejection and cross-process locking; keep it diagnostic-only, not a production worker.
 - .tools/probe-venv/ and .tools/probe-dist/ — ignored isolated environment and native diagnostic bundle, never release artifacts.
+- .tools/graphify-artifact/ and .tools/graphify-source/ — ignored hash-verified upstream wheel and extracted source for inspection, not user repositories.
+- tools/probe-graphify.py — run only the inspected local extractor on synthetic fixtures with network denied and validate graph evidence.
+- tools/fixtures/probe-repo/package.json — synthetic TypeScript fixture identity, no scripts/dependencies.
+- tools/fixtures/probe-repo/src/auth.ts — synthetic auth service with a known cross-file store call.
+- tools/fixtures/probe-repo/src/store.ts — synthetic store class exposing the known call target.
+- tools/tests/test_graphify_probe.py — exercise fixture extraction, evidence checks and denied network attempts.
+- config/dependency-manifest.json — exact upstream artifact hash/version/source and measured probe scope, not production release approval.
