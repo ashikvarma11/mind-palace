@@ -36,3 +36,14 @@ $env:MP_FROZEN_GRAPHIFY_PROBE = (Resolve-Path .tools/probe-dist/mind-palace-grap
 ```
 
 Use the direct diagnostic script, not graphify CLI: inspection found that CLI startup can refresh installed assistant skills even before help. The diagnostic maps only its bundled synthetic fixture, blocks Python network/process calls and does not enable provider paths. It is not a production repository adapter. Upstream artifact LICENSE/NOTICE files are retained locally; complete release attribution and hashes for all transitive artifacts remain pending.
+
+MCP synthetic stdio diagnostic (no external assistant setup):
+
+```powershell
+./.tools/probe-venv/Scripts/python.exe -m pip install --only-binary=:all: -r tools/requirements-probe-lock.txt
+./.tools/probe-venv/Scripts/python.exe -m PyInstaller --onedir --noupx --name mind-palace-mcp-probe --distpath .tools/probe-dist --workpath .tools/probe-build --specpath .tools --copy-metadata mcp tools/probe-mcp.py
+$env:MP_FROZEN_MCP_PROBE = (Resolve-Path .tools/probe-dist/mind-palace-mcp-probe/mind-palace-mcp-probe.exe).Path
+./.tools/probe-venv/Scripts/python.exe -m unittest discover -s tools/tests -v
+```
+
+Enable all three MP_FROZEN_* environment variables to run all 11 checks without skips. The MCP server waits for stdio protocol messages; launching it interactively is not an app preview. It exposes no search_memory/save_session tool and does not share memory. Real permission-scoped integration is deferred until storage/evidence contracts exist.

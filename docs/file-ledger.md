@@ -27,3 +27,6 @@ Step 02 packaging subset (not the complete model/Graphify gate):
 - tools/fixtures/probe-repo/src/store.ts — synthetic store class exposing the known call target.
 - tools/tests/test_graphify_probe.py — exercise fixture extraction, evidence checks and denied network attempts.
 - config/dependency-manifest.json — exact upstream artifact hash/version/source and measured probe scope, not production release approval.
+- tools/probe-mcp.py — synthetic local MCP stdio server exposing one diagnostic-only read tool, no vault or cloud access.
+- tools/tests/test_mcp_probe.py — run real local stdio initialization/tool checks against source and optional frozen diagnostic server.
+- .tools/mcp-artifact/ — ignored registry-hash-verified SDK wheel retained for diagnostic provenance, not release distribution.

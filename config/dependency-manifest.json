@@ -1,6 +1,21 @@
 {
   "schema_version": 1,
   "purpose": "Step 02 diagnostic provenance; not a production release manifest",
+  "mcp": {
+    "package": "mcp",
+    "version": "2.2.0",
+    "wheel": "mcp-2.2.0-py3-none-any.whl",
+    "url": "https://files.pythonhosted.org/packages/1b/ff/8e7eade68b8a28f7da0ed1085544341b51f9c935dbf6b95c76b7edfea6a0/mcp-2.2.0-py3-none-any.whl",
+    "sha256": "bde982589473a060ae145e3406e9a5333fe538c97229ba841f5a7f92be004f81",
+    "source_tag": "v2.2.0",
+    "tag_commit": "9972c21aa42054fb1450c5fc614761ed11847ec6",
+    "source_match_scope": "Tag resolves; whole source/wheel equivalence not asserted",
+    "license": "MIT (official SDK repository)",
+    "tested_target": "Windows AMD64 / Python 3.12.10",
+    "tested_api": "MCPServer.run(transport='stdio'), Client(StdioServerParameters(...))",
+    "tested_protocols": ["2025-11-25 legacy handshake", "2026-07-28 auto discovery"],
+    "production_status": "diagnostic-only; no memory tools or external assistant configured"
+  },
   "graphify": {
     "package": "graphifyy",
     "version": "0.9.73",

@@ -16,6 +16,14 @@ Inspected PyInstaller warning report: optional/platform imports and optional for
 
 Final regression: 3/3 checks passed in 1.626 seconds, including frozen execution from a temporary working directory with Python-specific variables removed and PATH restricted to Windows System32. Initial isolation harness exposed case-sensitive dictionary lookup of the Windows SystemRoot variable; fixed to use Windows-aware os.environ lookup and case-insensitive variable removal. Clean-machine verification remains pending, not inferred from this local isolation test.
 
+## MCP diagnostic
+
+Installed pinned mcp/mcp-types 2.2.0 with resolved binary-wheel dependencies in the isolated environment; pip check passed. Inspected installed APIs before constructing a stdio-only MCPServer exposing exactly diagnostic_status. SDK Client launches source or frozen subprocess, lists that one tool, checks its read-only annotation, calls it and validates synthetic flags; search_memory is unavailable. Source tests negotiate both legacy 2025-11-25 and auto-discovered 2026-07-28. Frozen test covers legacy 2025-11-25. No external host/client config, memory vault or HTTP server is involved.
+
+PyInstaller onedir build with mcp metadata succeeded, output 155 files / 43,711,678 bytes. Inspected warnings for optional/type-only/platform paths; actual exercised stdio/tool paths pass. Diagnostic sets OTEL_SDK_DISABLED and all exporter settings to none. Frozen process starts from a temporary working directory with PATH restricted to System32; SDK inherited environment excludes Python-specific and provider credential variables. This is not a clean-machine or native-network security certification.
+
+Final full diagnostic regression: 11/11 tests passed in 8.493 seconds, enabling all three frozen probes. No skips. Production combined worker, permission-scoped memory tools, inbox staging, actual Claude/ChatGPT setup, model and native desktop gates remain pending.
+
 ## Graphify diagnostic
 
 Verified pinned 0.9.73 wheel hash and matching tagged extract.py; preserved upstream LICENSE, LICENSE-MIT and NOTICE inside the ignored extracted artifact. Installed all default dependencies from available Windows wheels in the isolated environment; pip check passed. No Graphify CLI commands, install hooks, provider extras or personal repositories were used.

@@ -14,6 +14,7 @@ Updated: 2 October 2026. Only direct user choices are marked approved.
 | D008 | No browser persistence masquerading as a durable vault | Integrity boundary: prototype sample state is in memory and resets on reload; storage is owned by the planned Python service. |
 | D009 | Isolated Windows diagnostic packaging before production worker | Delegated engineering choice: free pinned dependencies in ignored .tools/probe-venv; synthetic tests only; no global/admin installation. Frozen diagnostic is not labelled production storage/native/AI. |
 | D010 | Graphify direct AST API only in the diagnostic | Inspected pinned 0.9.73 extractor; sequential TypeScript parsing with explicit fixture/cache roots, no provider path. CLI even performs stale-skill refresh before help/version, so do not invoke it or register skills in the app workflow. |
+| D011 | MCP 2.2.0 stdio diagnostic, separate from memory integration | Inspected official SDK docs and installed signatures; local diagnostic tool only, no assistant registration/vault scopes. Source tests cover legacy and modern protocols; frozen test covers legacy. Disable OpenTelemetry exporters and keep transport local stdio. |
 
 Pending: stable release bundle identity/publisher, model selection, minimum supported OS/hardware, Mac testing, signing/distribution, artwork redistribution license, provider export fixtures. Jev remains future-only.
 

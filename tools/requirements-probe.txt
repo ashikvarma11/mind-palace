@@ -2,3 +2,4 @@ PyInstaller==6.22.3
 jsonschema==4.26.0
 portalocker==4.4.0
 graphifyy==0.9.73
+mcp==2.2.0

@@ -25,6 +25,10 @@ Scaffold generated safely in ignored `.tools/scaffold` because the generator ref
 
 # Step 02 diagnostic packaging research — 2 October 2026
 
+## MCP follow-up — 2 October 2026
+
+Official https://github.com/modelcontextprotocol/python-sdk and https://py.sdk.modelcontextprotocol.io/run/ describe v2 MCPServer.run(transport="stdio"). https://py.sdk.modelcontextprotocol.io/client/transports/ documents Client(StdioServerParameters(...)); https://py.sdk.modelcontextprotocol.io/get-started/testing/ distinguishes in-memory tests from real stdio. Inspected installed 2.2.0 signatures and mcp_types/version.py before coding. Actual source stdio negotiations: legacy 2025-11-25, auto 2026-07-28; frozen test exercises legacy only. Registry wheel SHA256 was independently verified after download; GitHub v2.2.0 resolves to 9972c21aa42054fb1450c5fc614761ed11847ec6, without whole-tree equivalence claims. Dependencies installed as binary wheels into the isolated environment; exact versions recorded. No SDK CLI/provider/assistant install path used; OpenTelemetry disabled with exporters none. This is a synthetic compatibility probe, not Step 20 memory integration.
+
 ## Graphify follow-up — 2 October 2026
 
 Inspected the official PyPI 0.9.73 metadata and downloaded wheel; SHA256 verified against https://pypi.org/pypi/graphifyy/0.9.73/json. GitHub tag v0.9.73 resolves to ef4450d9c28acb2b8cdc22d369c1777b77148eef. Tagged graphify/extract.py (https://raw.githubusercontent.com/Graphify-Labs/graphify/ef4450d9c28acb2b8cdc22d369c1777b77148eef/graphify/extract.py) and wheel copy have matching SHA256 3b890815cb679cbe052e74d23af20af6e38dd88fd26409f289b462d632d9fee6. Whole-tree equivalence is not asserted. Artifact provenance is recorded in config/dependency-manifest.json.
