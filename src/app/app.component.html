@@ -9,7 +9,7 @@
       >
     } @else {
       <span>{{
-        vault.connected() ? 'Local vault connected · AI off' : 'Memory service not connected'
+        vault.connected() ? 'Local vault connected · AI off' : vault.native ? 'Local vault closed · open it to begin' : 'Desktop vault unavailable in browser'
       }}</span>
     }
   </div>

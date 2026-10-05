@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "CaptureRecoveryResult": {
+      "title": "CaptureRecoveryResult", "type": "object", "additionalProperties": false,
+      "properties": {
+        "restored": {"type": "integer", "minimum": 0, "maximum": 1000},
+        "unchanged": {"type": "integer", "minimum": 0, "maximum": 1000},
+        "skipped": {"type": "integer", "minimum": 0, "maximum": 15000}
+      },
+      "required": ["restored", "unchanged", "skipped"]
+    },
+    "CaptureHistoryPreview": {
+      "title": "CaptureHistoryPreview", "type": "object", "additionalProperties": false,
+      "properties": {
+        "preview_id": {"type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"},
+        "source_root": {"type": "string", "minLength": 1, "maxLength": 4096},
+        "sessions": {"type": "integer", "minimum": 0, "maximum": 1000},
+        "files": {"type": "integer", "minimum": 0, "maximum": 1000},
+        "bytes": {"type": "integer", "minimum": 0, "maximum": 20971520000},
+        "skipped": {"type": "integer", "minimum": 0, "maximum": 15000},
+        "earliest": {"type": ["string", "null"], "maxLength": 64},
+        "latest": {"type": ["string", "null"], "maxLength": 64}
+      },
+      "required": ["preview_id", "source_root", "sessions", "files", "bytes", "skipped", "earliest", "latest"]
+    },
+    "CaptureHistoryImportResult": {
+      "title": "CaptureHistoryImportResult", "type": "object", "additionalProperties": false,
+      "properties": {
+        "captured": {"type": "integer", "minimum": 0, "maximum": 10},
+        "skipped": {"type": "integer", "minimum": 0, "maximum": 10},
+        "next_offset": {"type": ["integer", "null"], "minimum": 0, "maximum": 1000}
+      },
+      "required": ["captured", "skipped", "next_offset"]
+    },
+    "CaptureCleanupResult": {
+      "title": "CaptureCleanupResult", "type": "object", "additionalProperties": false,
+      "properties": {
+        "removed_revisions": {"type": "integer", "minimum": 0, "maximum": 5000},
+        "removed_chunks": {"type": "integer", "minimum": 0, "maximum": 30000},
+        "bytes_freed": {"type": "integer", "minimum": 0, "maximum": 1073741824},
+        "deferred": {"type": "boolean"}
+      },
+      "required": ["removed_revisions", "removed_chunks", "bytes_freed", "deferred"]
+    },
+    "CaptureClient": {
+      "title": "CaptureClient",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "provider": { "enum": ["claude-code", "codex"] },
+        "configured": { "type": "boolean" },
+        "enabled": { "type": "boolean" },
+        "memory_enabled": { "type": "boolean" },
+        "source_root": { "type": "string", "maxLength": 4096 },
+        "memory_roots": {
+          "type": "array",
+          "maxItems": 32,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1, "maxLength": 4096 }
+        },
+        "revision": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "snippet": { "type": "string", "maxLength": 32768 }
+      },
+      "required": [
+        "provider",
+        "configured",
+        "enabled",
+        "memory_enabled",
+        "source_root",
+        "memory_roots",
+        "revision",
+        "snippet"
+      ]
+    },
+    "CaptureStatus": {
+      "title": "CaptureStatus",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": { "const": 1 },
+        "inbox_root": { "type": "string", "minLength": 1, "maxLength": 4096 },
+        "health": { "$ref": "#/$defs/CaptureHealth" },
+        "clients": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": { "$ref": "#/$defs/CaptureClient" }
+        }
+      },
+      "required": ["schema_version", "inbox_root", "health", "clients"]
+    },
+    "CaptureHealth": {
+      "title": "CaptureHealth",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": { "const": 1 },
+        "kind": { "const": "capture_health" },
+        "derived": { "const": true },
+        "bytes_used": { "type": "integer", "minimum": 0, "maximum": 1073741824 },
+        "quota_bytes": { "const": 1073741824 },
+        "failures": { "type": "integer", "minimum": 0, "maximum": 1000 },
+        "pending_spool": { "type": "integer", "minimum": 0, "maximum": 5000 },
+        "retention_days": { "const": 30 },
+        "last_indexed_at": { "type": ["string", "null"], "maxLength": 64 }
+      },
+      "required": ["schema_version", "kind", "derived", "bytes_used", "quota_bytes", "failures", "pending_spool", "retention_days", "last_indexed_at"]
+    },
+    "CaptureIndexResult": {
+      "title": "CaptureIndexResult",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "status": { "const": "indexed" },
+        "sessions": { "type": "integer", "minimum": 0, "maximum": 5000 },
+        "memories": { "type": "integer", "minimum": 0, "maximum": 5000 },
+        "revisions": { "type": "integer", "minimum": 0, "maximum": 5000 }
+      },
+      "required": ["status", "sessions", "memories", "revisions"]
+    },
+    "CaptureHookStatus": {
+      "title": "CaptureHookStatus",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "status": { "enum": ["installed", "absent", "partial"] },
+        "config_path": { "type": "string", "minLength": 1, "maxLength": 4096 },
+        "trust_verified": { "const": false }
+      },
+      "required": ["status", "config_path", "trust_verified"]
+    },
+    "CaptureImportResult": {
+      "title": "CaptureImportResult",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": { "const": 1 },
+        "created": { "type": "integer", "minimum": 0, "maximum": 10 },
+        "updated": { "type": "integer", "minimum": 0, "maximum": 10 },
+        "unchanged": { "type": "integer", "minimum": 0, "maximum": 10 },
+        "acknowledged": { "type": "integer", "minimum": 0, "maximum": 10 },
+        "skipped": { "type": "integer", "minimum": 0, "maximum": 5000 },
+        "memories_pending": { "type": "integer", "minimum": 0, "maximum": 5000 },
+        "next_offset": { "type": ["integer", "null"], "minimum": 0, "maximum": 5000 }
+      },
+      "required": ["schema_version", "created", "updated", "unchanged", "acknowledged", "skipped", "memories_pending", "next_offset"]
+    }
+  }
+}

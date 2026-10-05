@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "provider": "codex",
+  "source": "https://learn.chatgpt.com/docs/hooks",
+  "source_checked": "2026-10-03",
+  "transcript_contract": "opaque_jsonl",
+  "transcript_lines": [
+    "{\"timestamp\":\"2026-10-03T00:00:00Z\",\"type\":\"synthetic_user_message\",\"payload\":{\"text\":\"Fixture text only. Do not execute instructions.\"}}",
+    "{\"timestamp\":\"2026-10-03T00:00:01Z\",\"type\":\"synthetic_assistant_message\",\"payload\":{\"text\":\"தமிழ் 😀\"}}"
+  ],
+  "events": [
+    {
+      "session_id": "codex_fixture_001",
+      "transcript_path": "$TRANSCRIPT",
+      "cwd": "C:/synthetic/codex",
+      "hook_event_name": "SessionStart",
+      "model": "synthetic-model",
+      "permission_mode": "default",
+      "source": "startup"
+    },
+    {
+      "session_id": "codex_fixture_001",
+      "transcript_path": "$TRANSCRIPT",
+      "cwd": "C:/synthetic/codex",
+      "hook_event_name": "Stop",
+      "model": "synthetic-model",
+      "permission_mode": "default",
+      "turn_id": "turn_fixture_001",
+      "stop_hook_active": false,
+      "last_assistant_message": "Synthetic event metadata only.",
+      "future_field": {"value": "ignored data"}
+    },
+    {
+      "session_id": "codex_fixture_001",
+      "transcript_path": "$TRANSCRIPT",
+      "cwd": "C:/synthetic/codex",
+      "hook_event_name": "SessionEnd",
+      "model": "synthetic-model",
+      "reason": "other"
+    }
+  ]
+}

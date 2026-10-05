@@ -30,7 +30,7 @@ impl VaultState {
             let _ = child.start_kill();
         }
     }
-    async fn call(&self, method: &str, params: Value) -> Result<Value, Error> {
+    pub(crate) async fn call(&self, method: &str, params: Value) -> Result<Value, Error> {
         let mut worker = self.worker.try_lock().map_err(|_| busy())?;
         let result = worker.as_mut().ok_or_else(unavailable)?.request(method, params).await;
         if result.as_ref().is_err_and(|e| e.code == "WORKER_DISCONNECTED") { *worker = None; }
@@ -114,6 +114,11 @@ pub(crate) async fn sessions_list(state: tauri::State<'_, VaultState>, limit: u3
 pub(crate) async fn sessions_read(state: tauri::State<'_, VaultState>, id: String) -> Result<Value, Error> {
     if !identifier(&id) { return Err(invalid()); }
     state.call("sessions.read", json!({"id":id})).await
+}
+#[tauri::command]
+pub(crate) async fn sessions_ask(state: tauri::State<'_, VaultState>, question: String) -> Result<Value, Error> {
+    if !(1..=2000).contains(&question.chars().count()) { return Err(invalid()); }
+    state.call("sessions.ask", json!({"question":question})).await
 }
 
 #[derive(Deserialize, Serialize)]

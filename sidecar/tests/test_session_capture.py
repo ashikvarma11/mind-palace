@@ -7,8 +7,10 @@ import sys
 import tempfile
 import unittest
 from unittest.mock import patch
+import portalocker
 
 from memory_worker.errors import WorkerError
+from memory_worker import session_capture as module
 from memory_worker.session_capture import capture, configuration, read_transcript, MAX_EVENT
 
 
@@ -44,7 +46,7 @@ class CaptureTests(unittest.TestCase):
                               input=json.dumps(event).encode(), capture_output=True,
                               env=env, timeout=10)
 
-    def test_exact_bytes_and_duplicate_across_process_restart(self):
+    def test_exact_bytes_and_unique_delivery_across_process_restart(self):
         first = self.run_hook(self.event)
         self.assertEqual(first.returncode, 0, first.stderr)
         self.assertEqual(first.stdout, b"")
@@ -58,8 +60,9 @@ class CaptureTests(unittest.TestCase):
         prior = paths[0].read_bytes()
         second = self.run_hook(self.event)
         self.assertEqual(second.returncode, 0, second.stderr)
-        self.assertIn(b"duplicate", second.stderr)
+        self.assertIn(b"captured", second.stderr)
         self.assertEqual(paths[0].read_bytes(), prior)
+        self.assertEqual(len(self.records()), 2)
 
     def test_append_and_resume_keep_identity_and_original_snapshot(self):
         first = capture(self.config_path, self.event)
@@ -112,7 +115,7 @@ class CaptureTests(unittest.TestCase):
             self.assertEqual(capture(self.config_path, self.event)["status"], "paused")
         self.assertEqual(self.records(), [])
 
-    def test_simultaneous_hook_processes_deduplicate(self):
+    def test_simultaneous_hook_processes_write_unique_spools(self):
         env = dict(os.environ, PYTHONPATH=str(Path(__file__).resolve().parents[1]))
         command = [sys.executable, "-m", "memory_worker.session_capture", "--config", str(self.config_path)]
         children = [subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
@@ -126,7 +129,7 @@ class CaptureTests(unittest.TestCase):
                 stdout, stderr = child.communicate(timeout=15)
                 self.assertEqual(child.returncode, 0, stderr)
                 self.assertEqual(stdout, b"")
-            self.assertEqual(len(self.records()), 1)
+            self.assertEqual(len(self.records()), 2)
         finally:
             for child in children:
                 if child.poll() is None:
@@ -188,13 +191,47 @@ class CaptureTests(unittest.TestCase):
             with self.assertRaises(WorkerError):
                 capture(self.config_path, self.event)
 
-    def test_tampered_duplicate_is_preserved_and_reported(self):
+    def test_existing_spool_is_never_replaced_by_later_capture(self):
         capture(self.config_path, self.event)
         path = self.records()[0]
         path.write_bytes(b'{"transcript":"changed"}')
-        with self.assertRaises(WorkerError):
-            capture(self.config_path, self.event)
+        capture(self.config_path, self.event)
         self.assertEqual(path.read_bytes(), b'{"transcript":"changed"}')
+        self.assertEqual(len(self.records()), 2)
+
+    def test_shared_app_lock_does_not_block_hook_spool(self):
+        self.inbox.mkdir()
+        lock = self.inbox / "capture.lock"
+        with portalocker.Lock(str(lock), mode="a", timeout=0):
+            result = self.run_hook(self.event)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(len(self.records()), 1)
+
+    @unittest.skipUnless(os.environ.get("MP_CAPTURE_EXECUTABLE"), "Frozen capture executable not selected")
+    def test_frozen_hook_does_not_wait_for_shared_app_lock(self):
+        self.inbox.mkdir()
+        lock = self.inbox / "capture.lock"
+        with portalocker.Lock(str(lock), mode="a", timeout=0):
+            result = subprocess.run([os.environ["MP_CAPTURE_EXECUTABLE"], "--config", str(self.config_path)],
+                                    input=json.dumps(self.event).encode(), capture_output=True, timeout=10)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout, b"")
+        self.assertEqual(len(self.records()), 1)
+
+    def test_quota_stops_content_write_and_failure_marker_contains_no_identity(self):
+        with patch.object(module, "INBOX_QUOTA", 100), patch.object(module, "FAILURE_RESERVE", 0):
+            with self.assertRaises(WorkerError) as error:
+                capture(self.config_path, self.event)
+        self.assertEqual(error.exception.code, "QUOTA_EXCEEDED")
+        self.assertEqual(self.records(), [])
+        module.write_failure_marker(self.config_path, self.event, "QUOTA_EXCEEDED")
+        marker_path = next((self.inbox / "failures").glob("*.json"))
+        marker = json.loads(marker_path.read_bytes())
+        self.assertEqual(set(marker), {"schema_version", "kind", "provider", "event", "code", "occurred_at"})
+        raw = marker_path.read_text(encoding="utf-8")
+        self.assertNotIn(self.event["session_id"], raw)
+        self.assertNotIn(str(self.transcript), raw)
+        self.assertNotIn("தமிழ்", raw)
 
 
 if __name__ == "__main__":

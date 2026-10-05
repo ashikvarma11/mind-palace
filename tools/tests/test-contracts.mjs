@@ -36,7 +36,7 @@ test('real calendar UTC timestamps are required', () => {
 });
 test('response sizes and integer pagination are bounded', () => {
   assert.equal(validateSessionRead({ metadata, body: 'x'.repeat(32769), source_text: '' }), false);
-  assert.equal(validateSessionRead({ metadata, body: '', source_text: 'x'.repeat(65537) }), false);
+  assert.equal(validateSessionRead({ metadata, body: '', source_text: 'x'.repeat(20 * 1024 * 1024 + 1) }), false);
   assert.equal(validateSessionList({ items: Array(51).fill(metadata), total: 51, next_offset: null }), false);
   for (const total of [true, -1, 1001, 1.5]) {
     assert.equal(validateSessionList({ items: [], total, next_offset: null }), false);

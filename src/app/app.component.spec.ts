@@ -10,7 +10,7 @@ describe('Mind Palace shell', () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const element = fixture.nativeElement as HTMLElement;
-    expect(element.textContent).toContain('Memory service not connected');
+    expect(element.textContent).toContain('Desktop vault unavailable in browser');
     expect(element.querySelector('nav')?.getAttribute('aria-label')).toBe('Main navigation');
     expect(element.querySelectorAll('nav a')).toHaveLength(8);
   });

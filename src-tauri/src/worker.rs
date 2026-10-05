@@ -5,7 +5,7 @@ use sha2::{Digest, Sha256};
 use std::{collections::BTreeMap, fs, io::Read, path::{Component, Path, PathBuf}, process::Stdio, time::Duration};
 use tokio::{io::{AsyncBufReadExt, AsyncReadExt, AsyncWriteExt, BufReader}, process::{Child, ChildStdin, ChildStdout, Command}, time::timeout};
 
-const FRAME_LIMIT: usize = 1024 * 1024;
+const FRAME_LIMIT: usize = 64 * 1024 * 1024;
 const FILE_LIMIT: u64 = 64 * 1024 * 1024;
 const EXE: &str = "mind-palace-memory-worker.exe";
 const MANIFEST_TEXT: &str = include_str!("../resources/memory-worker/worker-manifest.json");
@@ -74,7 +74,9 @@ fn relative_path(value: &str) -> Result<PathBuf, Error> {
 }
 
 fn hash_file(path: &Path, expected_bytes: u64) -> Result<String, Error> {
-    no_links(path)?;
+    // The bounded inventory walk checks each entry with symlink_metadata before
+    // calling this function. Rechecking every ancestor for every file makes
+    // cold Windows resource verification exceed the capture command deadline.
     let metadata = fs::metadata(path).map_err(|_| Error::resources())?;
     if !metadata.is_file() || metadata.len() != expected_bytes || expected_bytes > FILE_LIMIT { return Err(Error::resources()); }
     let mut file = fs::File::open(path).map_err(|_| Error::resources())?.take(expected_bytes + 1);
@@ -93,16 +95,20 @@ fn hash_file(path: &Path, expected_bytes: u64) -> Result<String, Error> {
 }
 
 pub(crate) fn verify_bundle(root: &Path) -> Result<PathBuf, Error> {
+    verify_resources(root, MANIFEST_TEXT, EXE)
+}
+
+pub(crate) fn verify_resources(root: &Path, manifest_text: &str, executable: &str) -> Result<PathBuf, Error> {
     no_links(root)?;
-    let manifest: Manifest = serde_json::from_str(MANIFEST_TEXT).map_err(|_| Error::resources())?;
-    if manifest.schema_version != 1 || manifest.platform != "windows-x86_64" || manifest.executable != EXE
+    let manifest: Manifest = serde_json::from_str(manifest_text).map_err(|_| Error::resources())?;
+    if manifest.schema_version != 1 || manifest.platform != "windows-x86_64" || manifest.executable != executable
         || manifest.files.is_empty() || manifest.files.len() > 512 { return Err(Error::resources()); }
     let manifest_path = root.join("worker-manifest.json");
     no_links(&manifest_path)?;
     let mut stored = Vec::new();
     fs::File::open(&manifest_path).map_err(|_| Error::resources())?.take(256 * 1024 + 1)
         .read_to_end(&mut stored).map_err(|_| Error::resources())?;
-    if stored != MANIFEST_TEXT.as_bytes() { return Err(Error::resources()); }
+    if stored != manifest_text.as_bytes() { return Err(Error::resources()); }
     let mut expected = BTreeMap::new();
     let mut total = 0u64;
     for item in manifest.files {
@@ -112,18 +118,21 @@ pub(crate) fn verify_bundle(root: &Path) -> Result<PathBuf, Error> {
             || !item.sha256.bytes().all(|b| b.is_ascii_digit() || matches!(b, b'a'..=b'f'))
             || expected.insert(item.path.to_ascii_lowercase(), item).is_some() { return Err(Error::resources()); }
     }
-    if !expected.get(EXE).is_some_and(|item| item.bytes > 0) { return Err(Error::resources()); }
+    if !expected.get(executable).is_some_and(|item| item.bytes > 0) { return Err(Error::resources()); }
     let mut pending = vec![root.to_path_buf()];
     let mut entries = 0;
     let mut seen = std::collections::BTreeSet::new();
     while let Some(directory) = pending.pop() {
-        no_links(&directory)?;
         for entry in fs::read_dir(directory).map_err(|_| Error::resources())? {
             let path = entry.map_err(|_| Error::resources())?.path();
             entries += 1;
             if entries > 2048 { return Err(Error::resources()); }
-            no_links(&path)?;
             let metadata = fs::symlink_metadata(&path).map_err(|_| Error::resources())?;
+            if metadata.file_type().is_symlink() { return Err(Error::resources()); }
+            #[cfg(windows)] {
+                use std::os::windows::fs::MetadataExt;
+                if metadata.file_attributes() & 0x400 != 0 { return Err(Error::resources()); }
+            }
             let relative = path.strip_prefix(root).map_err(|_| Error::resources())?.to_str()
                 .ok_or_else(Error::resources)?.replace('\\', "/");
             relative_path(&relative)?;
@@ -137,7 +146,7 @@ pub(crate) fn verify_bundle(root: &Path) -> Result<PathBuf, Error> {
         }
     }
     if seen.len() != expected.len() { return Err(Error::resources()); }
-    Ok(root.join(EXE))
+    Ok(root.join(executable))
 }
 
 #[derive(Deserialize)]
@@ -265,8 +274,8 @@ impl Worker {
     }
 
     async fn request_with_deadline(&mut self, method: &str, params: Value, deadline: Duration) -> Result<Value, Error> {
-        if !matches!(method, "health" | "sessions.create" | "sessions.read" | "sessions.list"
-            | "cloud.preview" | "cloud.prepare" | "cloud.discard") {
+        if !matches!(method, "health" | "sessions.create" | "sessions.read" | "sessions.list" | "sessions.ask"
+            | "captures.ingest" | "cloud.preview" | "cloud.prepare" | "cloud.discard") {
             return Err(Error { code: "VALIDATION_ERROR", message: "This worker operation is not available.", retryable: false });
         }
         if !self.usable {

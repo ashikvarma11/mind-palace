@@ -3,7 +3,6 @@ import { vi } from 'vitest';
 import { AiGateway } from './ai-gateway';
 import { LocalVault, VAULT_INVOKE } from './local-vault';
 import type { AiPreviewRequest, AiPreviewResult, SessionRead } from './contracts.generated';
-import { AiPreviewPanel } from '../features/ask/ai-preview-panel.component';
 
 const original: SessionRead = {
   metadata: {
@@ -221,24 +220,6 @@ describe('Offline AI preview boundary', () => {
     expect(vault.selected()).toBeNull();
     expect(ai.error()).toContain('cancelled');
   });
-  it('renders requests as inert text and visibly disables sending', async () => {
-    const request = input();
-    request.question = '<script>window.injected=true</script>';
-    call.mockResolvedValue(result(request));
-    await ai.create(request, original);
-    const fixture = TestBed.createComponent(AiPreviewPanel);
-    fixture.detectChanges();
-    const element: HTMLElement = fixture.nativeElement;
-    expect(element.querySelector('[aria-label="Exact provider request"]')?.textContent).toContain(
-      '<script>',
-    );
-    expect(element.querySelector('script')).toBeNull();
-    const send = [...element.querySelectorAll('button')].find((button) =>
-      button.textContent?.includes('Send to AI'),
-    );
-    expect(send?.disabled).toBe(true);
-    fixture.destroy();
-  });
   it('makes no native request in browser-only mode', async () => {
     Reflect.deleteProperty(globalThis, '__TAURI_INTERNALS__');
     TestBed.resetTestingModule();
@@ -248,15 +229,5 @@ describe('Offline AI preview boundary', () => {
     await ai.create(input(), original);
     expect(call).not.toHaveBeenCalled();
     expect(ai.error()).toContain('desktop');
-  });
-  it('clears the old original before a newly selected conversation fails to load', async () => {
-    const fixture = TestBed.createComponent(AiPreviewPanel);
-    fixture.detectChanges();
-    fixture.componentInstance.session = '44444444-4444-4444-8444-444444444444';
-    call.mockRejectedValue({ code: 'NOT_FOUND', message: 'private' });
-    await fixture.componentInstance.load();
-    expect(vault.selected()).toBeNull();
-    expect(vault.error()).not.toContain('private');
-    fixture.destroy();
   });
 });

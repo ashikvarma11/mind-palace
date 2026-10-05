@@ -1,5 +1,13 @@
 # Automatic conversation capture — active priority
 
+## Current reader entry point — 5 October 2026
+
+The Codex desktop capture-to-vault-to-quoted-Ask workflow is implemented and has passed synthetic native checks. Use the [user guide](user-guide.md) and [roadmap](roadmap.md) for current behavior and limits. The earlier receiver-only descriptions below are historical contract notes; their statements that desktop integration is absent are superseded. Ordinary ChatGPT/Claude account-history sync and complete Claude Code verification remain deferred.
+
+Latest approved direction, 3 October (D024): **Codex and Claude Code** via user-installed hooks writing one shared local-per-user inbox. The user explicitly sets aside other automatic-capture concepts for now. Hooks retain lifecycle/turn snapshots and optional selected Markdown memory files; Mind Palace owns a rebuildable index and later canonical ingestion. Ordinary ChatGPT/Claude account syncing, browser extensions, broad source discovery/history scans and export automation are not the active approach. Earlier universal-coverage and implementation-order paragraphs below are historical; hook-sync.md is the current sequencing contract. Existing manual paste is preserved; the newly tested export importer is a shelved fallback, not ongoing sync.
+
+3 October follow-up: user prioritizes ChatGPT sync/GitHub research and proposes locating installed assistants' local memory files. Verified documented Claude Code project memory/transcript locations and local Codex memory contract; metadata-only machine discovery found Claude stores without reading private text. Independent source-only ChatGPT export/memory-text sync now exists as a fallback, with account-separated immutable revisions and batch receipts. This is not continuous account sync, native ingestion or completion of D022. See chatgpt-sync.md for exact contract, inspected projects and direct-store next steps.
+
 2 October 2026. The user explicitly requests automatic capture of all conversation sessions in Claude, Codex and ChatGPT, including existing history and ongoing sessions. Keep the paste feature as a fallback, but do not use it to claim this requirement is complete. Other note features and paid API transport are deprioritized. Capture and model inference are distinct: storing original local transcripts does not require a model call.
 
 ## Coverage and verified connection points

@@ -12,6 +12,8 @@ import uuid
 
 ROOT = Path(__file__).resolve().parents[1]
 EXE = "mind-palace-memory-worker.exe"
+SOURCE = ".tools/probe-dist/mind-palace-memory-worker"
+TARGET = "src-tauri/resources/memory-worker"
 MANIFEST = "worker-manifest.json"
 MAX_FILES = 512
 MAX_ENTRIES = 2048
@@ -139,8 +141,8 @@ def owned(path: Path, root: Path) -> None:
 
 def stage(root: Path, *, check=False, refresh=False) -> dict:
     root = root.absolute()
-    source = root / ".tools/probe-dist/mind-palace-memory-worker"
-    target = root / "src-tauri/resources/memory-worker"
+    source = root / SOURCE
+    target = root / TARGET
     owned(source, root)
     owned(target, root)
     expected = inventory(source)

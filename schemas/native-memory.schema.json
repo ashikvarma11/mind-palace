@@ -17,6 +17,8 @@
         "title": {"type": "string", "minLength": 1, "maxLength": 200},
         "source_id": {"$ref": "#/$defs/Identifier"},
         "review_status": {"const": "unreviewed"},
+        "source_kind": {"const": "hook_capture"},
+        "provider": {"enum": ["claude-code", "codex"]},
         "created_at": {
           "type": "string",
           "format": "date-time",
@@ -36,7 +38,7 @@
       "properties": {
         "metadata": {"$ref": "#/$defs/SessionMetadata"},
         "body": {"type": "string", "maxLength": 32768},
-        "source_text": {"type": "string", "maxLength": 65536}
+        "source_text": {"type": "string", "maxLength": 20971520}
       },
       "required": ["metadata", "body", "source_text"],
       "additionalProperties": false
@@ -57,6 +59,33 @@
       "type": "object",
       "properties": {"id": {"$ref": "#/$defs/Identifier"}},
       "required": ["id"],
+      "additionalProperties": false
+    },
+    "MemoryAnswerSource": {
+      "title": "MemoryAnswerSource",
+      "type": "object",
+      "properties": {
+        "session_id": {"$ref": "#/$defs/Identifier"},
+        "title": {"type": "string", "minLength": 1, "maxLength": 200},
+        "quote": {"type": "string", "minLength": 1, "maxLength": 1200},
+        "start": {"type": "integer", "minimum": 0, "maximum": 20971520},
+        "end": {"type": "integer", "minimum": 1, "maximum": 20971520},
+        "snapshot_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "provider": {"enum": ["claude-code", "codex"]}
+      },
+      "required": ["session_id", "title", "quote", "start", "end", "snapshot_sha256"],
+      "additionalProperties": false
+    },
+    "MemoryAnswer": {
+      "title": "MemoryAnswer",
+      "type": "object",
+      "properties": {
+        "schema_version": {"const": 1},
+        "status": {"enum": ["answered", "insufficient_evidence"]},
+        "answer": {"type": "string", "minLength": 1, "maxLength": 8000},
+        "sources": {"type": "array", "maxItems": 5, "items": {"$ref": "#/$defs/MemoryAnswerSource"}}
+      },
+      "required": ["schema_version", "status", "answer", "sources"],
       "additionalProperties": false
     }
   }

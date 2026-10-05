@@ -27,3 +27,7 @@ windows-sys = { version = "=0.61.2", features = ["Win32_Foundation", "Win32_Secu
 
 [features]
 custom-protocol = ["tauri/custom-protocol"]
+
+# Keep full resource hashing on every command without debug compression cost.
+[profile.dev.package.sha2]
+opt-level = 3

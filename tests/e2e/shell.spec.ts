@@ -6,7 +6,7 @@ test('sample opt-in, source inspection, review and handoff preserve approval bou
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/welcome');
-  await expect(page.getByText('Memory service not connected', { exact: true })).toBeVisible();
+  await expect(page.getByText('Desktop vault unavailable in browser', { exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'No workspace is open yet.' })).toBeVisible();
   await page.screenshot({ path: info.outputPath('opening.png'), fullPage: true });
   await page.getByRole('button', { name: 'Explore sample workspace', exact: true }).click();

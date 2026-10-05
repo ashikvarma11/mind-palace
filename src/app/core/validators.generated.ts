@@ -14,6 +14,8 @@ const schema32 = {
     title: { type: 'string', minLength: 1, maxLength: 200 },
     source_id: { $ref: '#/$defs/Identifier' },
     review_status: { const: 'unreviewed' },
+    source_kind: { const: 'hook_capture' },
+    provider: { enum: ['claude-code', 'codex'] },
     created_at: {
       type: 'string',
       format: 'date-time',
@@ -36,6 +38,13 @@ const schema33 = {
   type: 'string',
   pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
 };
+const func1 = Object.prototype.hasOwnProperty;
+const func2 = {
+  default:
+    typeof runtime0.default === 'function'
+      ? runtime0.default
+      : runtime0.default.default,
+}.default;
 const pattern4 = new RegExp(
   '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
   'u',
@@ -44,12 +53,6 @@ const pattern6 = new RegExp(
   '^(?!0000)[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](\\.[0-9]{1,6})?Z$',
   'u',
 );
-const func1 = {
-  default:
-    typeof runtime0.default === 'function'
-      ? runtime0.default
-      : runtime0.default.default,
-}.default;
 const formats0 = runtime1.fullFormats['date-time'];
 function validate21(
   data,
@@ -95,17 +98,7 @@ function validate21(
       } else {
         const _errs1 = errors;
         for (const key0 in data) {
-          if (
-            !(
-              key0 === 'schema_version' ||
-              key0 === 'id' ||
-              key0 === 'kind' ||
-              key0 === 'title' ||
-              key0 === 'source_id' ||
-              key0 === 'review_status' ||
-              key0 === 'created_at'
-            )
-          ) {
+          if (!func1.call(schema32.properties, key0)) {
             validate21.errors = [
               {
                 instancePath,
@@ -205,7 +198,7 @@ function validate21(
                   const _errs7 = errors;
                   if (errors === _errs7) {
                     if (typeof data3 === 'string') {
-                      if (func1(data3) > 200) {
+                      if (func2(data3) > 200) {
                         validate21.errors = [
                           {
                             instancePath: instancePath + '/title',
@@ -217,7 +210,7 @@ function validate21(
                         ];
                         return false;
                       } else {
-                        if (func1(data3) < 1) {
+                        if (func2(data3) < 1) {
                           validate21.errors = [
                             {
                               instancePath: instancePath + '/title',
@@ -309,66 +302,114 @@ function validate21(
                       var valid0 = true;
                     }
                     if (valid0) {
-                      if (data.created_at !== undefined) {
-                        let data6 = data.created_at;
+                      if (data.source_kind !== undefined) {
                         const _errs13 = errors;
-                        if (errors === _errs13) {
-                          if (errors === _errs13) {
-                            if (typeof data6 === 'string') {
-                              if (!pattern6.test(data6)) {
-                                validate21.errors = [
-                                  {
-                                    instancePath: instancePath + '/created_at',
-                                    schemaPath:
-                                      '#/properties/created_at/pattern',
-                                    keyword: 'pattern',
-                                    params: {
-                                      pattern:
-                                        '^(?!0000)[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](\\.[0-9]{1,6})?Z$',
-                                    },
-                                    message:
-                                      'must match pattern "' +
-                                      '^(?!0000)[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](\\.[0-9]{1,6})?Z$' +
-                                      '"',
-                                  },
-                                ];
-                                return false;
-                              } else {
-                                if (!formats0.validate(data6)) {
+                        if ('hook_capture' !== data.source_kind) {
+                          validate21.errors = [
+                            {
+                              instancePath: instancePath + '/source_kind',
+                              schemaPath: '#/properties/source_kind/const',
+                              keyword: 'const',
+                              params: { allowedValue: 'hook_capture' },
+                              message: 'must be equal to constant',
+                            },
+                          ];
+                          return false;
+                        }
+                        var valid0 = _errs13 === errors;
+                      } else {
+                        var valid0 = true;
+                      }
+                      if (valid0) {
+                        if (data.provider !== undefined) {
+                          let data7 = data.provider;
+                          const _errs14 = errors;
+                          if (!(data7 === 'claude-code' || data7 === 'codex')) {
+                            validate21.errors = [
+                              {
+                                instancePath: instancePath + '/provider',
+                                schemaPath: '#/properties/provider/enum',
+                                keyword: 'enum',
+                                params: {
+                                  allowedValues:
+                                    schema32.properties.provider.enum,
+                                },
+                                message:
+                                  'must be equal to one of the allowed values',
+                              },
+                            ];
+                            return false;
+                          }
+                          var valid0 = _errs14 === errors;
+                        } else {
+                          var valid0 = true;
+                        }
+                        if (valid0) {
+                          if (data.created_at !== undefined) {
+                            let data8 = data.created_at;
+                            const _errs15 = errors;
+                            if (errors === _errs15) {
+                              if (errors === _errs15) {
+                                if (typeof data8 === 'string') {
+                                  if (!pattern6.test(data8)) {
+                                    validate21.errors = [
+                                      {
+                                        instancePath:
+                                          instancePath + '/created_at',
+                                        schemaPath:
+                                          '#/properties/created_at/pattern',
+                                        keyword: 'pattern',
+                                        params: {
+                                          pattern:
+                                            '^(?!0000)[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](\\.[0-9]{1,6})?Z$',
+                                        },
+                                        message:
+                                          'must match pattern "' +
+                                          '^(?!0000)[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](\\.[0-9]{1,6})?Z$' +
+                                          '"',
+                                      },
+                                    ];
+                                    return false;
+                                  } else {
+                                    if (!formats0.validate(data8)) {
+                                      validate21.errors = [
+                                        {
+                                          instancePath:
+                                            instancePath + '/created_at',
+                                          schemaPath:
+                                            '#/properties/created_at/format',
+                                          keyword: 'format',
+                                          params: { format: 'date-time' },
+                                          message:
+                                            'must match format "' +
+                                            'date-time' +
+                                            '"',
+                                        },
+                                      ];
+                                      return false;
+                                    }
+                                  }
+                                } else {
                                   validate21.errors = [
                                     {
                                       instancePath:
                                         instancePath + '/created_at',
                                       schemaPath:
-                                        '#/properties/created_at/format',
-                                      keyword: 'format',
-                                      params: { format: 'date-time' },
-                                      message:
-                                        'must match format "' +
-                                        'date-time' +
-                                        '"',
+                                        '#/properties/created_at/type',
+                                      keyword: 'type',
+                                      params: { type: 'string' },
+                                      message: 'must be string',
                                     },
                                   ];
                                   return false;
                                 }
                               }
-                            } else {
-                              validate21.errors = [
-                                {
-                                  instancePath: instancePath + '/created_at',
-                                  schemaPath: '#/properties/created_at/type',
-                                  keyword: 'type',
-                                  params: { type: 'string' },
-                                  message: 'must be string',
-                                },
-                              ];
-                              return false;
                             }
+                            var valid0 = _errs15 === errors;
+                          } else {
+                            var valid0 = true;
                           }
                         }
-                        var valid0 = _errs13 === errors;
-                      } else {
-                        var valid0 = true;
                       }
                     }
                   }
@@ -406,7 +447,7 @@ const schema35 = {
   properties: {
     metadata: { $ref: '#/$defs/SessionMetadata' },
     body: { type: 'string', maxLength: 32768 },
-    source_text: { type: 'string', maxLength: 65536 },
+    source_text: { type: 'string', maxLength: 20971520 },
   },
   required: ['metadata', 'body', 'source_text'],
   additionalProperties: false,
@@ -495,7 +536,7 @@ function validate22(
               const _errs3 = errors;
               if (errors === _errs3) {
                 if (typeof data1 === 'string') {
-                  if (func1(data1) > 32768) {
+                  if (func2(data1) > 32768) {
                     validate22.errors = [
                       {
                         instancePath: instancePath + '/body',
@@ -530,14 +571,15 @@ function validate22(
                 const _errs5 = errors;
                 if (errors === _errs5) {
                   if (typeof data2 === 'string') {
-                    if (func1(data2) > 65536) {
+                    if (func2(data2) > 20971520) {
                       validate22.errors = [
                         {
                           instancePath: instancePath + '/source_text',
                           schemaPath: '#/properties/source_text/maxLength',
                           keyword: 'maxLength',
-                          params: { limit: 65536 },
-                          message: 'must NOT have more than 65536 characters',
+                          params: { limit: 20971520 },
+                          message:
+                            'must NOT have more than 20971520 characters',
                         },
                       ];
                       return false;
@@ -973,13 +1015,447 @@ validate26.evaluated = {
   dynamicProps: false,
   dynamicItems: false,
 };
-export const validateVaultStatus = validate27;
+export const validateMemoryAnswer = validate27;
 const schema39 = {
-  title: 'VaultStatus',
+  title: 'MemoryAnswer',
   type: 'object',
-  properties: { connected: { type: 'boolean' }, ai_enabled: { const: false } },
-  required: ['connected', 'ai_enabled'],
+  properties: {
+    schema_version: { const: 1 },
+    status: { enum: ['answered', 'insufficient_evidence'] },
+    answer: { type: 'string', minLength: 1, maxLength: 8000 },
+    sources: {
+      type: 'array',
+      maxItems: 5,
+      items: { $ref: '#/$defs/MemoryAnswerSource' },
+    },
+  },
+  required: ['schema_version', 'status', 'answer', 'sources'],
   additionalProperties: false,
+};
+const schema40 = {
+  title: 'MemoryAnswerSource',
+  type: 'object',
+  properties: {
+    session_id: { $ref: '#/$defs/Identifier' },
+    title: { type: 'string', minLength: 1, maxLength: 200 },
+    quote: { type: 'string', minLength: 1, maxLength: 1200 },
+    start: { type: 'integer', minimum: 0, maximum: 20971520 },
+    end: { type: 'integer', minimum: 1, maximum: 20971520 },
+    snapshot_sha256: { type: 'string', pattern: '^[0-9a-f]{64}$' },
+    provider: { enum: ['claude-code', 'codex'] },
+  },
+  required: ['session_id', 'title', 'quote', 'start', 'end', 'snapshot_sha256'],
+  additionalProperties: false,
+};
+const pattern9 = new RegExp('^[0-9a-f]{64}$', 'u');
+function validate28(
+  data,
+  {
+    instancePath = '',
+    parentData,
+    parentDataProperty,
+    rootData = data,
+    dynamicAnchors = {},
+  } = {},
+) {
+  let vErrors = null;
+  let errors = 0;
+  const evaluated0 = validate28.evaluated;
+  if (evaluated0.dynamicProps) {
+    evaluated0.props = undefined;
+  }
+  if (evaluated0.dynamicItems) {
+    evaluated0.items = undefined;
+  }
+  if (errors === 0) {
+    if (data && typeof data == 'object' && !Array.isArray(data)) {
+      let missing0;
+      if (
+        (data.session_id === undefined && (missing0 = 'session_id')) ||
+        (data.title === undefined && (missing0 = 'title')) ||
+        (data.quote === undefined && (missing0 = 'quote')) ||
+        (data.start === undefined && (missing0 = 'start')) ||
+        (data.end === undefined && (missing0 = 'end')) ||
+        (data.snapshot_sha256 === undefined && (missing0 = 'snapshot_sha256'))
+      ) {
+        validate28.errors = [
+          {
+            instancePath,
+            schemaPath: '#/required',
+            keyword: 'required',
+            params: { missingProperty: missing0 },
+            message: "must have required property '" + missing0 + "'",
+          },
+        ];
+        return false;
+      } else {
+        const _errs1 = errors;
+        for (const key0 in data) {
+          if (
+            !(
+              key0 === 'session_id' ||
+              key0 === 'title' ||
+              key0 === 'quote' ||
+              key0 === 'start' ||
+              key0 === 'end' ||
+              key0 === 'snapshot_sha256' ||
+              key0 === 'provider'
+            )
+          ) {
+            validate28.errors = [
+              {
+                instancePath,
+                schemaPath: '#/additionalProperties',
+                keyword: 'additionalProperties',
+                params: { additionalProperty: key0 },
+                message: 'must NOT have additional properties',
+              },
+            ];
+            return false;
+            break;
+          }
+        }
+        if (_errs1 === errors) {
+          if (data.session_id !== undefined) {
+            let data0 = data.session_id;
+            const _errs2 = errors;
+            const _errs3 = errors;
+            if (errors === _errs3) {
+              if (typeof data0 === 'string') {
+                if (!pattern4.test(data0)) {
+                  validate28.errors = [
+                    {
+                      instancePath: instancePath + '/session_id',
+                      schemaPath: '#/$defs/Identifier/pattern',
+                      keyword: 'pattern',
+                      params: {
+                        pattern:
+                          '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
+                      },
+                      message:
+                        'must match pattern "' +
+                        '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$' +
+                        '"',
+                    },
+                  ];
+                  return false;
+                }
+              } else {
+                validate28.errors = [
+                  {
+                    instancePath: instancePath + '/session_id',
+                    schemaPath: '#/$defs/Identifier/type',
+                    keyword: 'type',
+                    params: { type: 'string' },
+                    message: 'must be string',
+                  },
+                ];
+                return false;
+              }
+            }
+            var valid0 = _errs2 === errors;
+          } else {
+            var valid0 = true;
+          }
+          if (valid0) {
+            if (data.title !== undefined) {
+              let data1 = data.title;
+              const _errs5 = errors;
+              if (errors === _errs5) {
+                if (typeof data1 === 'string') {
+                  if (func2(data1) > 200) {
+                    validate28.errors = [
+                      {
+                        instancePath: instancePath + '/title',
+                        schemaPath: '#/properties/title/maxLength',
+                        keyword: 'maxLength',
+                        params: { limit: 200 },
+                        message: 'must NOT have more than 200 characters',
+                      },
+                    ];
+                    return false;
+                  } else {
+                    if (func2(data1) < 1) {
+                      validate28.errors = [
+                        {
+                          instancePath: instancePath + '/title',
+                          schemaPath: '#/properties/title/minLength',
+                          keyword: 'minLength',
+                          params: { limit: 1 },
+                          message: 'must NOT have fewer than 1 characters',
+                        },
+                      ];
+                      return false;
+                    }
+                  }
+                } else {
+                  validate28.errors = [
+                    {
+                      instancePath: instancePath + '/title',
+                      schemaPath: '#/properties/title/type',
+                      keyword: 'type',
+                      params: { type: 'string' },
+                      message: 'must be string',
+                    },
+                  ];
+                  return false;
+                }
+              }
+              var valid0 = _errs5 === errors;
+            } else {
+              var valid0 = true;
+            }
+            if (valid0) {
+              if (data.quote !== undefined) {
+                let data2 = data.quote;
+                const _errs7 = errors;
+                if (errors === _errs7) {
+                  if (typeof data2 === 'string') {
+                    if (func2(data2) > 1200) {
+                      validate28.errors = [
+                        {
+                          instancePath: instancePath + '/quote',
+                          schemaPath: '#/properties/quote/maxLength',
+                          keyword: 'maxLength',
+                          params: { limit: 1200 },
+                          message: 'must NOT have more than 1200 characters',
+                        },
+                      ];
+                      return false;
+                    } else {
+                      if (func2(data2) < 1) {
+                        validate28.errors = [
+                          {
+                            instancePath: instancePath + '/quote',
+                            schemaPath: '#/properties/quote/minLength',
+                            keyword: 'minLength',
+                            params: { limit: 1 },
+                            message: 'must NOT have fewer than 1 characters',
+                          },
+                        ];
+                        return false;
+                      }
+                    }
+                  } else {
+                    validate28.errors = [
+                      {
+                        instancePath: instancePath + '/quote',
+                        schemaPath: '#/properties/quote/type',
+                        keyword: 'type',
+                        params: { type: 'string' },
+                        message: 'must be string',
+                      },
+                    ];
+                    return false;
+                  }
+                }
+                var valid0 = _errs7 === errors;
+              } else {
+                var valid0 = true;
+              }
+              if (valid0) {
+                if (data.start !== undefined) {
+                  let data3 = data.start;
+                  const _errs9 = errors;
+                  if (
+                    !(
+                      typeof data3 == 'number' &&
+                      !(data3 % 1) &&
+                      !isNaN(data3) &&
+                      isFinite(data3)
+                    )
+                  ) {
+                    validate28.errors = [
+                      {
+                        instancePath: instancePath + '/start',
+                        schemaPath: '#/properties/start/type',
+                        keyword: 'type',
+                        params: { type: 'integer' },
+                        message: 'must be integer',
+                      },
+                    ];
+                    return false;
+                  }
+                  if (errors === _errs9) {
+                    if (typeof data3 == 'number' && isFinite(data3)) {
+                      if (data3 > 20971520 || isNaN(data3)) {
+                        validate28.errors = [
+                          {
+                            instancePath: instancePath + '/start',
+                            schemaPath: '#/properties/start/maximum',
+                            keyword: 'maximum',
+                            params: { comparison: '<=', limit: 20971520 },
+                            message: 'must be <= 20971520',
+                          },
+                        ];
+                        return false;
+                      } else {
+                        if (data3 < 0 || isNaN(data3)) {
+                          validate28.errors = [
+                            {
+                              instancePath: instancePath + '/start',
+                              schemaPath: '#/properties/start/minimum',
+                              keyword: 'minimum',
+                              params: { comparison: '>=', limit: 0 },
+                              message: 'must be >= 0',
+                            },
+                          ];
+                          return false;
+                        }
+                      }
+                    }
+                  }
+                  var valid0 = _errs9 === errors;
+                } else {
+                  var valid0 = true;
+                }
+                if (valid0) {
+                  if (data.end !== undefined) {
+                    let data4 = data.end;
+                    const _errs11 = errors;
+                    if (
+                      !(
+                        typeof data4 == 'number' &&
+                        !(data4 % 1) &&
+                        !isNaN(data4) &&
+                        isFinite(data4)
+                      )
+                    ) {
+                      validate28.errors = [
+                        {
+                          instancePath: instancePath + '/end',
+                          schemaPath: '#/properties/end/type',
+                          keyword: 'type',
+                          params: { type: 'integer' },
+                          message: 'must be integer',
+                        },
+                      ];
+                      return false;
+                    }
+                    if (errors === _errs11) {
+                      if (typeof data4 == 'number' && isFinite(data4)) {
+                        if (data4 > 20971520 || isNaN(data4)) {
+                          validate28.errors = [
+                            {
+                              instancePath: instancePath + '/end',
+                              schemaPath: '#/properties/end/maximum',
+                              keyword: 'maximum',
+                              params: { comparison: '<=', limit: 20971520 },
+                              message: 'must be <= 20971520',
+                            },
+                          ];
+                          return false;
+                        } else {
+                          if (data4 < 1 || isNaN(data4)) {
+                            validate28.errors = [
+                              {
+                                instancePath: instancePath + '/end',
+                                schemaPath: '#/properties/end/minimum',
+                                keyword: 'minimum',
+                                params: { comparison: '>=', limit: 1 },
+                                message: 'must be >= 1',
+                              },
+                            ];
+                            return false;
+                          }
+                        }
+                      }
+                    }
+                    var valid0 = _errs11 === errors;
+                  } else {
+                    var valid0 = true;
+                  }
+                  if (valid0) {
+                    if (data.snapshot_sha256 !== undefined) {
+                      let data5 = data.snapshot_sha256;
+                      const _errs13 = errors;
+                      if (errors === _errs13) {
+                        if (typeof data5 === 'string') {
+                          if (!pattern9.test(data5)) {
+                            validate28.errors = [
+                              {
+                                instancePath: instancePath + '/snapshot_sha256',
+                                schemaPath:
+                                  '#/properties/snapshot_sha256/pattern',
+                                keyword: 'pattern',
+                                params: { pattern: '^[0-9a-f]{64}$' },
+                                message:
+                                  'must match pattern "' +
+                                  '^[0-9a-f]{64}$' +
+                                  '"',
+                              },
+                            ];
+                            return false;
+                          }
+                        } else {
+                          validate28.errors = [
+                            {
+                              instancePath: instancePath + '/snapshot_sha256',
+                              schemaPath: '#/properties/snapshot_sha256/type',
+                              keyword: 'type',
+                              params: { type: 'string' },
+                              message: 'must be string',
+                            },
+                          ];
+                          return false;
+                        }
+                      }
+                      var valid0 = _errs13 === errors;
+                    } else {
+                      var valid0 = true;
+                    }
+                    if (valid0) {
+                      if (data.provider !== undefined) {
+                        let data6 = data.provider;
+                        const _errs15 = errors;
+                        if (!(data6 === 'claude-code' || data6 === 'codex')) {
+                          validate28.errors = [
+                            {
+                              instancePath: instancePath + '/provider',
+                              schemaPath: '#/properties/provider/enum',
+                              keyword: 'enum',
+                              params: {
+                                allowedValues:
+                                  schema40.properties.provider.enum,
+                              },
+                              message:
+                                'must be equal to one of the allowed values',
+                            },
+                          ];
+                          return false;
+                        }
+                        var valid0 = _errs15 === errors;
+                      } else {
+                        var valid0 = true;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    } else {
+      validate28.errors = [
+        {
+          instancePath,
+          schemaPath: '#/type',
+          keyword: 'type',
+          params: { type: 'object' },
+          message: 'must be object',
+        },
+      ];
+      return false;
+    }
+  }
+  validate28.errors = vErrors;
+  return errors === 0;
+}
+validate28.evaluated = {
+  props: true,
+  dynamicProps: false,
+  dynamicItems: false,
 };
 function validate27(
   data,
@@ -1004,8 +1480,10 @@ function validate27(
     if (data && typeof data == 'object' && !Array.isArray(data)) {
       let missing0;
       if (
-        (data.connected === undefined && (missing0 = 'connected')) ||
-        (data.ai_enabled === undefined && (missing0 = 'ai_enabled'))
+        (data.schema_version === undefined && (missing0 = 'schema_version')) ||
+        (data.status === undefined && (missing0 = 'status')) ||
+        (data.answer === undefined && (missing0 = 'answer')) ||
+        (data.sources === undefined && (missing0 = 'sources'))
       ) {
         validate27.errors = [
           {
@@ -1020,7 +1498,14 @@ function validate27(
       } else {
         const _errs1 = errors;
         for (const key0 in data) {
-          if (!(key0 === 'connected' || key0 === 'ai_enabled')) {
+          if (
+            !(
+              key0 === 'schema_version' ||
+              key0 === 'status' ||
+              key0 === 'answer' ||
+              key0 === 'sources'
+            )
+          ) {
             validate27.errors = [
               {
                 instancePath,
@@ -1035,16 +1520,16 @@ function validate27(
           }
         }
         if (_errs1 === errors) {
-          if (data.connected !== undefined) {
+          if (data.schema_version !== undefined) {
             const _errs2 = errors;
-            if (typeof data.connected !== 'boolean') {
+            if (1 !== data.schema_version) {
               validate27.errors = [
                 {
-                  instancePath: instancePath + '/connected',
-                  schemaPath: '#/properties/connected/type',
-                  keyword: 'type',
-                  params: { type: 'boolean' },
-                  message: 'must be boolean',
+                  instancePath: instancePath + '/schema_version',
+                  schemaPath: '#/properties/schema_version/const',
+                  keyword: 'const',
+                  params: { allowedValue: 1 },
+                  message: 'must be equal to constant',
                 },
               ];
               return false;
@@ -1054,23 +1539,136 @@ function validate27(
             var valid0 = true;
           }
           if (valid0) {
-            if (data.ai_enabled !== undefined) {
-              const _errs4 = errors;
-              if (false !== data.ai_enabled) {
+            if (data.status !== undefined) {
+              let data1 = data.status;
+              const _errs3 = errors;
+              if (
+                !(data1 === 'answered' || data1 === 'insufficient_evidence')
+              ) {
                 validate27.errors = [
                   {
-                    instancePath: instancePath + '/ai_enabled',
-                    schemaPath: '#/properties/ai_enabled/const',
-                    keyword: 'const',
-                    params: { allowedValue: false },
-                    message: 'must be equal to constant',
+                    instancePath: instancePath + '/status',
+                    schemaPath: '#/properties/status/enum',
+                    keyword: 'enum',
+                    params: { allowedValues: schema39.properties.status.enum },
+                    message: 'must be equal to one of the allowed values',
                   },
                 ];
                 return false;
               }
-              var valid0 = _errs4 === errors;
+              var valid0 = _errs3 === errors;
             } else {
               var valid0 = true;
+            }
+            if (valid0) {
+              if (data.answer !== undefined) {
+                let data2 = data.answer;
+                const _errs4 = errors;
+                if (errors === _errs4) {
+                  if (typeof data2 === 'string') {
+                    if (func2(data2) > 8000) {
+                      validate27.errors = [
+                        {
+                          instancePath: instancePath + '/answer',
+                          schemaPath: '#/properties/answer/maxLength',
+                          keyword: 'maxLength',
+                          params: { limit: 8000 },
+                          message: 'must NOT have more than 8000 characters',
+                        },
+                      ];
+                      return false;
+                    } else {
+                      if (func2(data2) < 1) {
+                        validate27.errors = [
+                          {
+                            instancePath: instancePath + '/answer',
+                            schemaPath: '#/properties/answer/minLength',
+                            keyword: 'minLength',
+                            params: { limit: 1 },
+                            message: 'must NOT have fewer than 1 characters',
+                          },
+                        ];
+                        return false;
+                      }
+                    }
+                  } else {
+                    validate27.errors = [
+                      {
+                        instancePath: instancePath + '/answer',
+                        schemaPath: '#/properties/answer/type',
+                        keyword: 'type',
+                        params: { type: 'string' },
+                        message: 'must be string',
+                      },
+                    ];
+                    return false;
+                  }
+                }
+                var valid0 = _errs4 === errors;
+              } else {
+                var valid0 = true;
+              }
+              if (valid0) {
+                if (data.sources !== undefined) {
+                  let data3 = data.sources;
+                  const _errs6 = errors;
+                  if (errors === _errs6) {
+                    if (Array.isArray(data3)) {
+                      if (data3.length > 5) {
+                        validate27.errors = [
+                          {
+                            instancePath: instancePath + '/sources',
+                            schemaPath: '#/properties/sources/maxItems',
+                            keyword: 'maxItems',
+                            params: { limit: 5 },
+                            message: 'must NOT have more than 5 items',
+                          },
+                        ];
+                        return false;
+                      } else {
+                        var valid1 = true;
+                        const len0 = data3.length;
+                        for (let i0 = 0; i0 < len0; i0++) {
+                          const _errs8 = errors;
+                          if (
+                            !validate28(data3[i0], {
+                              instancePath: instancePath + '/sources/' + i0,
+                              parentData: data3,
+                              parentDataProperty: i0,
+                              rootData,
+                              dynamicAnchors,
+                            })
+                          ) {
+                            vErrors =
+                              vErrors === null
+                                ? validate28.errors
+                                : vErrors.concat(validate28.errors);
+                            errors = vErrors.length;
+                          }
+                          var valid1 = _errs8 === errors;
+                          if (!valid1) {
+                            break;
+                          }
+                        }
+                      }
+                    } else {
+                      validate27.errors = [
+                        {
+                          instancePath: instancePath + '/sources',
+                          schemaPath: '#/properties/sources/type',
+                          keyword: 'type',
+                          params: { type: 'array' },
+                          message: 'must be array',
+                        },
+                      ];
+                      return false;
+                    }
+                  }
+                  var valid0 = _errs6 === errors;
+                } else {
+                  var valid0 = true;
+                }
+              }
             }
           }
         }
@@ -1096,8 +1694,131 @@ validate27.evaluated = {
   dynamicProps: false,
   dynamicItems: false,
 };
-export const validateAiPreviewRequest = validate28;
-const schema40 = {
+export const validateVaultStatus = validate30;
+const schema42 = {
+  title: 'VaultStatus',
+  type: 'object',
+  properties: { connected: { type: 'boolean' }, ai_enabled: { const: false } },
+  required: ['connected', 'ai_enabled'],
+  additionalProperties: false,
+};
+function validate30(
+  data,
+  {
+    instancePath = '',
+    parentData,
+    parentDataProperty,
+    rootData = data,
+    dynamicAnchors = {},
+  } = {},
+) {
+  let vErrors = null;
+  let errors = 0;
+  const evaluated0 = validate30.evaluated;
+  if (evaluated0.dynamicProps) {
+    evaluated0.props = undefined;
+  }
+  if (evaluated0.dynamicItems) {
+    evaluated0.items = undefined;
+  }
+  if (errors === 0) {
+    if (data && typeof data == 'object' && !Array.isArray(data)) {
+      let missing0;
+      if (
+        (data.connected === undefined && (missing0 = 'connected')) ||
+        (data.ai_enabled === undefined && (missing0 = 'ai_enabled'))
+      ) {
+        validate30.errors = [
+          {
+            instancePath,
+            schemaPath: '#/required',
+            keyword: 'required',
+            params: { missingProperty: missing0 },
+            message: "must have required property '" + missing0 + "'",
+          },
+        ];
+        return false;
+      } else {
+        const _errs1 = errors;
+        for (const key0 in data) {
+          if (!(key0 === 'connected' || key0 === 'ai_enabled')) {
+            validate30.errors = [
+              {
+                instancePath,
+                schemaPath: '#/additionalProperties',
+                keyword: 'additionalProperties',
+                params: { additionalProperty: key0 },
+                message: 'must NOT have additional properties',
+              },
+            ];
+            return false;
+            break;
+          }
+        }
+        if (_errs1 === errors) {
+          if (data.connected !== undefined) {
+            const _errs2 = errors;
+            if (typeof data.connected !== 'boolean') {
+              validate30.errors = [
+                {
+                  instancePath: instancePath + '/connected',
+                  schemaPath: '#/properties/connected/type',
+                  keyword: 'type',
+                  params: { type: 'boolean' },
+                  message: 'must be boolean',
+                },
+              ];
+              return false;
+            }
+            var valid0 = _errs2 === errors;
+          } else {
+            var valid0 = true;
+          }
+          if (valid0) {
+            if (data.ai_enabled !== undefined) {
+              const _errs4 = errors;
+              if (false !== data.ai_enabled) {
+                validate30.errors = [
+                  {
+                    instancePath: instancePath + '/ai_enabled',
+                    schemaPath: '#/properties/ai_enabled/const',
+                    keyword: 'const',
+                    params: { allowedValue: false },
+                    message: 'must be equal to constant',
+                  },
+                ];
+                return false;
+              }
+              var valid0 = _errs4 === errors;
+            } else {
+              var valid0 = true;
+            }
+          }
+        }
+      }
+    } else {
+      validate30.errors = [
+        {
+          instancePath,
+          schemaPath: '#/type',
+          keyword: 'type',
+          params: { type: 'object' },
+          message: 'must be object',
+        },
+      ];
+      return false;
+    }
+  }
+  validate30.errors = vErrors;
+  return errors === 0;
+}
+validate30.evaluated = {
+  props: true,
+  dynamicProps: false,
+  dynamicItems: false,
+};
+export const validateAiPreviewRequest = validate31;
+const schema43 = {
   title: 'AiPreviewRequest',
   type: 'object',
   properties: {
@@ -1131,17 +1852,17 @@ const schema40 = {
   ],
   additionalProperties: false,
 };
-const schema41 = {
+const schema44 = {
   type: 'string',
   pattern: '^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$',
 };
-const schema42 = { type: 'integer', minimum: 128, maximum: 1024 };
-const schema43 = {
+const schema45 = { type: 'integer', minimum: 128, maximum: 1024 };
+const schema46 = {
   type: 'string',
   pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
 };
-const pattern8 = new RegExp('^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$', 'u');
-function validate28(
+const pattern10 = new RegExp('^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$', 'u');
+function validate31(
   data,
   {
     instancePath = '',
@@ -1153,7 +1874,7 @@ function validate28(
 ) {
   let vErrors = null;
   let errors = 0;
-  const evaluated0 = validate28.evaluated;
+  const evaluated0 = validate31.evaluated;
   if (evaluated0.dynamicProps) {
     evaluated0.props = undefined;
   }
@@ -1171,7 +1892,7 @@ function validate28(
           (missing0 = 'max_output_tokens')) ||
         (data.selections === undefined && (missing0 = 'selections'))
       ) {
-        validate28.errors = [
+        validate31.errors = [
           {
             instancePath,
             schemaPath: '#/required',
@@ -1193,7 +1914,7 @@ function validate28(
               key0 === 'selections'
             )
           ) {
-            validate28.errors = [
+            validate31.errors = [
               {
                 instancePath,
                 schemaPath: '#/additionalProperties',
@@ -1211,12 +1932,12 @@ function validate28(
             let data0 = data.provider;
             const _errs2 = errors;
             if (!(data0 === 'openai' || data0 === 'anthropic')) {
-              validate28.errors = [
+              validate31.errors = [
                 {
                   instancePath: instancePath + '/provider',
                   schemaPath: '#/properties/provider/enum',
                   keyword: 'enum',
-                  params: { allowedValues: schema40.properties.provider.enum },
+                  params: { allowedValues: schema43.properties.provider.enum },
                   message: 'must be equal to one of the allowed values',
                 },
               ];
@@ -1233,8 +1954,8 @@ function validate28(
               const _errs4 = errors;
               if (errors === _errs4) {
                 if (typeof data1 === 'string') {
-                  if (!pattern8.test(data1)) {
-                    validate28.errors = [
+                  if (!pattern10.test(data1)) {
+                    validate31.errors = [
                       {
                         instancePath: instancePath + '/model',
                         schemaPath: '#/$defs/AiModel/pattern',
@@ -1251,7 +1972,7 @@ function validate28(
                     return false;
                   }
                 } else {
-                  validate28.errors = [
+                  validate31.errors = [
                     {
                       instancePath: instancePath + '/model',
                       schemaPath: '#/$defs/AiModel/type',
@@ -1273,8 +1994,8 @@ function validate28(
                 const _errs6 = errors;
                 if (errors === _errs6) {
                   if (typeof data2 === 'string') {
-                    if (func1(data2) > 2000) {
-                      validate28.errors = [
+                    if (func2(data2) > 2000) {
+                      validate31.errors = [
                         {
                           instancePath: instancePath + '/question',
                           schemaPath: '#/properties/question/maxLength',
@@ -1285,8 +2006,8 @@ function validate28(
                       ];
                       return false;
                     } else {
-                      if (func1(data2) < 1) {
-                        validate28.errors = [
+                      if (func2(data2) < 1) {
+                        validate31.errors = [
                           {
                             instancePath: instancePath + '/question',
                             schemaPath: '#/properties/question/minLength',
@@ -1299,7 +2020,7 @@ function validate28(
                       }
                     }
                   } else {
-                    validate28.errors = [
+                    validate31.errors = [
                       {
                         instancePath: instancePath + '/question',
                         schemaPath: '#/properties/question/type',
@@ -1328,7 +2049,7 @@ function validate28(
                       isFinite(data3)
                     )
                   ) {
-                    validate28.errors = [
+                    validate31.errors = [
                       {
                         instancePath: instancePath + '/max_output_tokens',
                         schemaPath: '#/$defs/AiCap/type',
@@ -1342,7 +2063,7 @@ function validate28(
                   if (errors === _errs9) {
                     if (typeof data3 == 'number' && isFinite(data3)) {
                       if (data3 > 1024 || isNaN(data3)) {
-                        validate28.errors = [
+                        validate31.errors = [
                           {
                             instancePath: instancePath + '/max_output_tokens',
                             schemaPath: '#/$defs/AiCap/maximum',
@@ -1354,7 +2075,7 @@ function validate28(
                         return false;
                       } else {
                         if (data3 < 128 || isNaN(data3)) {
-                          validate28.errors = [
+                          validate31.errors = [
                             {
                               instancePath: instancePath + '/max_output_tokens',
                               schemaPath: '#/$defs/AiCap/minimum',
@@ -1379,7 +2100,7 @@ function validate28(
                     if (errors === _errs11) {
                       if (Array.isArray(data4)) {
                         if (data4.length > 1) {
-                          validate28.errors = [
+                          validate31.errors = [
                             {
                               instancePath: instancePath + '/selections',
                               schemaPath: '#/properties/selections/maxItems',
@@ -1391,7 +2112,7 @@ function validate28(
                           return false;
                         } else {
                           if (data4.length < 1) {
-                            validate28.errors = [
+                            validate31.errors = [
                               {
                                 instancePath: instancePath + '/selections',
                                 schemaPath: '#/properties/selections/minItems',
@@ -1424,7 +2145,7 @@ function validate28(
                                     (data5.end === undefined &&
                                       (missing1 = 'end'))
                                   ) {
-                                    validate28.errors = [
+                                    validate31.errors = [
                                       {
                                         instancePath:
                                           instancePath + '/selections/' + i0,
@@ -1450,7 +2171,7 @@ function validate28(
                                           key1 === 'end'
                                         )
                                       ) {
-                                        validate28.errors = [
+                                        validate31.errors = [
                                           {
                                             instancePath:
                                               instancePath +
@@ -1474,7 +2195,7 @@ function validate28(
                                       if (data5.kind !== undefined) {
                                         const _errs16 = errors;
                                         if ('session' !== data5.kind) {
-                                          validate28.errors = [
+                                          validate31.errors = [
                                             {
                                               instancePath:
                                                 instancePath +
@@ -1505,7 +2226,7 @@ function validate28(
                                           if (errors === _errs18) {
                                             if (typeof data7 === 'string') {
                                               if (!pattern4.test(data7)) {
-                                                validate28.errors = [
+                                                validate31.errors = [
                                                   {
                                                     instancePath:
                                                       instancePath +
@@ -1528,7 +2249,7 @@ function validate28(
                                                 return false;
                                               }
                                             } else {
-                                              validate28.errors = [
+                                              validate31.errors = [
                                                 {
                                                   instancePath:
                                                     instancePath +
@@ -1561,7 +2282,7 @@ function validate28(
                                                 isFinite(data8)
                                               )
                                             ) {
-                                              validate28.errors = [
+                                              validate31.errors = [
                                                 {
                                                   instancePath:
                                                     instancePath +
@@ -1586,7 +2307,7 @@ function validate28(
                                                   data8 > 65535 ||
                                                   isNaN(data8)
                                                 ) {
-                                                  validate28.errors = [
+                                                  validate31.errors = [
                                                     {
                                                       instancePath:
                                                         instancePath +
@@ -1610,7 +2331,7 @@ function validate28(
                                                     data8 < 0 ||
                                                     isNaN(data8)
                                                   ) {
-                                                    validate28.errors = [
+                                                    validate31.errors = [
                                                       {
                                                         instancePath:
                                                           instancePath +
@@ -1648,7 +2369,7 @@ function validate28(
                                                   isFinite(data9)
                                                 )
                                               ) {
-                                                validate28.errors = [
+                                                validate31.errors = [
                                                   {
                                                     instancePath:
                                                       instancePath +
@@ -1673,7 +2394,7 @@ function validate28(
                                                     data9 > 65536 ||
                                                     isNaN(data9)
                                                   ) {
-                                                    validate28.errors = [
+                                                    validate31.errors = [
                                                       {
                                                         instancePath:
                                                           instancePath +
@@ -1697,7 +2418,7 @@ function validate28(
                                                       data9 < 1 ||
                                                       isNaN(data9)
                                                     ) {
-                                                      validate28.errors = [
+                                                      validate31.errors = [
                                                         {
                                                           instancePath:
                                                             instancePath +
@@ -1730,7 +2451,7 @@ function validate28(
                                     }
                                   }
                                 } else {
-                                  validate28.errors = [
+                                  validate31.errors = [
                                     {
                                       instancePath:
                                         instancePath + '/selections/' + i0,
@@ -1752,7 +2473,7 @@ function validate28(
                           }
                         }
                       } else {
-                        validate28.errors = [
+                        validate31.errors = [
                           {
                             instancePath: instancePath + '/selections',
                             schemaPath: '#/properties/selections/type',
@@ -1775,7 +2496,7 @@ function validate28(
         }
       }
     } else {
-      validate28.errors = [
+      validate31.errors = [
         {
           instancePath,
           schemaPath: '#/type',
@@ -1787,16 +2508,16 @@ function validate28(
       return false;
     }
   }
-  validate28.errors = vErrors;
+  validate31.errors = vErrors;
   return errors === 0;
 }
-validate28.evaluated = {
+validate31.evaluated = {
   props: true,
   dynamicProps: false,
   dynamicItems: false,
 };
-export const validateAiPreviewResult = validate29;
-const schema44 = {
+export const validateAiPreviewResult = validate32;
+const schema47 = {
   title: 'AiPreviewResult',
   type: 'object',
   properties: {
@@ -1843,9 +2564,8 @@ const schema44 = {
   ],
   additionalProperties: false,
 };
-const schema46 = { type: 'string', pattern: '^[0-9a-f]{64}$' };
-const pattern11 = new RegExp('^[0-9a-f]{64}$', 'u');
-const schema47 = {
+const schema49 = { type: 'string', pattern: '^[0-9a-f]{64}$' };
+const schema50 = {
   oneOf: [
     {
       type: 'object',
@@ -1914,7 +2634,7 @@ const schema47 = {
     },
   ],
 };
-const schema49 = {
+const schema52 = {
   type: 'array',
   minItems: 1,
   maxItems: 1,
@@ -1928,7 +2648,7 @@ const schema49 = {
     additionalProperties: false,
   },
 };
-function validate30(
+function validate33(
   data,
   {
     instancePath = '',
@@ -1940,7 +2660,7 @@ function validate30(
 ) {
   let vErrors = null;
   let errors = 0;
-  const evaluated0 = validate30.evaluated;
+  const evaluated0 = validate33.evaluated;
   if (evaluated0.dynamicProps) {
     evaluated0.props = undefined;
   }
@@ -2210,7 +2930,7 @@ function validate30(
                             const _errs14 = errors;
                             if (errors === _errs14) {
                               if (typeof data5 === 'string') {
-                                if (!pattern8.test(data5)) {
+                                if (!pattern10.test(data5)) {
                                   const err10 = {
                                     instancePath: instancePath + '/body/model',
                                     schemaPath: '#/$defs/AiModel/pattern',
@@ -2257,7 +2977,7 @@ function validate30(
                               const _errs16 = errors;
                               if (errors === _errs16) {
                                 if (typeof data6 === 'string') {
-                                  if (func1(data6) > 2000) {
+                                  if (func2(data6) > 2000) {
                                     const err12 = {
                                       instancePath:
                                         instancePath + '/body/instructions',
@@ -2275,7 +2995,7 @@ function validate30(
                                     }
                                     errors++;
                                   } else {
-                                    if (func1(data6) < 1) {
+                                    if (func2(data6) < 1) {
                                       const err13 = {
                                         instancePath:
                                           instancePath + '/body/instructions',
@@ -2480,7 +3200,7 @@ function validate30(
                                                           'string'
                                                         ) {
                                                           if (
-                                                            func1(data10) >
+                                                            func2(data10) >
                                                             262144
                                                           ) {
                                                             const err20 = {
@@ -2511,7 +3231,7 @@ function validate30(
                                                             errors++;
                                                           } else {
                                                             if (
-                                                              func1(data10) < 1
+                                                              func2(data10) < 1
                                                             ) {
                                                               const err21 = {
                                                                 instancePath:
@@ -3103,7 +3823,7 @@ function validate30(
                             const _errs46 = errors;
                             if (errors === _errs46) {
                               if (typeof data20 === 'string') {
-                                if (!pattern8.test(data20)) {
+                                if (!pattern10.test(data20)) {
                                   const err43 = {
                                     instancePath: instancePath + '/body/model',
                                     schemaPath: '#/$defs/AiModel/pattern',
@@ -3150,7 +3870,7 @@ function validate30(
                               const _errs48 = errors;
                               if (errors === _errs48) {
                                 if (typeof data21 === 'string') {
-                                  if (func1(data21) > 2000) {
+                                  if (func2(data21) > 2000) {
                                     const err45 = {
                                       instancePath:
                                         instancePath + '/body/system',
@@ -3168,7 +3888,7 @@ function validate30(
                                     }
                                     errors++;
                                   } else {
-                                    if (func1(data21) < 1) {
+                                    if (func2(data21) < 1) {
                                       const err46 = {
                                         instancePath:
                                           instancePath + '/body/system',
@@ -3374,7 +4094,7 @@ function validate30(
                                                           'string'
                                                         ) {
                                                           if (
-                                                            func1(data25) >
+                                                            func2(data25) >
                                                             262144
                                                           ) {
                                                             const err53 = {
@@ -3405,7 +4125,7 @@ function validate30(
                                                             errors++;
                                                           } else {
                                                             if (
-                                                              func1(data25) < 1
+                                                              func2(data25) < 1
                                                             ) {
                                                               const err54 = {
                                                                 instancePath:
@@ -3695,7 +4415,7 @@ function validate30(
       vErrors.push(err64);
     }
     errors++;
-    validate30.errors = vErrors;
+    validate33.errors = vErrors;
     return false;
   } else {
     errors = _errs0;
@@ -3707,12 +4427,12 @@ function validate30(
       }
     }
   }
-  validate30.errors = vErrors;
+  validate33.errors = vErrors;
   evaluated0.props = props0;
   return errors === 0;
 }
-validate30.evaluated = { dynamicProps: true, dynamicItems: false };
-function validate29(
+validate33.evaluated = { dynamicProps: true, dynamicItems: false };
+function validate32(
   data,
   {
     instancePath = '',
@@ -3724,7 +4444,7 @@ function validate29(
 ) {
   let vErrors = null;
   let errors = 0;
-  const evaluated0 = validate29.evaluated;
+  const evaluated0 = validate32.evaluated;
   if (evaluated0.dynamicProps) {
     evaluated0.props = undefined;
   }
@@ -3745,7 +4465,7 @@ function validate29(
         (data.request === undefined && (missing0 = 'request')) ||
         (data.local_references === undefined && (missing0 = 'local_references'))
       ) {
-        validate29.errors = [
+        validate32.errors = [
           {
             instancePath,
             schemaPath: '#/required',
@@ -3769,7 +4489,7 @@ function validate29(
               key0 === 'local_references'
             )
           ) {
-            validate29.errors = [
+            validate32.errors = [
               {
                 instancePath,
                 schemaPath: '#/additionalProperties',
@@ -3790,7 +4510,7 @@ function validate29(
             if (errors === _errs3) {
               if (typeof data0 === 'string') {
                 if (!pattern4.test(data0)) {
-                  validate29.errors = [
+                  validate32.errors = [
                     {
                       instancePath: instancePath + '/preview_id',
                       schemaPath: '#/$defs/AiIdentifier/pattern',
@@ -3808,7 +4528,7 @@ function validate29(
                   return false;
                 }
               } else {
-                validate29.errors = [
+                validate32.errors = [
                   {
                     instancePath: instancePath + '/preview_id',
                     schemaPath: '#/$defs/AiIdentifier/type',
@@ -3831,8 +4551,8 @@ function validate29(
               const _errs6 = errors;
               if (errors === _errs6) {
                 if (typeof data1 === 'string') {
-                  if (!pattern11.test(data1)) {
-                    validate29.errors = [
+                  if (!pattern9.test(data1)) {
+                    validate32.errors = [
                       {
                         instancePath: instancePath + '/payload_sha256',
                         schemaPath: '#/$defs/AiHash/pattern',
@@ -3845,7 +4565,7 @@ function validate29(
                     return false;
                   }
                 } else {
-                  validate29.errors = [
+                  validate32.errors = [
                     {
                       instancePath: instancePath + '/payload_sha256',
                       schemaPath: '#/$defs/AiHash/type',
@@ -3865,7 +4585,7 @@ function validate29(
               if (data.expires_in_seconds !== undefined) {
                 const _errs8 = errors;
                 if (300 !== data.expires_in_seconds) {
-                  validate29.errors = [
+                  validate32.errors = [
                     {
                       instancePath: instancePath + '/expires_in_seconds',
                       schemaPath: '#/properties/expires_in_seconds/const',
@@ -3884,7 +4604,7 @@ function validate29(
                 if (data.can_send !== undefined) {
                   const _errs9 = errors;
                   if (false !== data.can_send) {
-                    validate29.errors = [
+                    validate32.errors = [
                       {
                         instancePath: instancePath + '/can_send',
                         schemaPath: '#/properties/can_send/const',
@@ -3905,8 +4625,8 @@ function validate29(
                     const _errs10 = errors;
                     if (errors === _errs10) {
                       if (typeof data4 === 'string') {
-                        if (func1(data4) > 300) {
-                          validate29.errors = [
+                        if (func2(data4) > 300) {
+                          validate32.errors = [
                             {
                               instancePath: instancePath + '/sharing_warning',
                               schemaPath:
@@ -3918,8 +4638,8 @@ function validate29(
                           ];
                           return false;
                         } else {
-                          if (func1(data4) < 1) {
-                            validate29.errors = [
+                          if (func2(data4) < 1) {
+                            validate32.errors = [
                               {
                                 instancePath: instancePath + '/sharing_warning',
                                 schemaPath:
@@ -3934,7 +4654,7 @@ function validate29(
                           }
                         }
                       } else {
-                        validate29.errors = [
+                        validate32.errors = [
                           {
                             instancePath: instancePath + '/sharing_warning',
                             schemaPath: '#/properties/sharing_warning/type',
@@ -3954,7 +4674,7 @@ function validate29(
                     if (data.request !== undefined) {
                       const _errs12 = errors;
                       if (
-                        !validate30(data.request, {
+                        !validate33(data.request, {
                           instancePath: instancePath + '/request',
                           parentData: data,
                           parentDataProperty: 'request',
@@ -3964,8 +4684,8 @@ function validate29(
                       ) {
                         vErrors =
                           vErrors === null
-                            ? validate30.errors
-                            : vErrors.concat(validate30.errors);
+                            ? validate33.errors
+                            : vErrors.concat(validate33.errors);
                         errors = vErrors.length;
                       }
                       var valid0 = _errs12 === errors;
@@ -3979,7 +4699,7 @@ function validate29(
                         if (errors === _errs13) {
                           if (Array.isArray(data6)) {
                             if (data6.length > 1) {
-                              validate29.errors = [
+                              validate32.errors = [
                                 {
                                   instancePath:
                                     instancePath + '/local_references',
@@ -3993,7 +4713,7 @@ function validate29(
                               return false;
                             } else {
                               if (data6.length < 1) {
-                                validate29.errors = [
+                                validate32.errors = [
                                   {
                                     instancePath:
                                       instancePath + '/local_references',
@@ -4032,7 +4752,7 @@ function validate29(
                                         (data7.snapshot_sha256 === undefined &&
                                           (missing1 = 'snapshot_sha256'))
                                       ) {
-                                        validate29.errors = [
+                                        validate32.errors = [
                                           {
                                             instancePath:
                                               instancePath +
@@ -4064,7 +4784,7 @@ function validate29(
                                               key1 === 'snapshot_sha256'
                                             )
                                           ) {
-                                            validate29.errors = [
+                                            validate32.errors = [
                                               {
                                                 instancePath:
                                                   instancePath +
@@ -4088,7 +4808,7 @@ function validate29(
                                           if (data7.kind !== undefined) {
                                             const _errs18 = errors;
                                             if ('session' !== data7.kind) {
-                                              validate29.errors = [
+                                              validate32.errors = [
                                                 {
                                                   instancePath:
                                                     instancePath +
@@ -4119,7 +4839,7 @@ function validate29(
                                               if (errors === _errs20) {
                                                 if (typeof data9 === 'string') {
                                                   if (!pattern4.test(data9)) {
-                                                    validate29.errors = [
+                                                    validate32.errors = [
                                                       {
                                                         instancePath:
                                                           instancePath +
@@ -4142,7 +4862,7 @@ function validate29(
                                                     return false;
                                                   }
                                                 } else {
-                                                  validate29.errors = [
+                                                  validate32.errors = [
                                                     {
                                                       instancePath:
                                                         instancePath +
@@ -4177,7 +4897,7 @@ function validate29(
                                                     isFinite(data10)
                                                   )
                                                 ) {
-                                                  validate29.errors = [
+                                                  validate32.errors = [
                                                     {
                                                       instancePath:
                                                         instancePath +
@@ -4205,7 +4925,7 @@ function validate29(
                                                       data10 > 65535 ||
                                                       isNaN(data10)
                                                     ) {
-                                                      validate29.errors = [
+                                                      validate32.errors = [
                                                         {
                                                           instancePath:
                                                             instancePath +
@@ -4229,7 +4949,7 @@ function validate29(
                                                         data10 < 0 ||
                                                         isNaN(data10)
                                                       ) {
-                                                        validate29.errors = [
+                                                        validate32.errors = [
                                                           {
                                                             instancePath:
                                                               instancePath +
@@ -4269,7 +4989,7 @@ function validate29(
                                                       isFinite(data11)
                                                     )
                                                   ) {
-                                                    validate29.errors = [
+                                                    validate32.errors = [
                                                       {
                                                         instancePath:
                                                           instancePath +
@@ -4298,7 +5018,7 @@ function validate29(
                                                         data11 > 65536 ||
                                                         isNaN(data11)
                                                       ) {
-                                                        validate29.errors = [
+                                                        validate32.errors = [
                                                           {
                                                             instancePath:
                                                               instancePath +
@@ -4322,7 +5042,7 @@ function validate29(
                                                           data11 < 1 ||
                                                           isNaN(data11)
                                                         ) {
-                                                          validate29.errors = [
+                                                          validate32.errors = [
                                                             {
                                                               instancePath:
                                                                 instancePath +
@@ -4361,7 +5081,7 @@ function validate29(
                                                     if (
                                                       'S1' !== data7.source_id
                                                     ) {
-                                                      validate29.errors = [
+                                                      validate32.errors = [
                                                         {
                                                           instancePath:
                                                             instancePath +
@@ -4400,11 +5120,11 @@ function validate29(
                                                           'string'
                                                         ) {
                                                           if (
-                                                            !pattern11.test(
+                                                            !pattern9.test(
                                                               data13,
                                                             )
                                                           ) {
-                                                            validate29.errors =
+                                                            validate32.errors =
                                                               [
                                                                 {
                                                                   instancePath:
@@ -4429,7 +5149,7 @@ function validate29(
                                                             return false;
                                                           }
                                                         } else {
-                                                          validate29.errors = [
+                                                          validate32.errors = [
                                                             {
                                                               instancePath:
                                                                 instancePath +
@@ -4462,7 +5182,7 @@ function validate29(
                                         }
                                       }
                                     } else {
-                                      validate29.errors = [
+                                      validate32.errors = [
                                         {
                                           instancePath:
                                             instancePath +
@@ -4486,7 +5206,7 @@ function validate29(
                               }
                             }
                           } else {
-                            validate29.errors = [
+                            validate32.errors = [
                               {
                                 instancePath:
                                   instancePath + '/local_references',
@@ -4513,7 +5233,7 @@ function validate29(
         }
       }
     } else {
-      validate29.errors = [
+      validate32.errors = [
         {
           instancePath,
           schemaPath: '#/type',
@@ -4525,16 +5245,16 @@ function validate29(
       return false;
     }
   }
-  validate29.errors = vErrors;
+  validate32.errors = vErrors;
   return errors === 0;
 }
-validate29.evaluated = {
+validate32.evaluated = {
   props: true,
   dynamicProps: false,
   dynamicItems: false,
 };
-export const validateAiPrompt = validate32;
-const schema56 = {
+export const validateAiPrompt = validate35;
+const schema59 = {
   title: 'AiPrompt',
   type: 'object',
   properties: {
@@ -4557,8 +5277,8 @@ const schema56 = {
   required: ['question', 'sources'],
   additionalProperties: false,
 };
-const pattern16 = new RegExp('^S[1-5]$', 'u');
-function validate32(
+const pattern18 = new RegExp('^S[1-5]$', 'u');
+function validate35(
   data,
   {
     instancePath = '',
@@ -4570,7 +5290,7 @@ function validate32(
 ) {
   let vErrors = null;
   let errors = 0;
-  const evaluated0 = validate32.evaluated;
+  const evaluated0 = validate35.evaluated;
   if (evaluated0.dynamicProps) {
     evaluated0.props = undefined;
   }
@@ -4584,7 +5304,7 @@ function validate32(
         (data.question === undefined && (missing0 = 'question')) ||
         (data.sources === undefined && (missing0 = 'sources'))
       ) {
-        validate32.errors = [
+        validate35.errors = [
           {
             instancePath,
             schemaPath: '#/required',
@@ -4598,7 +5318,7 @@ function validate32(
         const _errs1 = errors;
         for (const key0 in data) {
           if (!(key0 === 'question' || key0 === 'sources')) {
-            validate32.errors = [
+            validate35.errors = [
               {
                 instancePath,
                 schemaPath: '#/additionalProperties',
@@ -4617,8 +5337,8 @@ function validate32(
             const _errs2 = errors;
             if (errors === _errs2) {
               if (typeof data0 === 'string') {
-                if (func1(data0) > 2000) {
-                  validate32.errors = [
+                if (func2(data0) > 2000) {
+                  validate35.errors = [
                     {
                       instancePath: instancePath + '/question',
                       schemaPath: '#/properties/question/maxLength',
@@ -4629,8 +5349,8 @@ function validate32(
                   ];
                   return false;
                 } else {
-                  if (func1(data0) < 1) {
-                    validate32.errors = [
+                  if (func2(data0) < 1) {
+                    validate35.errors = [
                       {
                         instancePath: instancePath + '/question',
                         schemaPath: '#/properties/question/minLength',
@@ -4643,7 +5363,7 @@ function validate32(
                   }
                 }
               } else {
-                validate32.errors = [
+                validate35.errors = [
                   {
                     instancePath: instancePath + '/question',
                     schemaPath: '#/properties/question/type',
@@ -4666,7 +5386,7 @@ function validate32(
               if (errors === _errs4) {
                 if (Array.isArray(data1)) {
                   if (data1.length > 5) {
-                    validate32.errors = [
+                    validate35.errors = [
                       {
                         instancePath: instancePath + '/sources',
                         schemaPath: '#/properties/sources/maxItems',
@@ -4678,7 +5398,7 @@ function validate32(
                     return false;
                   } else {
                     if (data1.length < 1) {
-                      validate32.errors = [
+                      validate35.errors = [
                         {
                           instancePath: instancePath + '/sources',
                           schemaPath: '#/properties/sources/minItems',
@@ -4706,7 +5426,7 @@ function validate32(
                                 (missing1 = 'source_id')) ||
                               (data2.text === undefined && (missing1 = 'text'))
                             ) {
-                              validate32.errors = [
+                              validate35.errors = [
                                 {
                                   instancePath: instancePath + '/sources/' + i0,
                                   schemaPath:
@@ -4726,7 +5446,7 @@ function validate32(
                                 if (
                                   !(key1 === 'source_id' || key1 === 'text')
                                 ) {
-                                  validate32.errors = [
+                                  validate35.errors = [
                                     {
                                       instancePath:
                                         instancePath + '/sources/' + i0,
@@ -4748,8 +5468,8 @@ function validate32(
                                   const _errs9 = errors;
                                   if (errors === _errs9) {
                                     if (typeof data3 === 'string') {
-                                      if (!pattern16.test(data3)) {
-                                        validate32.errors = [
+                                      if (!pattern18.test(data3)) {
+                                        validate35.errors = [
                                           {
                                             instancePath:
                                               instancePath +
@@ -4769,7 +5489,7 @@ function validate32(
                                         return false;
                                       }
                                     } else {
-                                      validate32.errors = [
+                                      validate35.errors = [
                                         {
                                           instancePath:
                                             instancePath +
@@ -4796,8 +5516,8 @@ function validate32(
                                     const _errs11 = errors;
                                     if (errors === _errs11) {
                                       if (typeof data4 === 'string') {
-                                        if (func1(data4) > 8000) {
-                                          validate32.errors = [
+                                        if (func2(data4) > 8000) {
+                                          validate35.errors = [
                                             {
                                               instancePath:
                                                 instancePath +
@@ -4814,8 +5534,8 @@ function validate32(
                                           ];
                                           return false;
                                         } else {
-                                          if (func1(data4) < 1) {
-                                            validate32.errors = [
+                                          if (func2(data4) < 1) {
+                                            validate35.errors = [
                                               {
                                                 instancePath:
                                                   instancePath +
@@ -4834,7 +5554,7 @@ function validate32(
                                           }
                                         }
                                       } else {
-                                        validate32.errors = [
+                                        validate35.errors = [
                                           {
                                             instancePath:
                                               instancePath +
@@ -4859,7 +5579,7 @@ function validate32(
                               }
                             }
                           } else {
-                            validate32.errors = [
+                            validate35.errors = [
                               {
                                 instancePath: instancePath + '/sources/' + i0,
                                 schemaPath: '#/properties/sources/items/type',
@@ -4879,7 +5599,7 @@ function validate32(
                     }
                   }
                 } else {
-                  validate32.errors = [
+                  validate35.errors = [
                     {
                       instancePath: instancePath + '/sources',
                       schemaPath: '#/properties/sources/type',
@@ -4899,7 +5619,7 @@ function validate32(
         }
       }
     } else {
-      validate32.errors = [
+      validate35.errors = [
         {
           instancePath,
           schemaPath: '#/type',
@@ -4911,23 +5631,23 @@ function validate32(
       return false;
     }
   }
-  validate32.errors = vErrors;
+  validate35.errors = vErrors;
   return errors === 0;
 }
-validate32.evaluated = {
+validate35.evaluated = {
   props: true,
   dynamicProps: false,
   dynamicItems: false,
 };
-export const validateAiDiscardResult = validate33;
-const schema57 = {
+export const validateAiDiscardResult = validate36;
+const schema60 = {
   title: 'AiDiscardResult',
   type: 'object',
   properties: { discarded: { const: true } },
   required: ['discarded'],
   additionalProperties: false,
 };
-function validate33(
+function validate36(
   data,
   {
     instancePath = '',
@@ -4939,7 +5659,7 @@ function validate33(
 ) {
   let vErrors = null;
   let errors = 0;
-  const evaluated0 = validate33.evaluated;
+  const evaluated0 = validate36.evaluated;
   if (evaluated0.dynamicProps) {
     evaluated0.props = undefined;
   }
@@ -4950,7 +5670,7 @@ function validate33(
     if (data && typeof data == 'object' && !Array.isArray(data)) {
       let missing0;
       if (data.discarded === undefined && (missing0 = 'discarded')) {
-        validate33.errors = [
+        validate36.errors = [
           {
             instancePath,
             schemaPath: '#/required',
@@ -4964,7 +5684,7 @@ function validate33(
         const _errs1 = errors;
         for (const key0 in data) {
           if (!(key0 === 'discarded')) {
-            validate33.errors = [
+            validate36.errors = [
               {
                 instancePath,
                 schemaPath: '#/additionalProperties',
@@ -4980,7 +5700,7 @@ function validate33(
         if (_errs1 === errors) {
           if (data.discarded !== undefined) {
             if (true !== data.discarded) {
-              validate33.errors = [
+              validate36.errors = [
                 {
                   instancePath: instancePath + '/discarded',
                   schemaPath: '#/properties/discarded/const',
@@ -4995,7 +5715,7 @@ function validate33(
         }
       }
     } else {
-      validate33.errors = [
+      validate36.errors = [
         {
           instancePath,
           schemaPath: '#/type',
@@ -5007,10 +5727,3714 @@ function validate33(
       return false;
     }
   }
-  validate33.errors = vErrors;
+  validate36.errors = vErrors;
   return errors === 0;
 }
-validate33.evaluated = {
+validate36.evaluated = {
+  props: true,
+  dynamicProps: false,
+  dynamicItems: false,
+};
+export const validateCaptureStatus = validate37;
+const schema61 = {
+  title: 'CaptureStatus',
+  type: 'object',
+  additionalProperties: false,
+  properties: {
+    schema_version: { const: 1 },
+    inbox_root: { type: 'string', minLength: 1, maxLength: 4096 },
+    health: { $ref: '#/$defs/CaptureHealth' },
+    clients: {
+      type: 'array',
+      minItems: 2,
+      maxItems: 2,
+      items: { $ref: '#/$defs/CaptureClient' },
+    },
+  },
+  required: ['schema_version', 'inbox_root', 'health', 'clients'],
+};
+const schema62 = {
+  title: 'CaptureHealth',
+  type: 'object',
+  additionalProperties: false,
+  properties: {
+    schema_version: { const: 1 },
+    kind: { const: 'capture_health' },
+    derived: { const: true },
+    bytes_used: { type: 'integer', minimum: 0, maximum: 1073741824 },
+    quota_bytes: { const: 1073741824 },
+    failures: { type: 'integer', minimum: 0, maximum: 1000 },
+    pending_spool: { type: 'integer', minimum: 0, maximum: 5000 },
+    retention_days: { const: 30 },
+    last_indexed_at: { type: ['string', 'null'], maxLength: 64 },
+  },
+  required: [
+    'schema_version',
+    'kind',
+    'derived',
+    'bytes_used',
+    'quota_bytes',
+    'failures',
+    'pending_spool',
+    'retention_days',
+    'last_indexed_at',
+  ],
+};
+const schema63 = {
+  title: 'CaptureClient',
+  type: 'object',
+  additionalProperties: false,
+  properties: {
+    provider: { enum: ['claude-code', 'codex'] },
+    configured: { type: 'boolean' },
+    enabled: { type: 'boolean' },
+    memory_enabled: { type: 'boolean' },
+    source_root: { type: 'string', maxLength: 4096 },
+    memory_roots: {
+      type: 'array',
+      maxItems: 32,
+      uniqueItems: true,
+      items: { type: 'string', minLength: 1, maxLength: 4096 },
+    },
+    revision: { type: 'string', pattern: '^[0-9a-f]{64}$' },
+    snippet: { type: 'string', maxLength: 32768 },
+  },
+  required: [
+    'provider',
+    'configured',
+    'enabled',
+    'memory_enabled',
+    'source_root',
+    'memory_roots',
+    'revision',
+    'snippet',
+  ],
+};
+function validate37(
+  data,
+  {
+    instancePath = '',
+    parentData,
+    parentDataProperty,
+    rootData = data,
+    dynamicAnchors = {},
+  } = {},
+) {
+  let vErrors = null;
+  let errors = 0;
+  const evaluated0 = validate37.evaluated;
+  if (evaluated0.dynamicProps) {
+    evaluated0.props = undefined;
+  }
+  if (evaluated0.dynamicItems) {
+    evaluated0.items = undefined;
+  }
+  if (errors === 0) {
+    if (data && typeof data == 'object' && !Array.isArray(data)) {
+      let missing0;
+      if (
+        (data.schema_version === undefined && (missing0 = 'schema_version')) ||
+        (data.inbox_root === undefined && (missing0 = 'inbox_root')) ||
+        (data.health === undefined && (missing0 = 'health')) ||
+        (data.clients === undefined && (missing0 = 'clients'))
+      ) {
+        validate37.errors = [
+          {
+            instancePath,
+            schemaPath: '#/required',
+            keyword: 'required',
+            params: { missingProperty: missing0 },
+            message: "must have required property '" + missing0 + "'",
+          },
+        ];
+        return false;
+      } else {
+        const _errs1 = errors;
+        for (const key0 in data) {
+          if (
+            !(
+              key0 === 'schema_version' ||
+              key0 === 'inbox_root' ||
+              key0 === 'health' ||
+              key0 === 'clients'
+            )
+          ) {
+            validate37.errors = [
+              {
+                instancePath,
+                schemaPath: '#/additionalProperties',
+                keyword: 'additionalProperties',
+                params: { additionalProperty: key0 },
+                message: 'must NOT have additional properties',
+              },
+            ];
+            return false;
+            break;
+          }
+        }
+        if (_errs1 === errors) {
+          if (data.schema_version !== undefined) {
+            const _errs2 = errors;
+            if (1 !== data.schema_version) {
+              validate37.errors = [
+                {
+                  instancePath: instancePath + '/schema_version',
+                  schemaPath: '#/properties/schema_version/const',
+                  keyword: 'const',
+                  params: { allowedValue: 1 },
+                  message: 'must be equal to constant',
+                },
+              ];
+              return false;
+            }
+            var valid0 = _errs2 === errors;
+          } else {
+            var valid0 = true;
+          }
+          if (valid0) {
+            if (data.inbox_root !== undefined) {
+              let data1 = data.inbox_root;
+              const _errs3 = errors;
+              if (errors === _errs3) {
+                if (typeof data1 === 'string') {
+                  if (func2(data1) > 4096) {
+                    validate37.errors = [
+                      {
+                        instancePath: instancePath + '/inbox_root',
+                        schemaPath: '#/properties/inbox_root/maxLength',
+                        keyword: 'maxLength',
+                        params: { limit: 4096 },
+                        message: 'must NOT have more than 4096 characters',
+                      },
+                    ];
+                    return false;
+                  } else {
+                    if (func2(data1) < 1) {
+                      validate37.errors = [
+                        {
+                          instancePath: instancePath + '/inbox_root',
+                          schemaPath: '#/properties/inbox_root/minLength',
+                          keyword: 'minLength',
+                          params: { limit: 1 },
+                          message: 'must NOT have fewer than 1 characters',
+                        },
+                      ];
+                      return false;
+                    }
+                  }
+                } else {
+                  validate37.errors = [
+                    {
+                      instancePath: instancePath + '/inbox_root',
+                      schemaPath: '#/properties/inbox_root/type',
+                      keyword: 'type',
+                      params: { type: 'string' },
+                      message: 'must be string',
+                    },
+                  ];
+                  return false;
+                }
+              }
+              var valid0 = _errs3 === errors;
+            } else {
+              var valid0 = true;
+            }
+            if (valid0) {
+              if (data.health !== undefined) {
+                let data2 = data.health;
+                const _errs5 = errors;
+                const _errs6 = errors;
+                if (errors === _errs6) {
+                  if (
+                    data2 &&
+                    typeof data2 == 'object' &&
+                    !Array.isArray(data2)
+                  ) {
+                    let missing1;
+                    if (
+                      (data2.schema_version === undefined &&
+                        (missing1 = 'schema_version')) ||
+                      (data2.kind === undefined && (missing1 = 'kind')) ||
+                      (data2.derived === undefined && (missing1 = 'derived')) ||
+                      (data2.bytes_used === undefined &&
+                        (missing1 = 'bytes_used')) ||
+                      (data2.quota_bytes === undefined &&
+                        (missing1 = 'quota_bytes')) ||
+                      (data2.failures === undefined &&
+                        (missing1 = 'failures')) ||
+                      (data2.pending_spool === undefined &&
+                        (missing1 = 'pending_spool')) ||
+                      (data2.retention_days === undefined &&
+                        (missing1 = 'retention_days')) ||
+                      (data2.last_indexed_at === undefined &&
+                        (missing1 = 'last_indexed_at'))
+                    ) {
+                      validate37.errors = [
+                        {
+                          instancePath: instancePath + '/health',
+                          schemaPath: '#/$defs/CaptureHealth/required',
+                          keyword: 'required',
+                          params: { missingProperty: missing1 },
+                          message:
+                            "must have required property '" + missing1 + "'",
+                        },
+                      ];
+                      return false;
+                    } else {
+                      const _errs8 = errors;
+                      for (const key1 in data2) {
+                        if (!func1.call(schema62.properties, key1)) {
+                          validate37.errors = [
+                            {
+                              instancePath: instancePath + '/health',
+                              schemaPath:
+                                '#/$defs/CaptureHealth/additionalProperties',
+                              keyword: 'additionalProperties',
+                              params: { additionalProperty: key1 },
+                              message: 'must NOT have additional properties',
+                            },
+                          ];
+                          return false;
+                          break;
+                        }
+                      }
+                      if (_errs8 === errors) {
+                        if (data2.schema_version !== undefined) {
+                          const _errs9 = errors;
+                          if (1 !== data2.schema_version) {
+                            validate37.errors = [
+                              {
+                                instancePath:
+                                  instancePath + '/health/schema_version',
+                                schemaPath:
+                                  '#/$defs/CaptureHealth/properties/schema_version/const',
+                                keyword: 'const',
+                                params: { allowedValue: 1 },
+                                message: 'must be equal to constant',
+                              },
+                            ];
+                            return false;
+                          }
+                          var valid2 = _errs9 === errors;
+                        } else {
+                          var valid2 = true;
+                        }
+                        if (valid2) {
+                          if (data2.kind !== undefined) {
+                            const _errs10 = errors;
+                            if ('capture_health' !== data2.kind) {
+                              validate37.errors = [
+                                {
+                                  instancePath: instancePath + '/health/kind',
+                                  schemaPath:
+                                    '#/$defs/CaptureHealth/properties/kind/const',
+                                  keyword: 'const',
+                                  params: { allowedValue: 'capture_health' },
+                                  message: 'must be equal to constant',
+                                },
+                              ];
+                              return false;
+                            }
+                            var valid2 = _errs10 === errors;
+                          } else {
+                            var valid2 = true;
+                          }
+                          if (valid2) {
+                            if (data2.derived !== undefined) {
+                              const _errs11 = errors;
+                              if (true !== data2.derived) {
+                                validate37.errors = [
+                                  {
+                                    instancePath:
+                                      instancePath + '/health/derived',
+                                    schemaPath:
+                                      '#/$defs/CaptureHealth/properties/derived/const',
+                                    keyword: 'const',
+                                    params: { allowedValue: true },
+                                    message: 'must be equal to constant',
+                                  },
+                                ];
+                                return false;
+                              }
+                              var valid2 = _errs11 === errors;
+                            } else {
+                              var valid2 = true;
+                            }
+                            if (valid2) {
+                              if (data2.bytes_used !== undefined) {
+                                let data6 = data2.bytes_used;
+                                const _errs12 = errors;
+                                if (
+                                  !(
+                                    typeof data6 == 'number' &&
+                                    !(data6 % 1) &&
+                                    !isNaN(data6) &&
+                                    isFinite(data6)
+                                  )
+                                ) {
+                                  validate37.errors = [
+                                    {
+                                      instancePath:
+                                        instancePath + '/health/bytes_used',
+                                      schemaPath:
+                                        '#/$defs/CaptureHealth/properties/bytes_used/type',
+                                      keyword: 'type',
+                                      params: { type: 'integer' },
+                                      message: 'must be integer',
+                                    },
+                                  ];
+                                  return false;
+                                }
+                                if (errors === _errs12) {
+                                  if (
+                                    typeof data6 == 'number' &&
+                                    isFinite(data6)
+                                  ) {
+                                    if (data6 > 1073741824 || isNaN(data6)) {
+                                      validate37.errors = [
+                                        {
+                                          instancePath:
+                                            instancePath + '/health/bytes_used',
+                                          schemaPath:
+                                            '#/$defs/CaptureHealth/properties/bytes_used/maximum',
+                                          keyword: 'maximum',
+                                          params: {
+                                            comparison: '<=',
+                                            limit: 1073741824,
+                                          },
+                                          message: 'must be <= 1073741824',
+                                        },
+                                      ];
+                                      return false;
+                                    } else {
+                                      if (data6 < 0 || isNaN(data6)) {
+                                        validate37.errors = [
+                                          {
+                                            instancePath:
+                                              instancePath +
+                                              '/health/bytes_used',
+                                            schemaPath:
+                                              '#/$defs/CaptureHealth/properties/bytes_used/minimum',
+                                            keyword: 'minimum',
+                                            params: {
+                                              comparison: '>=',
+                                              limit: 0,
+                                            },
+                                            message: 'must be >= 0',
+                                          },
+                                        ];
+                                        return false;
+                                      }
+                                    }
+                                  }
+                                }
+                                var valid2 = _errs12 === errors;
+                              } else {
+                                var valid2 = true;
+                              }
+                              if (valid2) {
+                                if (data2.quota_bytes !== undefined) {
+                                  const _errs14 = errors;
+                                  if (1073741824 !== data2.quota_bytes) {
+                                    validate37.errors = [
+                                      {
+                                        instancePath:
+                                          instancePath + '/health/quota_bytes',
+                                        schemaPath:
+                                          '#/$defs/CaptureHealth/properties/quota_bytes/const',
+                                        keyword: 'const',
+                                        params: { allowedValue: 1073741824 },
+                                        message: 'must be equal to constant',
+                                      },
+                                    ];
+                                    return false;
+                                  }
+                                  var valid2 = _errs14 === errors;
+                                } else {
+                                  var valid2 = true;
+                                }
+                                if (valid2) {
+                                  if (data2.failures !== undefined) {
+                                    let data8 = data2.failures;
+                                    const _errs15 = errors;
+                                    if (
+                                      !(
+                                        typeof data8 == 'number' &&
+                                        !(data8 % 1) &&
+                                        !isNaN(data8) &&
+                                        isFinite(data8)
+                                      )
+                                    ) {
+                                      validate37.errors = [
+                                        {
+                                          instancePath:
+                                            instancePath + '/health/failures',
+                                          schemaPath:
+                                            '#/$defs/CaptureHealth/properties/failures/type',
+                                          keyword: 'type',
+                                          params: { type: 'integer' },
+                                          message: 'must be integer',
+                                        },
+                                      ];
+                                      return false;
+                                    }
+                                    if (errors === _errs15) {
+                                      if (
+                                        typeof data8 == 'number' &&
+                                        isFinite(data8)
+                                      ) {
+                                        if (data8 > 1000 || isNaN(data8)) {
+                                          validate37.errors = [
+                                            {
+                                              instancePath:
+                                                instancePath +
+                                                '/health/failures',
+                                              schemaPath:
+                                                '#/$defs/CaptureHealth/properties/failures/maximum',
+                                              keyword: 'maximum',
+                                              params: {
+                                                comparison: '<=',
+                                                limit: 1000,
+                                              },
+                                              message: 'must be <= 1000',
+                                            },
+                                          ];
+                                          return false;
+                                        } else {
+                                          if (data8 < 0 || isNaN(data8)) {
+                                            validate37.errors = [
+                                              {
+                                                instancePath:
+                                                  instancePath +
+                                                  '/health/failures',
+                                                schemaPath:
+                                                  '#/$defs/CaptureHealth/properties/failures/minimum',
+                                                keyword: 'minimum',
+                                                params: {
+                                                  comparison: '>=',
+                                                  limit: 0,
+                                                },
+                                                message: 'must be >= 0',
+                                              },
+                                            ];
+                                            return false;
+                                          }
+                                        }
+                                      }
+                                    }
+                                    var valid2 = _errs15 === errors;
+                                  } else {
+                                    var valid2 = true;
+                                  }
+                                  if (valid2) {
+                                    if (data2.pending_spool !== undefined) {
+                                      let data9 = data2.pending_spool;
+                                      const _errs17 = errors;
+                                      if (
+                                        !(
+                                          typeof data9 == 'number' &&
+                                          !(data9 % 1) &&
+                                          !isNaN(data9) &&
+                                          isFinite(data9)
+                                        )
+                                      ) {
+                                        validate37.errors = [
+                                          {
+                                            instancePath:
+                                              instancePath +
+                                              '/health/pending_spool',
+                                            schemaPath:
+                                              '#/$defs/CaptureHealth/properties/pending_spool/type',
+                                            keyword: 'type',
+                                            params: { type: 'integer' },
+                                            message: 'must be integer',
+                                          },
+                                        ];
+                                        return false;
+                                      }
+                                      if (errors === _errs17) {
+                                        if (
+                                          typeof data9 == 'number' &&
+                                          isFinite(data9)
+                                        ) {
+                                          if (data9 > 5000 || isNaN(data9)) {
+                                            validate37.errors = [
+                                              {
+                                                instancePath:
+                                                  instancePath +
+                                                  '/health/pending_spool',
+                                                schemaPath:
+                                                  '#/$defs/CaptureHealth/properties/pending_spool/maximum',
+                                                keyword: 'maximum',
+                                                params: {
+                                                  comparison: '<=',
+                                                  limit: 5000,
+                                                },
+                                                message: 'must be <= 5000',
+                                              },
+                                            ];
+                                            return false;
+                                          } else {
+                                            if (data9 < 0 || isNaN(data9)) {
+                                              validate37.errors = [
+                                                {
+                                                  instancePath:
+                                                    instancePath +
+                                                    '/health/pending_spool',
+                                                  schemaPath:
+                                                    '#/$defs/CaptureHealth/properties/pending_spool/minimum',
+                                                  keyword: 'minimum',
+                                                  params: {
+                                                    comparison: '>=',
+                                                    limit: 0,
+                                                  },
+                                                  message: 'must be >= 0',
+                                                },
+                                              ];
+                                              return false;
+                                            }
+                                          }
+                                        }
+                                      }
+                                      var valid2 = _errs17 === errors;
+                                    } else {
+                                      var valid2 = true;
+                                    }
+                                    if (valid2) {
+                                      if (data2.retention_days !== undefined) {
+                                        const _errs19 = errors;
+                                        if (30 !== data2.retention_days) {
+                                          validate37.errors = [
+                                            {
+                                              instancePath:
+                                                instancePath +
+                                                '/health/retention_days',
+                                              schemaPath:
+                                                '#/$defs/CaptureHealth/properties/retention_days/const',
+                                              keyword: 'const',
+                                              params: { allowedValue: 30 },
+                                              message:
+                                                'must be equal to constant',
+                                            },
+                                          ];
+                                          return false;
+                                        }
+                                        var valid2 = _errs19 === errors;
+                                      } else {
+                                        var valid2 = true;
+                                      }
+                                      if (valid2) {
+                                        if (
+                                          data2.last_indexed_at !== undefined
+                                        ) {
+                                          let data11 = data2.last_indexed_at;
+                                          const _errs20 = errors;
+                                          if (
+                                            typeof data11 !== 'string' &&
+                                            data11 !== null
+                                          ) {
+                                            validate37.errors = [
+                                              {
+                                                instancePath:
+                                                  instancePath +
+                                                  '/health/last_indexed_at',
+                                                schemaPath:
+                                                  '#/$defs/CaptureHealth/properties/last_indexed_at/type',
+                                                keyword: 'type',
+                                                params: {
+                                                  type: schema62.properties
+                                                    .last_indexed_at.type,
+                                                },
+                                                message: 'must be string,null',
+                                              },
+                                            ];
+                                            return false;
+                                          }
+                                          if (errors === _errs20) {
+                                            if (typeof data11 === 'string') {
+                                              if (func2(data11) > 64) {
+                                                validate37.errors = [
+                                                  {
+                                                    instancePath:
+                                                      instancePath +
+                                                      '/health/last_indexed_at',
+                                                    schemaPath:
+                                                      '#/$defs/CaptureHealth/properties/last_indexed_at/maxLength',
+                                                    keyword: 'maxLength',
+                                                    params: { limit: 64 },
+                                                    message:
+                                                      'must NOT have more than 64 characters',
+                                                  },
+                                                ];
+                                                return false;
+                                              }
+                                            }
+                                          }
+                                          var valid2 = _errs20 === errors;
+                                        } else {
+                                          var valid2 = true;
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  } else {
+                    validate37.errors = [
+                      {
+                        instancePath: instancePath + '/health',
+                        schemaPath: '#/$defs/CaptureHealth/type',
+                        keyword: 'type',
+                        params: { type: 'object' },
+                        message: 'must be object',
+                      },
+                    ];
+                    return false;
+                  }
+                }
+                var valid0 = _errs5 === errors;
+              } else {
+                var valid0 = true;
+              }
+              if (valid0) {
+                if (data.clients !== undefined) {
+                  let data12 = data.clients;
+                  const _errs22 = errors;
+                  if (errors === _errs22) {
+                    if (Array.isArray(data12)) {
+                      if (data12.length > 2) {
+                        validate37.errors = [
+                          {
+                            instancePath: instancePath + '/clients',
+                            schemaPath: '#/properties/clients/maxItems',
+                            keyword: 'maxItems',
+                            params: { limit: 2 },
+                            message: 'must NOT have more than 2 items',
+                          },
+                        ];
+                        return false;
+                      } else {
+                        if (data12.length < 2) {
+                          validate37.errors = [
+                            {
+                              instancePath: instancePath + '/clients',
+                              schemaPath: '#/properties/clients/minItems',
+                              keyword: 'minItems',
+                              params: { limit: 2 },
+                              message: 'must NOT have fewer than 2 items',
+                            },
+                          ];
+                          return false;
+                        } else {
+                          var valid3 = true;
+                          const len0 = data12.length;
+                          for (let i0 = 0; i0 < len0; i0++) {
+                            let data13 = data12[i0];
+                            const _errs24 = errors;
+                            const _errs25 = errors;
+                            if (errors === _errs25) {
+                              if (
+                                data13 &&
+                                typeof data13 == 'object' &&
+                                !Array.isArray(data13)
+                              ) {
+                                let missing2;
+                                if (
+                                  (data13.provider === undefined &&
+                                    (missing2 = 'provider')) ||
+                                  (data13.configured === undefined &&
+                                    (missing2 = 'configured')) ||
+                                  (data13.enabled === undefined &&
+                                    (missing2 = 'enabled')) ||
+                                  (data13.memory_enabled === undefined &&
+                                    (missing2 = 'memory_enabled')) ||
+                                  (data13.source_root === undefined &&
+                                    (missing2 = 'source_root')) ||
+                                  (data13.memory_roots === undefined &&
+                                    (missing2 = 'memory_roots')) ||
+                                  (data13.revision === undefined &&
+                                    (missing2 = 'revision')) ||
+                                  (data13.snippet === undefined &&
+                                    (missing2 = 'snippet'))
+                                ) {
+                                  validate37.errors = [
+                                    {
+                                      instancePath:
+                                        instancePath + '/clients/' + i0,
+                                      schemaPath:
+                                        '#/$defs/CaptureClient/required',
+                                      keyword: 'required',
+                                      params: { missingProperty: missing2 },
+                                      message:
+                                        "must have required property '" +
+                                        missing2 +
+                                        "'",
+                                    },
+                                  ];
+                                  return false;
+                                } else {
+                                  const _errs27 = errors;
+                                  for (const key2 in data13) {
+                                    if (
+                                      !(
+                                        key2 === 'provider' ||
+                                        key2 === 'configured' ||
+                                        key2 === 'enabled' ||
+                                        key2 === 'memory_enabled' ||
+                                        key2 === 'source_root' ||
+                                        key2 === 'memory_roots' ||
+                                        key2 === 'revision' ||
+                                        key2 === 'snippet'
+                                      )
+                                    ) {
+                                      validate37.errors = [
+                                        {
+                                          instancePath:
+                                            instancePath + '/clients/' + i0,
+                                          schemaPath:
+                                            '#/$defs/CaptureClient/additionalProperties',
+                                          keyword: 'additionalProperties',
+                                          params: { additionalProperty: key2 },
+                                          message:
+                                            'must NOT have additional properties',
+                                        },
+                                      ];
+                                      return false;
+                                      break;
+                                    }
+                                  }
+                                  if (_errs27 === errors) {
+                                    if (data13.provider !== undefined) {
+                                      let data14 = data13.provider;
+                                      const _errs28 = errors;
+                                      if (
+                                        !(
+                                          data14 === 'claude-code' ||
+                                          data14 === 'codex'
+                                        )
+                                      ) {
+                                        validate37.errors = [
+                                          {
+                                            instancePath:
+                                              instancePath +
+                                              '/clients/' +
+                                              i0 +
+                                              '/provider',
+                                            schemaPath:
+                                              '#/$defs/CaptureClient/properties/provider/enum',
+                                            keyword: 'enum',
+                                            params: {
+                                              allowedValues:
+                                                schema63.properties.provider
+                                                  .enum,
+                                            },
+                                            message:
+                                              'must be equal to one of the allowed values',
+                                          },
+                                        ];
+                                        return false;
+                                      }
+                                      var valid5 = _errs28 === errors;
+                                    } else {
+                                      var valid5 = true;
+                                    }
+                                    if (valid5) {
+                                      if (data13.configured !== undefined) {
+                                        const _errs29 = errors;
+                                        if (
+                                          typeof data13.configured !== 'boolean'
+                                        ) {
+                                          validate37.errors = [
+                                            {
+                                              instancePath:
+                                                instancePath +
+                                                '/clients/' +
+                                                i0 +
+                                                '/configured',
+                                              schemaPath:
+                                                '#/$defs/CaptureClient/properties/configured/type',
+                                              keyword: 'type',
+                                              params: { type: 'boolean' },
+                                              message: 'must be boolean',
+                                            },
+                                          ];
+                                          return false;
+                                        }
+                                        var valid5 = _errs29 === errors;
+                                      } else {
+                                        var valid5 = true;
+                                      }
+                                      if (valid5) {
+                                        if (data13.enabled !== undefined) {
+                                          const _errs31 = errors;
+                                          if (
+                                            typeof data13.enabled !== 'boolean'
+                                          ) {
+                                            validate37.errors = [
+                                              {
+                                                instancePath:
+                                                  instancePath +
+                                                  '/clients/' +
+                                                  i0 +
+                                                  '/enabled',
+                                                schemaPath:
+                                                  '#/$defs/CaptureClient/properties/enabled/type',
+                                                keyword: 'type',
+                                                params: { type: 'boolean' },
+                                                message: 'must be boolean',
+                                              },
+                                            ];
+                                            return false;
+                                          }
+                                          var valid5 = _errs31 === errors;
+                                        } else {
+                                          var valid5 = true;
+                                        }
+                                        if (valid5) {
+                                          if (
+                                            data13.memory_enabled !== undefined
+                                          ) {
+                                            const _errs33 = errors;
+                                            if (
+                                              typeof data13.memory_enabled !==
+                                              'boolean'
+                                            ) {
+                                              validate37.errors = [
+                                                {
+                                                  instancePath:
+                                                    instancePath +
+                                                    '/clients/' +
+                                                    i0 +
+                                                    '/memory_enabled',
+                                                  schemaPath:
+                                                    '#/$defs/CaptureClient/properties/memory_enabled/type',
+                                                  keyword: 'type',
+                                                  params: { type: 'boolean' },
+                                                  message: 'must be boolean',
+                                                },
+                                              ];
+                                              return false;
+                                            }
+                                            var valid5 = _errs33 === errors;
+                                          } else {
+                                            var valid5 = true;
+                                          }
+                                          if (valid5) {
+                                            if (
+                                              data13.source_root !== undefined
+                                            ) {
+                                              let data18 = data13.source_root;
+                                              const _errs35 = errors;
+                                              if (errors === _errs35) {
+                                                if (
+                                                  typeof data18 === 'string'
+                                                ) {
+                                                  if (func2(data18) > 4096) {
+                                                    validate37.errors = [
+                                                      {
+                                                        instancePath:
+                                                          instancePath +
+                                                          '/clients/' +
+                                                          i0 +
+                                                          '/source_root',
+                                                        schemaPath:
+                                                          '#/$defs/CaptureClient/properties/source_root/maxLength',
+                                                        keyword: 'maxLength',
+                                                        params: { limit: 4096 },
+                                                        message:
+                                                          'must NOT have more than 4096 characters',
+                                                      },
+                                                    ];
+                                                    return false;
+                                                  }
+                                                } else {
+                                                  validate37.errors = [
+                                                    {
+                                                      instancePath:
+                                                        instancePath +
+                                                        '/clients/' +
+                                                        i0 +
+                                                        '/source_root',
+                                                      schemaPath:
+                                                        '#/$defs/CaptureClient/properties/source_root/type',
+                                                      keyword: 'type',
+                                                      params: {
+                                                        type: 'string',
+                                                      },
+                                                      message: 'must be string',
+                                                    },
+                                                  ];
+                                                  return false;
+                                                }
+                                              }
+                                              var valid5 = _errs35 === errors;
+                                            } else {
+                                              var valid5 = true;
+                                            }
+                                            if (valid5) {
+                                              if (
+                                                data13.memory_roots !==
+                                                undefined
+                                              ) {
+                                                let data19 =
+                                                  data13.memory_roots;
+                                                const _errs37 = errors;
+                                                if (errors === _errs37) {
+                                                  if (Array.isArray(data19)) {
+                                                    if (data19.length > 32) {
+                                                      validate37.errors = [
+                                                        {
+                                                          instancePath:
+                                                            instancePath +
+                                                            '/clients/' +
+                                                            i0 +
+                                                            '/memory_roots',
+                                                          schemaPath:
+                                                            '#/$defs/CaptureClient/properties/memory_roots/maxItems',
+                                                          keyword: 'maxItems',
+                                                          params: { limit: 32 },
+                                                          message:
+                                                            'must NOT have more than 32 items',
+                                                        },
+                                                      ];
+                                                      return false;
+                                                    } else {
+                                                      var valid6 = true;
+                                                      const len1 =
+                                                        data19.length;
+                                                      for (
+                                                        let i1 = 0;
+                                                        i1 < len1;
+                                                        i1++
+                                                      ) {
+                                                        let data20 = data19[i1];
+                                                        const _errs39 = errors;
+                                                        if (
+                                                          errors === _errs39
+                                                        ) {
+                                                          if (
+                                                            typeof data20 ===
+                                                            'string'
+                                                          ) {
+                                                            if (
+                                                              func2(data20) >
+                                                              4096
+                                                            ) {
+                                                              validate37.errors =
+                                                                [
+                                                                  {
+                                                                    instancePath:
+                                                                      instancePath +
+                                                                      '/clients/' +
+                                                                      i0 +
+                                                                      '/memory_roots/' +
+                                                                      i1,
+                                                                    schemaPath:
+                                                                      '#/$defs/CaptureClient/properties/memory_roots/items/maxLength',
+                                                                    keyword:
+                                                                      'maxLength',
+                                                                    params: {
+                                                                      limit: 4096,
+                                                                    },
+                                                                    message:
+                                                                      'must NOT have more than 4096 characters',
+                                                                  },
+                                                                ];
+                                                              return false;
+                                                            } else {
+                                                              if (
+                                                                func2(data20) <
+                                                                1
+                                                              ) {
+                                                                validate37.errors =
+                                                                  [
+                                                                    {
+                                                                      instancePath:
+                                                                        instancePath +
+                                                                        '/clients/' +
+                                                                        i0 +
+                                                                        '/memory_roots/' +
+                                                                        i1,
+                                                                      schemaPath:
+                                                                        '#/$defs/CaptureClient/properties/memory_roots/items/minLength',
+                                                                      keyword:
+                                                                        'minLength',
+                                                                      params: {
+                                                                        limit: 1,
+                                                                      },
+                                                                      message:
+                                                                        'must NOT have fewer than 1 characters',
+                                                                    },
+                                                                  ];
+                                                                return false;
+                                                              }
+                                                            }
+                                                          } else {
+                                                            validate37.errors =
+                                                              [
+                                                                {
+                                                                  instancePath:
+                                                                    instancePath +
+                                                                    '/clients/' +
+                                                                    i0 +
+                                                                    '/memory_roots/' +
+                                                                    i1,
+                                                                  schemaPath:
+                                                                    '#/$defs/CaptureClient/properties/memory_roots/items/type',
+                                                                  keyword:
+                                                                    'type',
+                                                                  params: {
+                                                                    type: 'string',
+                                                                  },
+                                                                  message:
+                                                                    'must be string',
+                                                                },
+                                                              ];
+                                                            return false;
+                                                          }
+                                                        }
+                                                        var valid6 =
+                                                          _errs39 === errors;
+                                                        if (!valid6) {
+                                                          break;
+                                                        }
+                                                      }
+                                                      if (valid6) {
+                                                        let i2 = data19.length;
+                                                        let j0;
+                                                        if (i2 > 1) {
+                                                          const indices0 = {};
+                                                          for (; i2--; ) {
+                                                            let item0 =
+                                                              data19[i2];
+                                                            if (
+                                                              typeof item0 !==
+                                                              'string'
+                                                            ) {
+                                                              continue;
+                                                            }
+                                                            if (
+                                                              typeof indices0[
+                                                                item0
+                                                              ] == 'number'
+                                                            ) {
+                                                              j0 =
+                                                                indices0[item0];
+                                                              validate37.errors =
+                                                                [
+                                                                  {
+                                                                    instancePath:
+                                                                      instancePath +
+                                                                      '/clients/' +
+                                                                      i0 +
+                                                                      '/memory_roots',
+                                                                    schemaPath:
+                                                                      '#/$defs/CaptureClient/properties/memory_roots/uniqueItems',
+                                                                    keyword:
+                                                                      'uniqueItems',
+                                                                    params: {
+                                                                      i: i2,
+                                                                      j: j0,
+                                                                    },
+                                                                    message:
+                                                                      'must NOT have duplicate items (items ## ' +
+                                                                      j0 +
+                                                                      ' and ' +
+                                                                      i2 +
+                                                                      ' are identical)',
+                                                                  },
+                                                                ];
+                                                              return false;
+                                                              break;
+                                                            }
+                                                            indices0[item0] =
+                                                              i2;
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  } else {
+                                                    validate37.errors = [
+                                                      {
+                                                        instancePath:
+                                                          instancePath +
+                                                          '/clients/' +
+                                                          i0 +
+                                                          '/memory_roots',
+                                                        schemaPath:
+                                                          '#/$defs/CaptureClient/properties/memory_roots/type',
+                                                        keyword: 'type',
+                                                        params: {
+                                                          type: 'array',
+                                                        },
+                                                        message:
+                                                          'must be array',
+                                                      },
+                                                    ];
+                                                    return false;
+                                                  }
+                                                }
+                                                var valid5 = _errs37 === errors;
+                                              } else {
+                                                var valid5 = true;
+                                              }
+                                              if (valid5) {
+                                                if (
+                                                  data13.revision !== undefined
+                                                ) {
+                                                  let data21 = data13.revision;
+                                                  const _errs41 = errors;
+                                                  if (errors === _errs41) {
+                                                    if (
+                                                      typeof data21 === 'string'
+                                                    ) {
+                                                      if (
+                                                        !pattern9.test(data21)
+                                                      ) {
+                                                        validate37.errors = [
+                                                          {
+                                                            instancePath:
+                                                              instancePath +
+                                                              '/clients/' +
+                                                              i0 +
+                                                              '/revision',
+                                                            schemaPath:
+                                                              '#/$defs/CaptureClient/properties/revision/pattern',
+                                                            keyword: 'pattern',
+                                                            params: {
+                                                              pattern:
+                                                                '^[0-9a-f]{64}$',
+                                                            },
+                                                            message:
+                                                              'must match pattern "' +
+                                                              '^[0-9a-f]{64}$' +
+                                                              '"',
+                                                          },
+                                                        ];
+                                                        return false;
+                                                      }
+                                                    } else {
+                                                      validate37.errors = [
+                                                        {
+                                                          instancePath:
+                                                            instancePath +
+                                                            '/clients/' +
+                                                            i0 +
+                                                            '/revision',
+                                                          schemaPath:
+                                                            '#/$defs/CaptureClient/properties/revision/type',
+                                                          keyword: 'type',
+                                                          params: {
+                                                            type: 'string',
+                                                          },
+                                                          message:
+                                                            'must be string',
+                                                        },
+                                                      ];
+                                                      return false;
+                                                    }
+                                                  }
+                                                  var valid5 =
+                                                    _errs41 === errors;
+                                                } else {
+                                                  var valid5 = true;
+                                                }
+                                                if (valid5) {
+                                                  if (
+                                                    data13.snippet !== undefined
+                                                  ) {
+                                                    let data22 = data13.snippet;
+                                                    const _errs43 = errors;
+                                                    if (errors === _errs43) {
+                                                      if (
+                                                        typeof data22 ===
+                                                        'string'
+                                                      ) {
+                                                        if (
+                                                          func2(data22) > 32768
+                                                        ) {
+                                                          validate37.errors = [
+                                                            {
+                                                              instancePath:
+                                                                instancePath +
+                                                                '/clients/' +
+                                                                i0 +
+                                                                '/snippet',
+                                                              schemaPath:
+                                                                '#/$defs/CaptureClient/properties/snippet/maxLength',
+                                                              keyword:
+                                                                'maxLength',
+                                                              params: {
+                                                                limit: 32768,
+                                                              },
+                                                              message:
+                                                                'must NOT have more than 32768 characters',
+                                                            },
+                                                          ];
+                                                          return false;
+                                                        }
+                                                      } else {
+                                                        validate37.errors = [
+                                                          {
+                                                            instancePath:
+                                                              instancePath +
+                                                              '/clients/' +
+                                                              i0 +
+                                                              '/snippet',
+                                                            schemaPath:
+                                                              '#/$defs/CaptureClient/properties/snippet/type',
+                                                            keyword: 'type',
+                                                            params: {
+                                                              type: 'string',
+                                                            },
+                                                            message:
+                                                              'must be string',
+                                                          },
+                                                        ];
+                                                        return false;
+                                                      }
+                                                    }
+                                                    var valid5 =
+                                                      _errs43 === errors;
+                                                  } else {
+                                                    var valid5 = true;
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              } else {
+                                validate37.errors = [
+                                  {
+                                    instancePath:
+                                      instancePath + '/clients/' + i0,
+                                    schemaPath: '#/$defs/CaptureClient/type',
+                                    keyword: 'type',
+                                    params: { type: 'object' },
+                                    message: 'must be object',
+                                  },
+                                ];
+                                return false;
+                              }
+                            }
+                            var valid3 = _errs24 === errors;
+                            if (!valid3) {
+                              break;
+                            }
+                          }
+                        }
+                      }
+                    } else {
+                      validate37.errors = [
+                        {
+                          instancePath: instancePath + '/clients',
+                          schemaPath: '#/properties/clients/type',
+                          keyword: 'type',
+                          params: { type: 'array' },
+                          message: 'must be array',
+                        },
+                      ];
+                      return false;
+                    }
+                  }
+                  var valid0 = _errs22 === errors;
+                } else {
+                  var valid0 = true;
+                }
+              }
+            }
+          }
+        }
+      }
+    } else {
+      validate37.errors = [
+        {
+          instancePath,
+          schemaPath: '#/type',
+          keyword: 'type',
+          params: { type: 'object' },
+          message: 'must be object',
+        },
+      ];
+      return false;
+    }
+  }
+  validate37.errors = vErrors;
+  return errors === 0;
+}
+validate37.evaluated = {
+  props: true,
+  dynamicProps: false,
+  dynamicItems: false,
+};
+export const validateCaptureIndexResult = validate38;
+const schema64 = {
+  title: 'CaptureIndexResult',
+  type: 'object',
+  additionalProperties: false,
+  properties: {
+    status: { const: 'indexed' },
+    sessions: { type: 'integer', minimum: 0, maximum: 5000 },
+    memories: { type: 'integer', minimum: 0, maximum: 5000 },
+    revisions: { type: 'integer', minimum: 0, maximum: 5000 },
+  },
+  required: ['status', 'sessions', 'memories', 'revisions'],
+};
+function validate38(
+  data,
+  {
+    instancePath = '',
+    parentData,
+    parentDataProperty,
+    rootData = data,
+    dynamicAnchors = {},
+  } = {},
+) {
+  let vErrors = null;
+  let errors = 0;
+  const evaluated0 = validate38.evaluated;
+  if (evaluated0.dynamicProps) {
+    evaluated0.props = undefined;
+  }
+  if (evaluated0.dynamicItems) {
+    evaluated0.items = undefined;
+  }
+  if (errors === 0) {
+    if (data && typeof data == 'object' && !Array.isArray(data)) {
+      let missing0;
+      if (
+        (data.status === undefined && (missing0 = 'status')) ||
+        (data.sessions === undefined && (missing0 = 'sessions')) ||
+        (data.memories === undefined && (missing0 = 'memories')) ||
+        (data.revisions === undefined && (missing0 = 'revisions'))
+      ) {
+        validate38.errors = [
+          {
+            instancePath,
+            schemaPath: '#/required',
+            keyword: 'required',
+            params: { missingProperty: missing0 },
+            message: "must have required property '" + missing0 + "'",
+          },
+        ];
+        return false;
+      } else {
+        const _errs1 = errors;
+        for (const key0 in data) {
+          if (
+            !(
+              key0 === 'status' ||
+              key0 === 'sessions' ||
+              key0 === 'memories' ||
+              key0 === 'revisions'
+            )
+          ) {
+            validate38.errors = [
+              {
+                instancePath,
+                schemaPath: '#/additionalProperties',
+                keyword: 'additionalProperties',
+                params: { additionalProperty: key0 },
+                message: 'must NOT have additional properties',
+              },
+            ];
+            return false;
+            break;
+          }
+        }
+        if (_errs1 === errors) {
+          if (data.status !== undefined) {
+            const _errs2 = errors;
+            if ('indexed' !== data.status) {
+              validate38.errors = [
+                {
+                  instancePath: instancePath + '/status',
+                  schemaPath: '#/properties/status/const',
+                  keyword: 'const',
+                  params: { allowedValue: 'indexed' },
+                  message: 'must be equal to constant',
+                },
+              ];
+              return false;
+            }
+            var valid0 = _errs2 === errors;
+          } else {
+            var valid0 = true;
+          }
+          if (valid0) {
+            if (data.sessions !== undefined) {
+              let data1 = data.sessions;
+              const _errs3 = errors;
+              if (
+                !(
+                  typeof data1 == 'number' &&
+                  !(data1 % 1) &&
+                  !isNaN(data1) &&
+                  isFinite(data1)
+                )
+              ) {
+                validate38.errors = [
+                  {
+                    instancePath: instancePath + '/sessions',
+                    schemaPath: '#/properties/sessions/type',
+                    keyword: 'type',
+                    params: { type: 'integer' },
+                    message: 'must be integer',
+                  },
+                ];
+                return false;
+              }
+              if (errors === _errs3) {
+                if (typeof data1 == 'number' && isFinite(data1)) {
+                  if (data1 > 5000 || isNaN(data1)) {
+                    validate38.errors = [
+                      {
+                        instancePath: instancePath + '/sessions',
+                        schemaPath: '#/properties/sessions/maximum',
+                        keyword: 'maximum',
+                        params: { comparison: '<=', limit: 5000 },
+                        message: 'must be <= 5000',
+                      },
+                    ];
+                    return false;
+                  } else {
+                    if (data1 < 0 || isNaN(data1)) {
+                      validate38.errors = [
+                        {
+                          instancePath: instancePath + '/sessions',
+                          schemaPath: '#/properties/sessions/minimum',
+                          keyword: 'minimum',
+                          params: { comparison: '>=', limit: 0 },
+                          message: 'must be >= 0',
+                        },
+                      ];
+                      return false;
+                    }
+                  }
+                }
+              }
+              var valid0 = _errs3 === errors;
+            } else {
+              var valid0 = true;
+            }
+            if (valid0) {
+              if (data.memories !== undefined) {
+                let data2 = data.memories;
+                const _errs5 = errors;
+                if (
+                  !(
+                    typeof data2 == 'number' &&
+                    !(data2 % 1) &&
+                    !isNaN(data2) &&
+                    isFinite(data2)
+                  )
+                ) {
+                  validate38.errors = [
+                    {
+                      instancePath: instancePath + '/memories',
+                      schemaPath: '#/properties/memories/type',
+                      keyword: 'type',
+                      params: { type: 'integer' },
+                      message: 'must be integer',
+                    },
+                  ];
+                  return false;
+                }
+                if (errors === _errs5) {
+                  if (typeof data2 == 'number' && isFinite(data2)) {
+                    if (data2 > 5000 || isNaN(data2)) {
+                      validate38.errors = [
+                        {
+                          instancePath: instancePath + '/memories',
+                          schemaPath: '#/properties/memories/maximum',
+                          keyword: 'maximum',
+                          params: { comparison: '<=', limit: 5000 },
+                          message: 'must be <= 5000',
+                        },
+                      ];
+                      return false;
+                    } else {
+                      if (data2 < 0 || isNaN(data2)) {
+                        validate38.errors = [
+                          {
+                            instancePath: instancePath + '/memories',
+                            schemaPath: '#/properties/memories/minimum',
+                            keyword: 'minimum',
+                            params: { comparison: '>=', limit: 0 },
+                            message: 'must be >= 0',
+                          },
+                        ];
+                        return false;
+                      }
+                    }
+                  }
+                }
+                var valid0 = _errs5 === errors;
+              } else {
+                var valid0 = true;
+              }
+              if (valid0) {
+                if (data.revisions !== undefined) {
+                  let data3 = data.revisions;
+                  const _errs7 = errors;
+                  if (
+                    !(
+                      typeof data3 == 'number' &&
+                      !(data3 % 1) &&
+                      !isNaN(data3) &&
+                      isFinite(data3)
+                    )
+                  ) {
+                    validate38.errors = [
+                      {
+                        instancePath: instancePath + '/revisions',
+                        schemaPath: '#/properties/revisions/type',
+                        keyword: 'type',
+                        params: { type: 'integer' },
+                        message: 'must be integer',
+                      },
+                    ];
+                    return false;
+                  }
+                  if (errors === _errs7) {
+                    if (typeof data3 == 'number' && isFinite(data3)) {
+                      if (data3 > 5000 || isNaN(data3)) {
+                        validate38.errors = [
+                          {
+                            instancePath: instancePath + '/revisions',
+                            schemaPath: '#/properties/revisions/maximum',
+                            keyword: 'maximum',
+                            params: { comparison: '<=', limit: 5000 },
+                            message: 'must be <= 5000',
+                          },
+                        ];
+                        return false;
+                      } else {
+                        if (data3 < 0 || isNaN(data3)) {
+                          validate38.errors = [
+                            {
+                              instancePath: instancePath + '/revisions',
+                              schemaPath: '#/properties/revisions/minimum',
+                              keyword: 'minimum',
+                              params: { comparison: '>=', limit: 0 },
+                              message: 'must be >= 0',
+                            },
+                          ];
+                          return false;
+                        }
+                      }
+                    }
+                  }
+                  var valid0 = _errs7 === errors;
+                } else {
+                  var valid0 = true;
+                }
+              }
+            }
+          }
+        }
+      }
+    } else {
+      validate38.errors = [
+        {
+          instancePath,
+          schemaPath: '#/type',
+          keyword: 'type',
+          params: { type: 'object' },
+          message: 'must be object',
+        },
+      ];
+      return false;
+    }
+  }
+  validate38.errors = vErrors;
+  return errors === 0;
+}
+validate38.evaluated = {
+  props: true,
+  dynamicProps: false,
+  dynamicItems: false,
+};
+export const validateCaptureImportResult = validate39;
+const schema65 = {
+  title: 'CaptureImportResult',
+  type: 'object',
+  additionalProperties: false,
+  properties: {
+    schema_version: { const: 1 },
+    created: { type: 'integer', minimum: 0, maximum: 10 },
+    updated: { type: 'integer', minimum: 0, maximum: 10 },
+    unchanged: { type: 'integer', minimum: 0, maximum: 10 },
+    acknowledged: { type: 'integer', minimum: 0, maximum: 10 },
+    skipped: { type: 'integer', minimum: 0, maximum: 5000 },
+    memories_pending: { type: 'integer', minimum: 0, maximum: 5000 },
+    next_offset: { type: ['integer', 'null'], minimum: 0, maximum: 5000 },
+  },
+  required: [
+    'schema_version',
+    'created',
+    'updated',
+    'unchanged',
+    'acknowledged',
+    'skipped',
+    'memories_pending',
+    'next_offset',
+  ],
+};
+function validate39(
+  data,
+  {
+    instancePath = '',
+    parentData,
+    parentDataProperty,
+    rootData = data,
+    dynamicAnchors = {},
+  } = {},
+) {
+  let vErrors = null;
+  let errors = 0;
+  const evaluated0 = validate39.evaluated;
+  if (evaluated0.dynamicProps) {
+    evaluated0.props = undefined;
+  }
+  if (evaluated0.dynamicItems) {
+    evaluated0.items = undefined;
+  }
+  if (errors === 0) {
+    if (data && typeof data == 'object' && !Array.isArray(data)) {
+      let missing0;
+      if (
+        (data.schema_version === undefined && (missing0 = 'schema_version')) ||
+        (data.created === undefined && (missing0 = 'created')) ||
+        (data.updated === undefined && (missing0 = 'updated')) ||
+        (data.unchanged === undefined && (missing0 = 'unchanged')) ||
+        (data.acknowledged === undefined && (missing0 = 'acknowledged')) ||
+        (data.skipped === undefined && (missing0 = 'skipped')) ||
+        (data.memories_pending === undefined &&
+          (missing0 = 'memories_pending')) ||
+        (data.next_offset === undefined && (missing0 = 'next_offset'))
+      ) {
+        validate39.errors = [
+          {
+            instancePath,
+            schemaPath: '#/required',
+            keyword: 'required',
+            params: { missingProperty: missing0 },
+            message: "must have required property '" + missing0 + "'",
+          },
+        ];
+        return false;
+      } else {
+        const _errs1 = errors;
+        for (const key0 in data) {
+          if (
+            !(
+              key0 === 'schema_version' ||
+              key0 === 'created' ||
+              key0 === 'updated' ||
+              key0 === 'unchanged' ||
+              key0 === 'acknowledged' ||
+              key0 === 'skipped' ||
+              key0 === 'memories_pending' ||
+              key0 === 'next_offset'
+            )
+          ) {
+            validate39.errors = [
+              {
+                instancePath,
+                schemaPath: '#/additionalProperties',
+                keyword: 'additionalProperties',
+                params: { additionalProperty: key0 },
+                message: 'must NOT have additional properties',
+              },
+            ];
+            return false;
+            break;
+          }
+        }
+        if (_errs1 === errors) {
+          if (data.schema_version !== undefined) {
+            const _errs2 = errors;
+            if (1 !== data.schema_version) {
+              validate39.errors = [
+                {
+                  instancePath: instancePath + '/schema_version',
+                  schemaPath: '#/properties/schema_version/const',
+                  keyword: 'const',
+                  params: { allowedValue: 1 },
+                  message: 'must be equal to constant',
+                },
+              ];
+              return false;
+            }
+            var valid0 = _errs2 === errors;
+          } else {
+            var valid0 = true;
+          }
+          if (valid0) {
+            if (data.created !== undefined) {
+              let data1 = data.created;
+              const _errs3 = errors;
+              if (
+                !(
+                  typeof data1 == 'number' &&
+                  !(data1 % 1) &&
+                  !isNaN(data1) &&
+                  isFinite(data1)
+                )
+              ) {
+                validate39.errors = [
+                  {
+                    instancePath: instancePath + '/created',
+                    schemaPath: '#/properties/created/type',
+                    keyword: 'type',
+                    params: { type: 'integer' },
+                    message: 'must be integer',
+                  },
+                ];
+                return false;
+              }
+              if (errors === _errs3) {
+                if (typeof data1 == 'number' && isFinite(data1)) {
+                  if (data1 > 10 || isNaN(data1)) {
+                    validate39.errors = [
+                      {
+                        instancePath: instancePath + '/created',
+                        schemaPath: '#/properties/created/maximum',
+                        keyword: 'maximum',
+                        params: { comparison: '<=', limit: 10 },
+                        message: 'must be <= 10',
+                      },
+                    ];
+                    return false;
+                  } else {
+                    if (data1 < 0 || isNaN(data1)) {
+                      validate39.errors = [
+                        {
+                          instancePath: instancePath + '/created',
+                          schemaPath: '#/properties/created/minimum',
+                          keyword: 'minimum',
+                          params: { comparison: '>=', limit: 0 },
+                          message: 'must be >= 0',
+                        },
+                      ];
+                      return false;
+                    }
+                  }
+                }
+              }
+              var valid0 = _errs3 === errors;
+            } else {
+              var valid0 = true;
+            }
+            if (valid0) {
+              if (data.updated !== undefined) {
+                let data2 = data.updated;
+                const _errs5 = errors;
+                if (
+                  !(
+                    typeof data2 == 'number' &&
+                    !(data2 % 1) &&
+                    !isNaN(data2) &&
+                    isFinite(data2)
+                  )
+                ) {
+                  validate39.errors = [
+                    {
+                      instancePath: instancePath + '/updated',
+                      schemaPath: '#/properties/updated/type',
+                      keyword: 'type',
+                      params: { type: 'integer' },
+                      message: 'must be integer',
+                    },
+                  ];
+                  return false;
+                }
+                if (errors === _errs5) {
+                  if (typeof data2 == 'number' && isFinite(data2)) {
+                    if (data2 > 10 || isNaN(data2)) {
+                      validate39.errors = [
+                        {
+                          instancePath: instancePath + '/updated',
+                          schemaPath: '#/properties/updated/maximum',
+                          keyword: 'maximum',
+                          params: { comparison: '<=', limit: 10 },
+                          message: 'must be <= 10',
+                        },
+                      ];
+                      return false;
+                    } else {
+                      if (data2 < 0 || isNaN(data2)) {
+                        validate39.errors = [
+                          {
+                            instancePath: instancePath + '/updated',
+                            schemaPath: '#/properties/updated/minimum',
+                            keyword: 'minimum',
+                            params: { comparison: '>=', limit: 0 },
+                            message: 'must be >= 0',
+                          },
+                        ];
+                        return false;
+                      }
+                    }
+                  }
+                }
+                var valid0 = _errs5 === errors;
+              } else {
+                var valid0 = true;
+              }
+              if (valid0) {
+                if (data.unchanged !== undefined) {
+                  let data3 = data.unchanged;
+                  const _errs7 = errors;
+                  if (
+                    !(
+                      typeof data3 == 'number' &&
+                      !(data3 % 1) &&
+                      !isNaN(data3) &&
+                      isFinite(data3)
+                    )
+                  ) {
+                    validate39.errors = [
+                      {
+                        instancePath: instancePath + '/unchanged',
+                        schemaPath: '#/properties/unchanged/type',
+                        keyword: 'type',
+                        params: { type: 'integer' },
+                        message: 'must be integer',
+                      },
+                    ];
+                    return false;
+                  }
+                  if (errors === _errs7) {
+                    if (typeof data3 == 'number' && isFinite(data3)) {
+                      if (data3 > 10 || isNaN(data3)) {
+                        validate39.errors = [
+                          {
+                            instancePath: instancePath + '/unchanged',
+                            schemaPath: '#/properties/unchanged/maximum',
+                            keyword: 'maximum',
+                            params: { comparison: '<=', limit: 10 },
+                            message: 'must be <= 10',
+                          },
+                        ];
+                        return false;
+                      } else {
+                        if (data3 < 0 || isNaN(data3)) {
+                          validate39.errors = [
+                            {
+                              instancePath: instancePath + '/unchanged',
+                              schemaPath: '#/properties/unchanged/minimum',
+                              keyword: 'minimum',
+                              params: { comparison: '>=', limit: 0 },
+                              message: 'must be >= 0',
+                            },
+                          ];
+                          return false;
+                        }
+                      }
+                    }
+                  }
+                  var valid0 = _errs7 === errors;
+                } else {
+                  var valid0 = true;
+                }
+                if (valid0) {
+                  if (data.acknowledged !== undefined) {
+                    let data4 = data.acknowledged;
+                    const _errs9 = errors;
+                    if (
+                      !(
+                        typeof data4 == 'number' &&
+                        !(data4 % 1) &&
+                        !isNaN(data4) &&
+                        isFinite(data4)
+                      )
+                    ) {
+                      validate39.errors = [
+                        {
+                          instancePath: instancePath + '/acknowledged',
+                          schemaPath: '#/properties/acknowledged/type',
+                          keyword: 'type',
+                          params: { type: 'integer' },
+                          message: 'must be integer',
+                        },
+                      ];
+                      return false;
+                    }
+                    if (errors === _errs9) {
+                      if (typeof data4 == 'number' && isFinite(data4)) {
+                        if (data4 > 10 || isNaN(data4)) {
+                          validate39.errors = [
+                            {
+                              instancePath: instancePath + '/acknowledged',
+                              schemaPath: '#/properties/acknowledged/maximum',
+                              keyword: 'maximum',
+                              params: { comparison: '<=', limit: 10 },
+                              message: 'must be <= 10',
+                            },
+                          ];
+                          return false;
+                        } else {
+                          if (data4 < 0 || isNaN(data4)) {
+                            validate39.errors = [
+                              {
+                                instancePath: instancePath + '/acknowledged',
+                                schemaPath: '#/properties/acknowledged/minimum',
+                                keyword: 'minimum',
+                                params: { comparison: '>=', limit: 0 },
+                                message: 'must be >= 0',
+                              },
+                            ];
+                            return false;
+                          }
+                        }
+                      }
+                    }
+                    var valid0 = _errs9 === errors;
+                  } else {
+                    var valid0 = true;
+                  }
+                  if (valid0) {
+                    if (data.skipped !== undefined) {
+                      let data5 = data.skipped;
+                      const _errs11 = errors;
+                      if (
+                        !(
+                          typeof data5 == 'number' &&
+                          !(data5 % 1) &&
+                          !isNaN(data5) &&
+                          isFinite(data5)
+                        )
+                      ) {
+                        validate39.errors = [
+                          {
+                            instancePath: instancePath + '/skipped',
+                            schemaPath: '#/properties/skipped/type',
+                            keyword: 'type',
+                            params: { type: 'integer' },
+                            message: 'must be integer',
+                          },
+                        ];
+                        return false;
+                      }
+                      if (errors === _errs11) {
+                        if (typeof data5 == 'number' && isFinite(data5)) {
+                          if (data5 > 5000 || isNaN(data5)) {
+                            validate39.errors = [
+                              {
+                                instancePath: instancePath + '/skipped',
+                                schemaPath: '#/properties/skipped/maximum',
+                                keyword: 'maximum',
+                                params: { comparison: '<=', limit: 5000 },
+                                message: 'must be <= 5000',
+                              },
+                            ];
+                            return false;
+                          } else {
+                            if (data5 < 0 || isNaN(data5)) {
+                              validate39.errors = [
+                                {
+                                  instancePath: instancePath + '/skipped',
+                                  schemaPath: '#/properties/skipped/minimum',
+                                  keyword: 'minimum',
+                                  params: { comparison: '>=', limit: 0 },
+                                  message: 'must be >= 0',
+                                },
+                              ];
+                              return false;
+                            }
+                          }
+                        }
+                      }
+                      var valid0 = _errs11 === errors;
+                    } else {
+                      var valid0 = true;
+                    }
+                    if (valid0) {
+                      if (data.memories_pending !== undefined) {
+                        let data6 = data.memories_pending;
+                        const _errs13 = errors;
+                        if (
+                          !(
+                            typeof data6 == 'number' &&
+                            !(data6 % 1) &&
+                            !isNaN(data6) &&
+                            isFinite(data6)
+                          )
+                        ) {
+                          validate39.errors = [
+                            {
+                              instancePath: instancePath + '/memories_pending',
+                              schemaPath: '#/properties/memories_pending/type',
+                              keyword: 'type',
+                              params: { type: 'integer' },
+                              message: 'must be integer',
+                            },
+                          ];
+                          return false;
+                        }
+                        if (errors === _errs13) {
+                          if (typeof data6 == 'number' && isFinite(data6)) {
+                            if (data6 > 5000 || isNaN(data6)) {
+                              validate39.errors = [
+                                {
+                                  instancePath:
+                                    instancePath + '/memories_pending',
+                                  schemaPath:
+                                    '#/properties/memories_pending/maximum',
+                                  keyword: 'maximum',
+                                  params: { comparison: '<=', limit: 5000 },
+                                  message: 'must be <= 5000',
+                                },
+                              ];
+                              return false;
+                            } else {
+                              if (data6 < 0 || isNaN(data6)) {
+                                validate39.errors = [
+                                  {
+                                    instancePath:
+                                      instancePath + '/memories_pending',
+                                    schemaPath:
+                                      '#/properties/memories_pending/minimum',
+                                    keyword: 'minimum',
+                                    params: { comparison: '>=', limit: 0 },
+                                    message: 'must be >= 0',
+                                  },
+                                ];
+                                return false;
+                              }
+                            }
+                          }
+                        }
+                        var valid0 = _errs13 === errors;
+                      } else {
+                        var valid0 = true;
+                      }
+                      if (valid0) {
+                        if (data.next_offset !== undefined) {
+                          let data7 = data.next_offset;
+                          const _errs15 = errors;
+                          if (
+                            !(
+                              typeof data7 == 'number' &&
+                              !(data7 % 1) &&
+                              !isNaN(data7) &&
+                              isFinite(data7)
+                            ) &&
+                            data7 !== null
+                          ) {
+                            validate39.errors = [
+                              {
+                                instancePath: instancePath + '/next_offset',
+                                schemaPath: '#/properties/next_offset/type',
+                                keyword: 'type',
+                                params: {
+                                  type: schema65.properties.next_offset.type,
+                                },
+                                message: 'must be integer,null',
+                              },
+                            ];
+                            return false;
+                          }
+                          if (errors === _errs15) {
+                            if (typeof data7 == 'number' && isFinite(data7)) {
+                              if (data7 > 5000 || isNaN(data7)) {
+                                validate39.errors = [
+                                  {
+                                    instancePath: instancePath + '/next_offset',
+                                    schemaPath:
+                                      '#/properties/next_offset/maximum',
+                                    keyword: 'maximum',
+                                    params: { comparison: '<=', limit: 5000 },
+                                    message: 'must be <= 5000',
+                                  },
+                                ];
+                                return false;
+                              } else {
+                                if (data7 < 0 || isNaN(data7)) {
+                                  validate39.errors = [
+                                    {
+                                      instancePath:
+                                        instancePath + '/next_offset',
+                                      schemaPath:
+                                        '#/properties/next_offset/minimum',
+                                      keyword: 'minimum',
+                                      params: { comparison: '>=', limit: 0 },
+                                      message: 'must be >= 0',
+                                    },
+                                  ];
+                                  return false;
+                                }
+                              }
+                            }
+                          }
+                          var valid0 = _errs15 === errors;
+                        } else {
+                          var valid0 = true;
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    } else {
+      validate39.errors = [
+        {
+          instancePath,
+          schemaPath: '#/type',
+          keyword: 'type',
+          params: { type: 'object' },
+          message: 'must be object',
+        },
+      ];
+      return false;
+    }
+  }
+  validate39.errors = vErrors;
+  return errors === 0;
+}
+validate39.evaluated = {
+  props: true,
+  dynamicProps: false,
+  dynamicItems: false,
+};
+export const validateCaptureHookStatus = validate40;
+const schema66 = {
+  title: 'CaptureHookStatus',
+  type: 'object',
+  additionalProperties: false,
+  properties: {
+    status: { enum: ['installed', 'absent', 'partial'] },
+    config_path: { type: 'string', minLength: 1, maxLength: 4096 },
+    trust_verified: { const: false },
+  },
+  required: ['status', 'config_path', 'trust_verified'],
+};
+function validate40(
+  data,
+  {
+    instancePath = '',
+    parentData,
+    parentDataProperty,
+    rootData = data,
+    dynamicAnchors = {},
+  } = {},
+) {
+  let vErrors = null;
+  let errors = 0;
+  const evaluated0 = validate40.evaluated;
+  if (evaluated0.dynamicProps) {
+    evaluated0.props = undefined;
+  }
+  if (evaluated0.dynamicItems) {
+    evaluated0.items = undefined;
+  }
+  if (errors === 0) {
+    if (data && typeof data == 'object' && !Array.isArray(data)) {
+      let missing0;
+      if (
+        (data.status === undefined && (missing0 = 'status')) ||
+        (data.config_path === undefined && (missing0 = 'config_path')) ||
+        (data.trust_verified === undefined && (missing0 = 'trust_verified'))
+      ) {
+        validate40.errors = [
+          {
+            instancePath,
+            schemaPath: '#/required',
+            keyword: 'required',
+            params: { missingProperty: missing0 },
+            message: "must have required property '" + missing0 + "'",
+          },
+        ];
+        return false;
+      } else {
+        const _errs1 = errors;
+        for (const key0 in data) {
+          if (
+            !(
+              key0 === 'status' ||
+              key0 === 'config_path' ||
+              key0 === 'trust_verified'
+            )
+          ) {
+            validate40.errors = [
+              {
+                instancePath,
+                schemaPath: '#/additionalProperties',
+                keyword: 'additionalProperties',
+                params: { additionalProperty: key0 },
+                message: 'must NOT have additional properties',
+              },
+            ];
+            return false;
+            break;
+          }
+        }
+        if (_errs1 === errors) {
+          if (data.status !== undefined) {
+            let data0 = data.status;
+            const _errs2 = errors;
+            if (
+              !(
+                data0 === 'installed' ||
+                data0 === 'absent' ||
+                data0 === 'partial'
+              )
+            ) {
+              validate40.errors = [
+                {
+                  instancePath: instancePath + '/status',
+                  schemaPath: '#/properties/status/enum',
+                  keyword: 'enum',
+                  params: { allowedValues: schema66.properties.status.enum },
+                  message: 'must be equal to one of the allowed values',
+                },
+              ];
+              return false;
+            }
+            var valid0 = _errs2 === errors;
+          } else {
+            var valid0 = true;
+          }
+          if (valid0) {
+            if (data.config_path !== undefined) {
+              let data1 = data.config_path;
+              const _errs3 = errors;
+              if (errors === _errs3) {
+                if (typeof data1 === 'string') {
+                  if (func2(data1) > 4096) {
+                    validate40.errors = [
+                      {
+                        instancePath: instancePath + '/config_path',
+                        schemaPath: '#/properties/config_path/maxLength',
+                        keyword: 'maxLength',
+                        params: { limit: 4096 },
+                        message: 'must NOT have more than 4096 characters',
+                      },
+                    ];
+                    return false;
+                  } else {
+                    if (func2(data1) < 1) {
+                      validate40.errors = [
+                        {
+                          instancePath: instancePath + '/config_path',
+                          schemaPath: '#/properties/config_path/minLength',
+                          keyword: 'minLength',
+                          params: { limit: 1 },
+                          message: 'must NOT have fewer than 1 characters',
+                        },
+                      ];
+                      return false;
+                    }
+                  }
+                } else {
+                  validate40.errors = [
+                    {
+                      instancePath: instancePath + '/config_path',
+                      schemaPath: '#/properties/config_path/type',
+                      keyword: 'type',
+                      params: { type: 'string' },
+                      message: 'must be string',
+                    },
+                  ];
+                  return false;
+                }
+              }
+              var valid0 = _errs3 === errors;
+            } else {
+              var valid0 = true;
+            }
+            if (valid0) {
+              if (data.trust_verified !== undefined) {
+                const _errs5 = errors;
+                if (false !== data.trust_verified) {
+                  validate40.errors = [
+                    {
+                      instancePath: instancePath + '/trust_verified',
+                      schemaPath: '#/properties/trust_verified/const',
+                      keyword: 'const',
+                      params: { allowedValue: false },
+                      message: 'must be equal to constant',
+                    },
+                  ];
+                  return false;
+                }
+                var valid0 = _errs5 === errors;
+              } else {
+                var valid0 = true;
+              }
+            }
+          }
+        }
+      }
+    } else {
+      validate40.errors = [
+        {
+          instancePath,
+          schemaPath: '#/type',
+          keyword: 'type',
+          params: { type: 'object' },
+          message: 'must be object',
+        },
+      ];
+      return false;
+    }
+  }
+  validate40.errors = vErrors;
+  return errors === 0;
+}
+validate40.evaluated = {
+  props: true,
+  dynamicProps: false,
+  dynamicItems: false,
+};
+export const validateCaptureRecoveryResult = validate41;
+const schema67 = {
+  title: 'CaptureRecoveryResult',
+  type: 'object',
+  additionalProperties: false,
+  properties: {
+    restored: { type: 'integer', minimum: 0, maximum: 1000 },
+    unchanged: { type: 'integer', minimum: 0, maximum: 1000 },
+    skipped: { type: 'integer', minimum: 0, maximum: 15000 },
+  },
+  required: ['restored', 'unchanged', 'skipped'],
+};
+function validate41(
+  data,
+  {
+    instancePath = '',
+    parentData,
+    parentDataProperty,
+    rootData = data,
+    dynamicAnchors = {},
+  } = {},
+) {
+  let vErrors = null;
+  let errors = 0;
+  const evaluated0 = validate41.evaluated;
+  if (evaluated0.dynamicProps) {
+    evaluated0.props = undefined;
+  }
+  if (evaluated0.dynamicItems) {
+    evaluated0.items = undefined;
+  }
+  if (errors === 0) {
+    if (data && typeof data == 'object' && !Array.isArray(data)) {
+      let missing0;
+      if (
+        (data.restored === undefined && (missing0 = 'restored')) ||
+        (data.unchanged === undefined && (missing0 = 'unchanged')) ||
+        (data.skipped === undefined && (missing0 = 'skipped'))
+      ) {
+        validate41.errors = [
+          {
+            instancePath,
+            schemaPath: '#/required',
+            keyword: 'required',
+            params: { missingProperty: missing0 },
+            message: "must have required property '" + missing0 + "'",
+          },
+        ];
+        return false;
+      } else {
+        const _errs1 = errors;
+        for (const key0 in data) {
+          if (
+            !(key0 === 'restored' || key0 === 'unchanged' || key0 === 'skipped')
+          ) {
+            validate41.errors = [
+              {
+                instancePath,
+                schemaPath: '#/additionalProperties',
+                keyword: 'additionalProperties',
+                params: { additionalProperty: key0 },
+                message: 'must NOT have additional properties',
+              },
+            ];
+            return false;
+            break;
+          }
+        }
+        if (_errs1 === errors) {
+          if (data.restored !== undefined) {
+            let data0 = data.restored;
+            const _errs2 = errors;
+            if (
+              !(
+                typeof data0 == 'number' &&
+                !(data0 % 1) &&
+                !isNaN(data0) &&
+                isFinite(data0)
+              )
+            ) {
+              validate41.errors = [
+                {
+                  instancePath: instancePath + '/restored',
+                  schemaPath: '#/properties/restored/type',
+                  keyword: 'type',
+                  params: { type: 'integer' },
+                  message: 'must be integer',
+                },
+              ];
+              return false;
+            }
+            if (errors === _errs2) {
+              if (typeof data0 == 'number' && isFinite(data0)) {
+                if (data0 > 1000 || isNaN(data0)) {
+                  validate41.errors = [
+                    {
+                      instancePath: instancePath + '/restored',
+                      schemaPath: '#/properties/restored/maximum',
+                      keyword: 'maximum',
+                      params: { comparison: '<=', limit: 1000 },
+                      message: 'must be <= 1000',
+                    },
+                  ];
+                  return false;
+                } else {
+                  if (data0 < 0 || isNaN(data0)) {
+                    validate41.errors = [
+                      {
+                        instancePath: instancePath + '/restored',
+                        schemaPath: '#/properties/restored/minimum',
+                        keyword: 'minimum',
+                        params: { comparison: '>=', limit: 0 },
+                        message: 'must be >= 0',
+                      },
+                    ];
+                    return false;
+                  }
+                }
+              }
+            }
+            var valid0 = _errs2 === errors;
+          } else {
+            var valid0 = true;
+          }
+          if (valid0) {
+            if (data.unchanged !== undefined) {
+              let data1 = data.unchanged;
+              const _errs4 = errors;
+              if (
+                !(
+                  typeof data1 == 'number' &&
+                  !(data1 % 1) &&
+                  !isNaN(data1) &&
+                  isFinite(data1)
+                )
+              ) {
+                validate41.errors = [
+                  {
+                    instancePath: instancePath + '/unchanged',
+                    schemaPath: '#/properties/unchanged/type',
+                    keyword: 'type',
+                    params: { type: 'integer' },
+                    message: 'must be integer',
+                  },
+                ];
+                return false;
+              }
+              if (errors === _errs4) {
+                if (typeof data1 == 'number' && isFinite(data1)) {
+                  if (data1 > 1000 || isNaN(data1)) {
+                    validate41.errors = [
+                      {
+                        instancePath: instancePath + '/unchanged',
+                        schemaPath: '#/properties/unchanged/maximum',
+                        keyword: 'maximum',
+                        params: { comparison: '<=', limit: 1000 },
+                        message: 'must be <= 1000',
+                      },
+                    ];
+                    return false;
+                  } else {
+                    if (data1 < 0 || isNaN(data1)) {
+                      validate41.errors = [
+                        {
+                          instancePath: instancePath + '/unchanged',
+                          schemaPath: '#/properties/unchanged/minimum',
+                          keyword: 'minimum',
+                          params: { comparison: '>=', limit: 0 },
+                          message: 'must be >= 0',
+                        },
+                      ];
+                      return false;
+                    }
+                  }
+                }
+              }
+              var valid0 = _errs4 === errors;
+            } else {
+              var valid0 = true;
+            }
+            if (valid0) {
+              if (data.skipped !== undefined) {
+                let data2 = data.skipped;
+                const _errs6 = errors;
+                if (
+                  !(
+                    typeof data2 == 'number' &&
+                    !(data2 % 1) &&
+                    !isNaN(data2) &&
+                    isFinite(data2)
+                  )
+                ) {
+                  validate41.errors = [
+                    {
+                      instancePath: instancePath + '/skipped',
+                      schemaPath: '#/properties/skipped/type',
+                      keyword: 'type',
+                      params: { type: 'integer' },
+                      message: 'must be integer',
+                    },
+                  ];
+                  return false;
+                }
+                if (errors === _errs6) {
+                  if (typeof data2 == 'number' && isFinite(data2)) {
+                    if (data2 > 15000 || isNaN(data2)) {
+                      validate41.errors = [
+                        {
+                          instancePath: instancePath + '/skipped',
+                          schemaPath: '#/properties/skipped/maximum',
+                          keyword: 'maximum',
+                          params: { comparison: '<=', limit: 15000 },
+                          message: 'must be <= 15000',
+                        },
+                      ];
+                      return false;
+                    } else {
+                      if (data2 < 0 || isNaN(data2)) {
+                        validate41.errors = [
+                          {
+                            instancePath: instancePath + '/skipped',
+                            schemaPath: '#/properties/skipped/minimum',
+                            keyword: 'minimum',
+                            params: { comparison: '>=', limit: 0 },
+                            message: 'must be >= 0',
+                          },
+                        ];
+                        return false;
+                      }
+                    }
+                  }
+                }
+                var valid0 = _errs6 === errors;
+              } else {
+                var valid0 = true;
+              }
+            }
+          }
+        }
+      }
+    } else {
+      validate41.errors = [
+        {
+          instancePath,
+          schemaPath: '#/type',
+          keyword: 'type',
+          params: { type: 'object' },
+          message: 'must be object',
+        },
+      ];
+      return false;
+    }
+  }
+  validate41.errors = vErrors;
+  return errors === 0;
+}
+validate41.evaluated = {
+  props: true,
+  dynamicProps: false,
+  dynamicItems: false,
+};
+export const validateCaptureHistoryPreview = validate42;
+const schema68 = {
+  title: 'CaptureHistoryPreview',
+  type: 'object',
+  additionalProperties: false,
+  properties: {
+    preview_id: {
+      type: 'string',
+      pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
+    },
+    source_root: { type: 'string', minLength: 1, maxLength: 4096 },
+    sessions: { type: 'integer', minimum: 0, maximum: 1000 },
+    files: { type: 'integer', minimum: 0, maximum: 1000 },
+    bytes: { type: 'integer', minimum: 0, maximum: 20971520000 },
+    skipped: { type: 'integer', minimum: 0, maximum: 15000 },
+    earliest: { type: ['string', 'null'], maxLength: 64 },
+    latest: { type: ['string', 'null'], maxLength: 64 },
+  },
+  required: [
+    'preview_id',
+    'source_root',
+    'sessions',
+    'files',
+    'bytes',
+    'skipped',
+    'earliest',
+    'latest',
+  ],
+};
+function validate42(
+  data,
+  {
+    instancePath = '',
+    parentData,
+    parentDataProperty,
+    rootData = data,
+    dynamicAnchors = {},
+  } = {},
+) {
+  let vErrors = null;
+  let errors = 0;
+  const evaluated0 = validate42.evaluated;
+  if (evaluated0.dynamicProps) {
+    evaluated0.props = undefined;
+  }
+  if (evaluated0.dynamicItems) {
+    evaluated0.items = undefined;
+  }
+  if (errors === 0) {
+    if (data && typeof data == 'object' && !Array.isArray(data)) {
+      let missing0;
+      if (
+        (data.preview_id === undefined && (missing0 = 'preview_id')) ||
+        (data.source_root === undefined && (missing0 = 'source_root')) ||
+        (data.sessions === undefined && (missing0 = 'sessions')) ||
+        (data.files === undefined && (missing0 = 'files')) ||
+        (data.bytes === undefined && (missing0 = 'bytes')) ||
+        (data.skipped === undefined && (missing0 = 'skipped')) ||
+        (data.earliest === undefined && (missing0 = 'earliest')) ||
+        (data.latest === undefined && (missing0 = 'latest'))
+      ) {
+        validate42.errors = [
+          {
+            instancePath,
+            schemaPath: '#/required',
+            keyword: 'required',
+            params: { missingProperty: missing0 },
+            message: "must have required property '" + missing0 + "'",
+          },
+        ];
+        return false;
+      } else {
+        const _errs1 = errors;
+        for (const key0 in data) {
+          if (
+            !(
+              key0 === 'preview_id' ||
+              key0 === 'source_root' ||
+              key0 === 'sessions' ||
+              key0 === 'files' ||
+              key0 === 'bytes' ||
+              key0 === 'skipped' ||
+              key0 === 'earliest' ||
+              key0 === 'latest'
+            )
+          ) {
+            validate42.errors = [
+              {
+                instancePath,
+                schemaPath: '#/additionalProperties',
+                keyword: 'additionalProperties',
+                params: { additionalProperty: key0 },
+                message: 'must NOT have additional properties',
+              },
+            ];
+            return false;
+            break;
+          }
+        }
+        if (_errs1 === errors) {
+          if (data.preview_id !== undefined) {
+            let data0 = data.preview_id;
+            const _errs2 = errors;
+            if (errors === _errs2) {
+              if (typeof data0 === 'string') {
+                if (!pattern4.test(data0)) {
+                  validate42.errors = [
+                    {
+                      instancePath: instancePath + '/preview_id',
+                      schemaPath: '#/properties/preview_id/pattern',
+                      keyword: 'pattern',
+                      params: {
+                        pattern:
+                          '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
+                      },
+                      message:
+                        'must match pattern "' +
+                        '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$' +
+                        '"',
+                    },
+                  ];
+                  return false;
+                }
+              } else {
+                validate42.errors = [
+                  {
+                    instancePath: instancePath + '/preview_id',
+                    schemaPath: '#/properties/preview_id/type',
+                    keyword: 'type',
+                    params: { type: 'string' },
+                    message: 'must be string',
+                  },
+                ];
+                return false;
+              }
+            }
+            var valid0 = _errs2 === errors;
+          } else {
+            var valid0 = true;
+          }
+          if (valid0) {
+            if (data.source_root !== undefined) {
+              let data1 = data.source_root;
+              const _errs4 = errors;
+              if (errors === _errs4) {
+                if (typeof data1 === 'string') {
+                  if (func2(data1) > 4096) {
+                    validate42.errors = [
+                      {
+                        instancePath: instancePath + '/source_root',
+                        schemaPath: '#/properties/source_root/maxLength',
+                        keyword: 'maxLength',
+                        params: { limit: 4096 },
+                        message: 'must NOT have more than 4096 characters',
+                      },
+                    ];
+                    return false;
+                  } else {
+                    if (func2(data1) < 1) {
+                      validate42.errors = [
+                        {
+                          instancePath: instancePath + '/source_root',
+                          schemaPath: '#/properties/source_root/minLength',
+                          keyword: 'minLength',
+                          params: { limit: 1 },
+                          message: 'must NOT have fewer than 1 characters',
+                        },
+                      ];
+                      return false;
+                    }
+                  }
+                } else {
+                  validate42.errors = [
+                    {
+                      instancePath: instancePath + '/source_root',
+                      schemaPath: '#/properties/source_root/type',
+                      keyword: 'type',
+                      params: { type: 'string' },
+                      message: 'must be string',
+                    },
+                  ];
+                  return false;
+                }
+              }
+              var valid0 = _errs4 === errors;
+            } else {
+              var valid0 = true;
+            }
+            if (valid0) {
+              if (data.sessions !== undefined) {
+                let data2 = data.sessions;
+                const _errs6 = errors;
+                if (
+                  !(
+                    typeof data2 == 'number' &&
+                    !(data2 % 1) &&
+                    !isNaN(data2) &&
+                    isFinite(data2)
+                  )
+                ) {
+                  validate42.errors = [
+                    {
+                      instancePath: instancePath + '/sessions',
+                      schemaPath: '#/properties/sessions/type',
+                      keyword: 'type',
+                      params: { type: 'integer' },
+                      message: 'must be integer',
+                    },
+                  ];
+                  return false;
+                }
+                if (errors === _errs6) {
+                  if (typeof data2 == 'number' && isFinite(data2)) {
+                    if (data2 > 1000 || isNaN(data2)) {
+                      validate42.errors = [
+                        {
+                          instancePath: instancePath + '/sessions',
+                          schemaPath: '#/properties/sessions/maximum',
+                          keyword: 'maximum',
+                          params: { comparison: '<=', limit: 1000 },
+                          message: 'must be <= 1000',
+                        },
+                      ];
+                      return false;
+                    } else {
+                      if (data2 < 0 || isNaN(data2)) {
+                        validate42.errors = [
+                          {
+                            instancePath: instancePath + '/sessions',
+                            schemaPath: '#/properties/sessions/minimum',
+                            keyword: 'minimum',
+                            params: { comparison: '>=', limit: 0 },
+                            message: 'must be >= 0',
+                          },
+                        ];
+                        return false;
+                      }
+                    }
+                  }
+                }
+                var valid0 = _errs6 === errors;
+              } else {
+                var valid0 = true;
+              }
+              if (valid0) {
+                if (data.files !== undefined) {
+                  let data3 = data.files;
+                  const _errs8 = errors;
+                  if (
+                    !(
+                      typeof data3 == 'number' &&
+                      !(data3 % 1) &&
+                      !isNaN(data3) &&
+                      isFinite(data3)
+                    )
+                  ) {
+                    validate42.errors = [
+                      {
+                        instancePath: instancePath + '/files',
+                        schemaPath: '#/properties/files/type',
+                        keyword: 'type',
+                        params: { type: 'integer' },
+                        message: 'must be integer',
+                      },
+                    ];
+                    return false;
+                  }
+                  if (errors === _errs8) {
+                    if (typeof data3 == 'number' && isFinite(data3)) {
+                      if (data3 > 1000 || isNaN(data3)) {
+                        validate42.errors = [
+                          {
+                            instancePath: instancePath + '/files',
+                            schemaPath: '#/properties/files/maximum',
+                            keyword: 'maximum',
+                            params: { comparison: '<=', limit: 1000 },
+                            message: 'must be <= 1000',
+                          },
+                        ];
+                        return false;
+                      } else {
+                        if (data3 < 0 || isNaN(data3)) {
+                          validate42.errors = [
+                            {
+                              instancePath: instancePath + '/files',
+                              schemaPath: '#/properties/files/minimum',
+                              keyword: 'minimum',
+                              params: { comparison: '>=', limit: 0 },
+                              message: 'must be >= 0',
+                            },
+                          ];
+                          return false;
+                        }
+                      }
+                    }
+                  }
+                  var valid0 = _errs8 === errors;
+                } else {
+                  var valid0 = true;
+                }
+                if (valid0) {
+                  if (data.bytes !== undefined) {
+                    let data4 = data.bytes;
+                    const _errs10 = errors;
+                    if (
+                      !(
+                        typeof data4 == 'number' &&
+                        !(data4 % 1) &&
+                        !isNaN(data4) &&
+                        isFinite(data4)
+                      )
+                    ) {
+                      validate42.errors = [
+                        {
+                          instancePath: instancePath + '/bytes',
+                          schemaPath: '#/properties/bytes/type',
+                          keyword: 'type',
+                          params: { type: 'integer' },
+                          message: 'must be integer',
+                        },
+                      ];
+                      return false;
+                    }
+                    if (errors === _errs10) {
+                      if (typeof data4 == 'number' && isFinite(data4)) {
+                        if (data4 > 20971520000 || isNaN(data4)) {
+                          validate42.errors = [
+                            {
+                              instancePath: instancePath + '/bytes',
+                              schemaPath: '#/properties/bytes/maximum',
+                              keyword: 'maximum',
+                              params: { comparison: '<=', limit: 20971520000 },
+                              message: 'must be <= 20971520000',
+                            },
+                          ];
+                          return false;
+                        } else {
+                          if (data4 < 0 || isNaN(data4)) {
+                            validate42.errors = [
+                              {
+                                instancePath: instancePath + '/bytes',
+                                schemaPath: '#/properties/bytes/minimum',
+                                keyword: 'minimum',
+                                params: { comparison: '>=', limit: 0 },
+                                message: 'must be >= 0',
+                              },
+                            ];
+                            return false;
+                          }
+                        }
+                      }
+                    }
+                    var valid0 = _errs10 === errors;
+                  } else {
+                    var valid0 = true;
+                  }
+                  if (valid0) {
+                    if (data.skipped !== undefined) {
+                      let data5 = data.skipped;
+                      const _errs12 = errors;
+                      if (
+                        !(
+                          typeof data5 == 'number' &&
+                          !(data5 % 1) &&
+                          !isNaN(data5) &&
+                          isFinite(data5)
+                        )
+                      ) {
+                        validate42.errors = [
+                          {
+                            instancePath: instancePath + '/skipped',
+                            schemaPath: '#/properties/skipped/type',
+                            keyword: 'type',
+                            params: { type: 'integer' },
+                            message: 'must be integer',
+                          },
+                        ];
+                        return false;
+                      }
+                      if (errors === _errs12) {
+                        if (typeof data5 == 'number' && isFinite(data5)) {
+                          if (data5 > 15000 || isNaN(data5)) {
+                            validate42.errors = [
+                              {
+                                instancePath: instancePath + '/skipped',
+                                schemaPath: '#/properties/skipped/maximum',
+                                keyword: 'maximum',
+                                params: { comparison: '<=', limit: 15000 },
+                                message: 'must be <= 15000',
+                              },
+                            ];
+                            return false;
+                          } else {
+                            if (data5 < 0 || isNaN(data5)) {
+                              validate42.errors = [
+                                {
+                                  instancePath: instancePath + '/skipped',
+                                  schemaPath: '#/properties/skipped/minimum',
+                                  keyword: 'minimum',
+                                  params: { comparison: '>=', limit: 0 },
+                                  message: 'must be >= 0',
+                                },
+                              ];
+                              return false;
+                            }
+                          }
+                        }
+                      }
+                      var valid0 = _errs12 === errors;
+                    } else {
+                      var valid0 = true;
+                    }
+                    if (valid0) {
+                      if (data.earliest !== undefined) {
+                        let data6 = data.earliest;
+                        const _errs14 = errors;
+                        if (typeof data6 !== 'string' && data6 !== null) {
+                          validate42.errors = [
+                            {
+                              instancePath: instancePath + '/earliest',
+                              schemaPath: '#/properties/earliest/type',
+                              keyword: 'type',
+                              params: {
+                                type: schema68.properties.earliest.type,
+                              },
+                              message: 'must be string,null',
+                            },
+                          ];
+                          return false;
+                        }
+                        if (errors === _errs14) {
+                          if (typeof data6 === 'string') {
+                            if (func2(data6) > 64) {
+                              validate42.errors = [
+                                {
+                                  instancePath: instancePath + '/earliest',
+                                  schemaPath: '#/properties/earliest/maxLength',
+                                  keyword: 'maxLength',
+                                  params: { limit: 64 },
+                                  message:
+                                    'must NOT have more than 64 characters',
+                                },
+                              ];
+                              return false;
+                            }
+                          }
+                        }
+                        var valid0 = _errs14 === errors;
+                      } else {
+                        var valid0 = true;
+                      }
+                      if (valid0) {
+                        if (data.latest !== undefined) {
+                          let data7 = data.latest;
+                          const _errs16 = errors;
+                          if (typeof data7 !== 'string' && data7 !== null) {
+                            validate42.errors = [
+                              {
+                                instancePath: instancePath + '/latest',
+                                schemaPath: '#/properties/latest/type',
+                                keyword: 'type',
+                                params: {
+                                  type: schema68.properties.latest.type,
+                                },
+                                message: 'must be string,null',
+                              },
+                            ];
+                            return false;
+                          }
+                          if (errors === _errs16) {
+                            if (typeof data7 === 'string') {
+                              if (func2(data7) > 64) {
+                                validate42.errors = [
+                                  {
+                                    instancePath: instancePath + '/latest',
+                                    schemaPath: '#/properties/latest/maxLength',
+                                    keyword: 'maxLength',
+                                    params: { limit: 64 },
+                                    message:
+                                      'must NOT have more than 64 characters',
+                                  },
+                                ];
+                                return false;
+                              }
+                            }
+                          }
+                          var valid0 = _errs16 === errors;
+                        } else {
+                          var valid0 = true;
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    } else {
+      validate42.errors = [
+        {
+          instancePath,
+          schemaPath: '#/type',
+          keyword: 'type',
+          params: { type: 'object' },
+          message: 'must be object',
+        },
+      ];
+      return false;
+    }
+  }
+  validate42.errors = vErrors;
+  return errors === 0;
+}
+validate42.evaluated = {
+  props: true,
+  dynamicProps: false,
+  dynamicItems: false,
+};
+export const validateCaptureHistoryImportResult = validate43;
+const schema69 = {
+  title: 'CaptureHistoryImportResult',
+  type: 'object',
+  additionalProperties: false,
+  properties: {
+    captured: { type: 'integer', minimum: 0, maximum: 10 },
+    skipped: { type: 'integer', minimum: 0, maximum: 10 },
+    next_offset: { type: ['integer', 'null'], minimum: 0, maximum: 1000 },
+  },
+  required: ['captured', 'skipped', 'next_offset'],
+};
+function validate43(
+  data,
+  {
+    instancePath = '',
+    parentData,
+    parentDataProperty,
+    rootData = data,
+    dynamicAnchors = {},
+  } = {},
+) {
+  let vErrors = null;
+  let errors = 0;
+  const evaluated0 = validate43.evaluated;
+  if (evaluated0.dynamicProps) {
+    evaluated0.props = undefined;
+  }
+  if (evaluated0.dynamicItems) {
+    evaluated0.items = undefined;
+  }
+  if (errors === 0) {
+    if (data && typeof data == 'object' && !Array.isArray(data)) {
+      let missing0;
+      if (
+        (data.captured === undefined && (missing0 = 'captured')) ||
+        (data.skipped === undefined && (missing0 = 'skipped')) ||
+        (data.next_offset === undefined && (missing0 = 'next_offset'))
+      ) {
+        validate43.errors = [
+          {
+            instancePath,
+            schemaPath: '#/required',
+            keyword: 'required',
+            params: { missingProperty: missing0 },
+            message: "must have required property '" + missing0 + "'",
+          },
+        ];
+        return false;
+      } else {
+        const _errs1 = errors;
+        for (const key0 in data) {
+          if (
+            !(
+              key0 === 'captured' ||
+              key0 === 'skipped' ||
+              key0 === 'next_offset'
+            )
+          ) {
+            validate43.errors = [
+              {
+                instancePath,
+                schemaPath: '#/additionalProperties',
+                keyword: 'additionalProperties',
+                params: { additionalProperty: key0 },
+                message: 'must NOT have additional properties',
+              },
+            ];
+            return false;
+            break;
+          }
+        }
+        if (_errs1 === errors) {
+          if (data.captured !== undefined) {
+            let data0 = data.captured;
+            const _errs2 = errors;
+            if (
+              !(
+                typeof data0 == 'number' &&
+                !(data0 % 1) &&
+                !isNaN(data0) &&
+                isFinite(data0)
+              )
+            ) {
+              validate43.errors = [
+                {
+                  instancePath: instancePath + '/captured',
+                  schemaPath: '#/properties/captured/type',
+                  keyword: 'type',
+                  params: { type: 'integer' },
+                  message: 'must be integer',
+                },
+              ];
+              return false;
+            }
+            if (errors === _errs2) {
+              if (typeof data0 == 'number' && isFinite(data0)) {
+                if (data0 > 10 || isNaN(data0)) {
+                  validate43.errors = [
+                    {
+                      instancePath: instancePath + '/captured',
+                      schemaPath: '#/properties/captured/maximum',
+                      keyword: 'maximum',
+                      params: { comparison: '<=', limit: 10 },
+                      message: 'must be <= 10',
+                    },
+                  ];
+                  return false;
+                } else {
+                  if (data0 < 0 || isNaN(data0)) {
+                    validate43.errors = [
+                      {
+                        instancePath: instancePath + '/captured',
+                        schemaPath: '#/properties/captured/minimum',
+                        keyword: 'minimum',
+                        params: { comparison: '>=', limit: 0 },
+                        message: 'must be >= 0',
+                      },
+                    ];
+                    return false;
+                  }
+                }
+              }
+            }
+            var valid0 = _errs2 === errors;
+          } else {
+            var valid0 = true;
+          }
+          if (valid0) {
+            if (data.skipped !== undefined) {
+              let data1 = data.skipped;
+              const _errs4 = errors;
+              if (
+                !(
+                  typeof data1 == 'number' &&
+                  !(data1 % 1) &&
+                  !isNaN(data1) &&
+                  isFinite(data1)
+                )
+              ) {
+                validate43.errors = [
+                  {
+                    instancePath: instancePath + '/skipped',
+                    schemaPath: '#/properties/skipped/type',
+                    keyword: 'type',
+                    params: { type: 'integer' },
+                    message: 'must be integer',
+                  },
+                ];
+                return false;
+              }
+              if (errors === _errs4) {
+                if (typeof data1 == 'number' && isFinite(data1)) {
+                  if (data1 > 10 || isNaN(data1)) {
+                    validate43.errors = [
+                      {
+                        instancePath: instancePath + '/skipped',
+                        schemaPath: '#/properties/skipped/maximum',
+                        keyword: 'maximum',
+                        params: { comparison: '<=', limit: 10 },
+                        message: 'must be <= 10',
+                      },
+                    ];
+                    return false;
+                  } else {
+                    if (data1 < 0 || isNaN(data1)) {
+                      validate43.errors = [
+                        {
+                          instancePath: instancePath + '/skipped',
+                          schemaPath: '#/properties/skipped/minimum',
+                          keyword: 'minimum',
+                          params: { comparison: '>=', limit: 0 },
+                          message: 'must be >= 0',
+                        },
+                      ];
+                      return false;
+                    }
+                  }
+                }
+              }
+              var valid0 = _errs4 === errors;
+            } else {
+              var valid0 = true;
+            }
+            if (valid0) {
+              if (data.next_offset !== undefined) {
+                let data2 = data.next_offset;
+                const _errs6 = errors;
+                if (
+                  !(
+                    typeof data2 == 'number' &&
+                    !(data2 % 1) &&
+                    !isNaN(data2) &&
+                    isFinite(data2)
+                  ) &&
+                  data2 !== null
+                ) {
+                  validate43.errors = [
+                    {
+                      instancePath: instancePath + '/next_offset',
+                      schemaPath: '#/properties/next_offset/type',
+                      keyword: 'type',
+                      params: { type: schema69.properties.next_offset.type },
+                      message: 'must be integer,null',
+                    },
+                  ];
+                  return false;
+                }
+                if (errors === _errs6) {
+                  if (typeof data2 == 'number' && isFinite(data2)) {
+                    if (data2 > 1000 || isNaN(data2)) {
+                      validate43.errors = [
+                        {
+                          instancePath: instancePath + '/next_offset',
+                          schemaPath: '#/properties/next_offset/maximum',
+                          keyword: 'maximum',
+                          params: { comparison: '<=', limit: 1000 },
+                          message: 'must be <= 1000',
+                        },
+                      ];
+                      return false;
+                    } else {
+                      if (data2 < 0 || isNaN(data2)) {
+                        validate43.errors = [
+                          {
+                            instancePath: instancePath + '/next_offset',
+                            schemaPath: '#/properties/next_offset/minimum',
+                            keyword: 'minimum',
+                            params: { comparison: '>=', limit: 0 },
+                            message: 'must be >= 0',
+                          },
+                        ];
+                        return false;
+                      }
+                    }
+                  }
+                }
+                var valid0 = _errs6 === errors;
+              } else {
+                var valid0 = true;
+              }
+            }
+          }
+        }
+      }
+    } else {
+      validate43.errors = [
+        {
+          instancePath,
+          schemaPath: '#/type',
+          keyword: 'type',
+          params: { type: 'object' },
+          message: 'must be object',
+        },
+      ];
+      return false;
+    }
+  }
+  validate43.errors = vErrors;
+  return errors === 0;
+}
+validate43.evaluated = {
+  props: true,
+  dynamicProps: false,
+  dynamicItems: false,
+};
+export const validateCaptureCleanupResult = validate44;
+const schema70 = {
+  title: 'CaptureCleanupResult',
+  type: 'object',
+  additionalProperties: false,
+  properties: {
+    removed_revisions: { type: 'integer', minimum: 0, maximum: 5000 },
+    removed_chunks: { type: 'integer', minimum: 0, maximum: 30000 },
+    bytes_freed: { type: 'integer', minimum: 0, maximum: 1073741824 },
+    deferred: { type: 'boolean' },
+  },
+  required: ['removed_revisions', 'removed_chunks', 'bytes_freed', 'deferred'],
+};
+function validate44(
+  data,
+  {
+    instancePath = '',
+    parentData,
+    parentDataProperty,
+    rootData = data,
+    dynamicAnchors = {},
+  } = {},
+) {
+  let vErrors = null;
+  let errors = 0;
+  const evaluated0 = validate44.evaluated;
+  if (evaluated0.dynamicProps) {
+    evaluated0.props = undefined;
+  }
+  if (evaluated0.dynamicItems) {
+    evaluated0.items = undefined;
+  }
+  if (errors === 0) {
+    if (data && typeof data == 'object' && !Array.isArray(data)) {
+      let missing0;
+      if (
+        (data.removed_revisions === undefined &&
+          (missing0 = 'removed_revisions')) ||
+        (data.removed_chunks === undefined && (missing0 = 'removed_chunks')) ||
+        (data.bytes_freed === undefined && (missing0 = 'bytes_freed')) ||
+        (data.deferred === undefined && (missing0 = 'deferred'))
+      ) {
+        validate44.errors = [
+          {
+            instancePath,
+            schemaPath: '#/required',
+            keyword: 'required',
+            params: { missingProperty: missing0 },
+            message: "must have required property '" + missing0 + "'",
+          },
+        ];
+        return false;
+      } else {
+        const _errs1 = errors;
+        for (const key0 in data) {
+          if (
+            !(
+              key0 === 'removed_revisions' ||
+              key0 === 'removed_chunks' ||
+              key0 === 'bytes_freed' ||
+              key0 === 'deferred'
+            )
+          ) {
+            validate44.errors = [
+              {
+                instancePath,
+                schemaPath: '#/additionalProperties',
+                keyword: 'additionalProperties',
+                params: { additionalProperty: key0 },
+                message: 'must NOT have additional properties',
+              },
+            ];
+            return false;
+            break;
+          }
+        }
+        if (_errs1 === errors) {
+          if (data.removed_revisions !== undefined) {
+            let data0 = data.removed_revisions;
+            const _errs2 = errors;
+            if (
+              !(
+                typeof data0 == 'number' &&
+                !(data0 % 1) &&
+                !isNaN(data0) &&
+                isFinite(data0)
+              )
+            ) {
+              validate44.errors = [
+                {
+                  instancePath: instancePath + '/removed_revisions',
+                  schemaPath: '#/properties/removed_revisions/type',
+                  keyword: 'type',
+                  params: { type: 'integer' },
+                  message: 'must be integer',
+                },
+              ];
+              return false;
+            }
+            if (errors === _errs2) {
+              if (typeof data0 == 'number' && isFinite(data0)) {
+                if (data0 > 5000 || isNaN(data0)) {
+                  validate44.errors = [
+                    {
+                      instancePath: instancePath + '/removed_revisions',
+                      schemaPath: '#/properties/removed_revisions/maximum',
+                      keyword: 'maximum',
+                      params: { comparison: '<=', limit: 5000 },
+                      message: 'must be <= 5000',
+                    },
+                  ];
+                  return false;
+                } else {
+                  if (data0 < 0 || isNaN(data0)) {
+                    validate44.errors = [
+                      {
+                        instancePath: instancePath + '/removed_revisions',
+                        schemaPath: '#/properties/removed_revisions/minimum',
+                        keyword: 'minimum',
+                        params: { comparison: '>=', limit: 0 },
+                        message: 'must be >= 0',
+                      },
+                    ];
+                    return false;
+                  }
+                }
+              }
+            }
+            var valid0 = _errs2 === errors;
+          } else {
+            var valid0 = true;
+          }
+          if (valid0) {
+            if (data.removed_chunks !== undefined) {
+              let data1 = data.removed_chunks;
+              const _errs4 = errors;
+              if (
+                !(
+                  typeof data1 == 'number' &&
+                  !(data1 % 1) &&
+                  !isNaN(data1) &&
+                  isFinite(data1)
+                )
+              ) {
+                validate44.errors = [
+                  {
+                    instancePath: instancePath + '/removed_chunks',
+                    schemaPath: '#/properties/removed_chunks/type',
+                    keyword: 'type',
+                    params: { type: 'integer' },
+                    message: 'must be integer',
+                  },
+                ];
+                return false;
+              }
+              if (errors === _errs4) {
+                if (typeof data1 == 'number' && isFinite(data1)) {
+                  if (data1 > 30000 || isNaN(data1)) {
+                    validate44.errors = [
+                      {
+                        instancePath: instancePath + '/removed_chunks',
+                        schemaPath: '#/properties/removed_chunks/maximum',
+                        keyword: 'maximum',
+                        params: { comparison: '<=', limit: 30000 },
+                        message: 'must be <= 30000',
+                      },
+                    ];
+                    return false;
+                  } else {
+                    if (data1 < 0 || isNaN(data1)) {
+                      validate44.errors = [
+                        {
+                          instancePath: instancePath + '/removed_chunks',
+                          schemaPath: '#/properties/removed_chunks/minimum',
+                          keyword: 'minimum',
+                          params: { comparison: '>=', limit: 0 },
+                          message: 'must be >= 0',
+                        },
+                      ];
+                      return false;
+                    }
+                  }
+                }
+              }
+              var valid0 = _errs4 === errors;
+            } else {
+              var valid0 = true;
+            }
+            if (valid0) {
+              if (data.bytes_freed !== undefined) {
+                let data2 = data.bytes_freed;
+                const _errs6 = errors;
+                if (
+                  !(
+                    typeof data2 == 'number' &&
+                    !(data2 % 1) &&
+                    !isNaN(data2) &&
+                    isFinite(data2)
+                  )
+                ) {
+                  validate44.errors = [
+                    {
+                      instancePath: instancePath + '/bytes_freed',
+                      schemaPath: '#/properties/bytes_freed/type',
+                      keyword: 'type',
+                      params: { type: 'integer' },
+                      message: 'must be integer',
+                    },
+                  ];
+                  return false;
+                }
+                if (errors === _errs6) {
+                  if (typeof data2 == 'number' && isFinite(data2)) {
+                    if (data2 > 1073741824 || isNaN(data2)) {
+                      validate44.errors = [
+                        {
+                          instancePath: instancePath + '/bytes_freed',
+                          schemaPath: '#/properties/bytes_freed/maximum',
+                          keyword: 'maximum',
+                          params: { comparison: '<=', limit: 1073741824 },
+                          message: 'must be <= 1073741824',
+                        },
+                      ];
+                      return false;
+                    } else {
+                      if (data2 < 0 || isNaN(data2)) {
+                        validate44.errors = [
+                          {
+                            instancePath: instancePath + '/bytes_freed',
+                            schemaPath: '#/properties/bytes_freed/minimum',
+                            keyword: 'minimum',
+                            params: { comparison: '>=', limit: 0 },
+                            message: 'must be >= 0',
+                          },
+                        ];
+                        return false;
+                      }
+                    }
+                  }
+                }
+                var valid0 = _errs6 === errors;
+              } else {
+                var valid0 = true;
+              }
+              if (valid0) {
+                if (data.deferred !== undefined) {
+                  const _errs8 = errors;
+                  if (typeof data.deferred !== 'boolean') {
+                    validate44.errors = [
+                      {
+                        instancePath: instancePath + '/deferred',
+                        schemaPath: '#/properties/deferred/type',
+                        keyword: 'type',
+                        params: { type: 'boolean' },
+                        message: 'must be boolean',
+                      },
+                    ];
+                    return false;
+                  }
+                  var valid0 = _errs8 === errors;
+                } else {
+                  var valid0 = true;
+                }
+              }
+            }
+          }
+        }
+      }
+    } else {
+      validate44.errors = [
+        {
+          instancePath,
+          schemaPath: '#/type',
+          keyword: 'type',
+          params: { type: 'object' },
+          message: 'must be object',
+        },
+      ];
+      return false;
+    }
+  }
+  validate44.errors = vErrors;
+  return errors === 0;
+}
+validate44.evaluated = {
   props: true,
   dynamicProps: false,
   dynamicItems: false,

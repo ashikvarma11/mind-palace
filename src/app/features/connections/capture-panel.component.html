@@ -1,0 +1,226 @@
+<div class="page-heading">
+  <span class="eyebrow">Local connections</span>
+  <h1>Bring your coding sessions home.</h1>
+  <p class="sub">
+    Connect Codex, store sessions in your local vault, then ask questions with source evidence.
+  </p>
+</div>
+@if (!connection.native) {
+  <section class="panel">
+    <h2>Open Mind Palace on your desktop.</h2>
+    <p>Hook setup requires the installed desktop app. No capture is running in this browser.</p>
+  </section>
+} @else {
+  <section class="panel setup-guide" aria-label="Codex setup checklist">
+    <div class="section-title"><div><span class="eyebrow">Codex connection</span><h2>Your next steps</h2></div><span class="badge">On this computer</span></div>
+    <ol class="setup-steps">
+      <li><strong>1. Open your vault</strong><span>{{ vault.connected() ? 'Vault open. Stored sessions are available.' : 'Create a vault once, or open your existing vault.' }}</span>
+        @if (!vault.connected()) {
+          <div class="actions"><button class="button primary" type="button" (click)="vault.open(true)" [disabled]="vault.busy() || connection.busy()">Create local vault</button><button class="button" type="button" (click)="vault.open(false)" [disabled]="vault.busy() || connection.busy()">Open existing vault</button></div>
+        }
+      </li>
+      <li><strong>2. Allow the source folder</strong><span>{{ codex()?.enabled ? 'Capture is allowed for the saved folder.' : codex()?.configured ? 'Capture is paused. Edit the scope to resume.' : 'Enter the exact Codex transcript folder below. Capture starts only with your consent.' }}</span><a class="button" href="#capture-scope">Choose or edit folder</a></li>
+      <li><strong>3. Install and approve the hook</strong><span>{{ connection.error() ? 'Status unavailable. Refresh before another change.' : connection.codexHook()?.status === 'installed' ? 'Hook file installed. Runtime approval is not checked here.' : 'Save the scope, then install the Codex hook.' }}</span><p>In Codex, open <code>/hooks</code>. Review and trust the Mind Palace handlers. Changed hooks need new approval.</p></li>
+      <li><strong>4. Use Codex, then sync</strong><span>Capture can run while Mind Palace is closed. Opening the vault or asking a question checks new captures.</span>
+        <div class="actions"><button class="button primary" type="button" (click)="syncNow()" [disabled]="connection.busy() || vault.busy() || !vault.connected()">Sync Codex to vault</button>
+          @if (vault.connected()) { <a class="button" routerLink="/sessions">View stored sessions</a><a class="button" routerLink="/ask">Ask stored sessions</a> }
+        </div>
+      </li>
+    </ol>
+    <p class="small">An installed hook does not prove delivery. Check the inbox results and stored sessions after a new Codex turn.</p>
+  </section>
+  @if (connection.error()) { <p class="notice-box" role="alert">{{ connection.error() }}</p> }
+  @if (connection.notice()) { <p class="notice-box" role="status">{{ connection.notice() }}</p> }
+  @if (vault.error()) { <p class="notice-box" role="alert">{{ vault.error() }}</p> }
+  @if (vault.notice()) { <p class="notice-box" role="status">{{ vault.notice() }}</p> }
+  <div class="actions">
+    <button class="button" (click)="connection.refresh()" [disabled]="connection.busy()">
+      Refresh capture status
+    </button>
+  </div>
+  @if (connection.status(); as status) {
+    <section class="panel spaced">
+      <h2>Capture inbox and sync status</h2>
+      <details><summary>Local inbox folder</summary><p class="path">{{ status.inbox_root }}</p></details>
+      <p>
+        Inbox: {{ usage(status.health.bytes_used) }} of {{ usage(status.health.quota_bytes) }} ·
+        {{ status.health.pending_spool }} pending · {{ status.health.failures }} capture failures.
+      </p>
+      <p class="small">
+        Redundant prefixes older than {{ status.health.retention_days }} days are removed after
+        a verified vault import. The complete acknowledged source stays in the inbox.
+        Last validated: {{ status.health.last_indexed_at || 'Not yet validated' }}.
+      </p>
+      @if (status.health.failures > 0) {
+        <p role="alert">
+          Capture failures need attention. Rebuild the index to validate the inbox before repair.
+        </p>
+      }
+      <p>
+        Capture works while Mind Palace is closed. Install the Codex hook below, then review it in
+        Codex with /hooks. Codex skips a hook until you trust its current definition.
+      </p>
+      <button class="button" (click)="connection.rebuild()" [disabled]="connection.busy()">
+        Validate inbox and rebuild index
+      </button>
+      <button
+        class="button primary"
+        (click)="importCaptured()"
+        [disabled]="connection.busy() || vault.busy() || !vault.connected()"
+      >
+        {{ connection.nextOffset() ? 'Import next captured sessions' : 'Import captured sessions' }}
+      </button>
+      @if (!vault.connected()) {
+        <p class="small">Open the local vault on Welcome or Sessions before importing.</p>
+      }
+      @if (connection.index(); as index) {
+        <p role="status">
+          {{ index.sessions }} sessions · {{ index.memories }} memory files ·
+          {{ index.revisions }} revisions.
+        </p>
+      }
+    </section>
+    <div class="clients spaced">
+      @for (client of status.clients; track client.provider) {
+        <section class="panel" [class.codex-card]="client.provider === 'codex'">
+          <h2>{{ client.provider === 'codex' ? 'Codex' : 'Claude Code' }}</h2>
+          <p>
+            {{
+              client.configured
+                ? client.enabled
+                  ? 'Capture allowed for this folder'
+                  : 'Capture paused'
+                : 'Not configured · capture off'
+            }}
+          </p>
+          @if (client.configured) {
+            <p class="path">Transcript scope: {{ client.source_root }}</p>
+            <p>Memory: {{ client.memory_enabled ? 'Selected folders allowed' : 'Off' }}</p>
+            @if (client.provider === 'codex' && connection.codexHook(); as hook) {
+              <p>
+                Codex hook file: {{ hook.status === 'installed' ? 'Installed' : hook.status === 'partial' ? 'Needs repair' : 'Not installed' }}.
+                Runtime trust and event delivery need a new Codex session to verify.
+              </p>
+              <details><summary>Installed hook file</summary><p class="path">{{ hook.config_path }}</p></details>
+              <div class="actions">
+                @if (hook.status === 'absent') {
+                  <button class="button primary" type="button" (click)="connection.installCodexHook()" [disabled]="connection.busy() || !client.enabled">Install Codex hook</button>
+                } @else if (hook.status === 'installed') {
+                  <button class="button" type="button" (click)="connection.removeCodexHook()" [disabled]="connection.busy()">Remove Mind Palace hook</button>
+                }
+              </div>
+              <div class="actions spaced">
+                <button class="button" type="button" (click)="recover()" [disabled]="connection.busy() || vault.busy()">Repair known Codex sessions</button>
+                <button class="button" type="button" (click)="connection.previewHistory()" [disabled]="connection.busy() || vault.busy()">Review Codex history import</button>
+                <button class="button" type="button" (click)="connection.cleanup()" [disabled]="connection.busy() || vault.busy()">Clean old imported prefixes</button>
+              </div>
+              <p class="small">Repair checks only sessions already captured. New historical sessions require the review below.</p>
+            }
+          }
+          <div class="actions">
+            <button class="button" (click)="edit(client)" [disabled]="connection.busy()">
+              Edit {{ client.provider }} scope
+            </button>
+            @if (client.enabled) {
+              <button class="button" (click)="pause(client)" [disabled]="connection.busy()">
+                Pause {{ client.provider }}
+              </button>
+            }
+          </div>
+          @if (client.snippet && client.provider !== 'codex') {
+            <h3 class="spaced">Install the hook manually</h3>
+            <p>
+              Append these event handlers to your Claude Code settings.json. Preserve existing
+              hooks and settings; avoid installing the same handler twice.
+            </p>
+            <label [for]="client.provider + '-snippet'">Hook JSON for {{ client.provider }}</label>
+            <textarea
+              #snippet
+              [id]="client.provider + '-snippet'"
+              readonly
+              [value]="client.snippet"
+              rows="9"
+              spellcheck="false"
+            ></textarea>
+            <button class="button" (click)="selectSnippet(snippet)">
+              Select {{ client.provider }} hook to copy
+            </button>
+            <p class="small">
+              Use SessionStart, Stop and SessionEnd. A missed hook or abrupt client exit can leave
+              gaps. Ordinary web chats and historical sessions are outside this connection.
+            </p>
+          }
+        </section>
+      }
+    </div>
+    @if (connection.historyPreview(); as preview) {
+      <section class="panel spaced" aria-label="Codex history import review">
+        <h2>Review Codex history import</h2>
+        <p class="path">{{ preview.source_root }}</p>
+        <p>{{ preview.sessions }} sessions in {{ preview.files }} files · {{ usage(preview.bytes) }} · {{ preview.skipped }} invalid or unsupported files skipped.</p>
+        <p>Session dates: {{ preview.earliest || 'Not available' }} to {{ preview.latest || 'Not available' }}.</p>
+        <p>Confirmation copies these files to your local inbox and open vault. Changed files are skipped. This review expires after 15 minutes.</p>
+        <div class="actions">
+          <button class="button primary" type="button" (click)="importHistory()" [disabled]="connection.busy() || vault.busy() || !vault.connected() || preview.files === 0">Confirm and import Codex history</button>
+          <button class="button" type="button" (click)="connection.dismissHistory()" [disabled]="connection.busy()">Cancel history import</button>
+        </div>
+        @if (!vault.connected()) { <p>Open your local vault before you confirm this import.</p> }
+      </section>
+    }
+    <form id="capture-scope" class="panel spaced" (ngSubmit)="save()">
+      <h2>Choose the exact scope</h2>
+      <p class="sub">Use Codex first. Claude Code setup remains available, but its complete workflow is not verified.</p>
+      <label for="capture-provider">Coding client</label
+      ><select
+        id="capture-provider"
+        name="provider"
+        [(ngModel)]="provider"
+        [disabled]="connection.busy() || vault.busy()"
+        (ngModelChange)="selectProvider()"
+      >
+        <option value="claude-code">Claude Code</option>
+        <option value="codex">Codex</option>
+      </select>
+      <label for="capture-source">Absolute transcript folder</label
+      ><input
+        id="capture-source"
+        name="source"
+        [(ngModel)]="sourceRoot"
+        maxlength="4096"
+        required
+        [disabled]="connection.busy() || vault.busy()"
+        placeholder="Paste your client's transcript folder"
+      />
+      <p class="small">
+        Choose the actual configured folder. Claude Code normally uses .claude/projects; Codex uses
+        its configured local home. No folder contents are scanned during setup.
+      </p>
+      <label class="consent"><input type="checkbox" name="enabled" [(ngModel)]="enabled" />Allow hooks to copy available
+        session JSONL, including prompts, tool results and personal text, into this local inbox.</label>
+      <details class="spaced"><summary>Optional Markdown memory capture</summary>
+      <label for="capture-memory">Optional memory folders, one absolute path per line</label
+      ><textarea
+        id="capture-memory"
+        name="memory"
+        [(ngModel)]="memoryRoots"
+        maxlength="16000"
+        rows="3"
+      ></textarea>
+      <label class="consent"
+        ><input type="checkbox" name="memoryEnabled" [(ngModel)]="memoryEnabled" />Also copy
+        Markdown from the memory folders listed above. Imported memory stays unreviewed.</label
+      >
+      </details>
+      <p>
+        No cloud upload or inferred approval. Pausing retains existing snapshots; remove the handler
+        from the client settings to uninstall it.
+      </p>
+      <button class="button primary" type="submit" [disabled]="connection.busy()">
+        Save capture scope
+      </button>
+    </form>
+  }
+  @if (connection.busy()) {
+    <p role="status">Working with the local receiver…</p>
+  }
+}

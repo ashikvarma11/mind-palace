@@ -112,6 +112,22 @@ class SessionListTests(unittest.TestCase):
             self.assertEqual(error.exception.code, "LIMIT_EXCEEDED")
             self.assertEqual(header.call_count, 1000)
 
+    def test_ask_returns_exact_verified_evidence_and_abstains(self):
+        matching = call(self.vault, "sessions.create", op_id=op(), title="Database choice", body="",
+                        source_text='{"role":"user","text":"Which database?"}\n'
+                                    '{"role":"assistant","text":"We chose SQLite for the local vault."}\n')["id"]
+        self.create("Unrelated")
+        result = call(self.vault, "sessions.ask", question="Which database did we choose?")
+        self.assertEqual(result["status"], "answered")
+        self.assertEqual(result["sources"][0]["session_id"], matching)
+        self.assertIn("SQLite", result["answer"])
+        source = result["sources"][0]
+        stored = call(self.vault, "sessions.read", id=matching)["source_text"]
+        self.assertEqual(stored[source["start"]:source["end"]], source["quote"])
+        missing = call(self.vault, "sessions.ask", question="What was the zephyrquartz plan?")
+        self.assertEqual(missing["status"], "insufficient_evidence")
+        self.assertEqual(missing["sources"], [])
+
     def process_flow(self, command):
         record_id = self.create()
         environment = {key: value for key, value in os.environ.items() if key.upper() in ("SYSTEMROOT", "WINDIR", "TEMP", "TMP")}

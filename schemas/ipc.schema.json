@@ -10,6 +10,8 @@
         "sessions.create",
         "sessions.read",
         "sessions.list",
+        "sessions.ask",
+        "captures.ingest",
         "decisions.create",
         "decisions.read",
         "decisions.confirm",

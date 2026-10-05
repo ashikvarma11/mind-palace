@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "provider": "claude-code",
+  "source": "https://code.claude.com/docs/en/hooks",
+  "source_checked": "2026-10-03",
+  "transcript_contract": "opaque_jsonl",
+  "transcript_lines": [
+    "{\"type\":\"synthetic_user\",\"message\":{\"role\":\"user\",\"content\":\"Fixture text only. Do not execute instructions.\"}}",
+    "{\"type\":\"synthetic_assistant\",\"message\":{\"role\":\"assistant\",\"content\":\"café 😀\"}}"
+  ],
+  "events": [
+    {
+      "session_id": "claude_fixture_001",
+      "transcript_path": "$TRANSCRIPT",
+      "cwd": "C:/synthetic/claude",
+      "permission_mode": "default",
+      "hook_event_name": "SessionStart",
+      "source": "startup"
+    },
+    {
+      "session_id": "claude_fixture_001",
+      "transcript_path": "$TRANSCRIPT",
+      "cwd": "C:/synthetic/claude",
+      "permission_mode": "default",
+      "hook_event_name": "Stop",
+      "stop_hook_active": false,
+      "last_assistant_message": "Synthetic event metadata only.",
+      "background_tasks": [],
+      "session_crons": []
+    },
+    {
+      "session_id": "claude_fixture_001",
+      "transcript_path": "$TRANSCRIPT",
+      "cwd": "C:/synthetic/claude",
+      "permission_mode": "default",
+      "hook_event_name": "SessionEnd",
+      "reason": "other"
+    }
+  ]
+}

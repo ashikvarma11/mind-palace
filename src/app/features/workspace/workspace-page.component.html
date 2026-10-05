@@ -23,7 +23,8 @@
             >See today’s priorities<svg [lucideIcon]="icons.arrow" aria-hidden="true"></svg></a
           ><a class="button" routerLink="/resume">Resume work</a>
         } @else {
-          <button type="button" class="button primary" (click)="activateSample()">
+          <a class="button primary" routerLink="/connections">Connect Codex</a>
+          <button type="button" class="button" (click)="activateSample()">
             Explore sample workspace<svg [lucideIcon]="icons.arrow" aria-hidden="true"></svg>
           </button>
         }
@@ -76,16 +77,14 @@
       <span class="eyebrow">A truthful starting point</span>
       <h2>{{ vault.connected() ? 'Your local vault is open.' : 'No workspace is open yet.' }}</h2>
       <p class="sub">
-        Open a local vault in the desktop app to save conversations. Or explore the separate
-        fictional sample.
+        Open your vault, connect Codex, then read sessions or ask questions with source evidence.
       </p>
       <div class="capability-list">
-        <span class="badge">Local conversation storage · desktop only</span
-        ><span class="badge">Local AI · pending</span
-        ><span class="badge">Desktop installer · pending</span>
+        <span class="badge">Local session storage</span><span class="badge">Ask with exact source evidence</span>
       </div>
+      <div class="actions spaced"><a class="button primary" routerLink="/connections">Set up Codex</a><a class="button" routerLink="/ask">Ask stored sessions</a></div>
     </section>
-    <app-vault-panel />
+    <app-vault-panel [showPaste]="true" />
   }
 } @else if (page() === 'settings') {
   <div class="page-heading">
@@ -152,14 +151,16 @@
 } @else if (page() === 'sessions' && !store.sampleActive() && vault.native) {
   <div class="page-heading">
     <span class="eyebrow">Your personal memory</span>
-    <h1>Local conversations.</h1>
+    <h1>Your session library.</h1>
     <p class="sub">
-      Save and reopen original text. AI extraction and decision review are still pending.
+      Browse stored sessions, read original messages, and open the source behind an answer.
     </p>
   </div>
   <app-vault-panel />
 } @else if (page() === 'ask' && !store.sampleActive()) {
   <app-ai-preview-panel />
+} @else if (page() === 'connections' && !store.sampleActive()) {
+  <app-capture-panel />
 } @else if (!store.sampleActive()) {
   <div class="page-heading">
     <span class="eyebrow">Personal memory</span>

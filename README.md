@@ -1,41 +1,115 @@
+<div align="center">
+
 # Mind Palace
 
-A private, local-first memory workspace for notes, conversations, decisions, and unfinished work.
+### Your coding conversations. Your local vault. Answers with sources.
 
-Current priority: automatically capture original conversations from Claude, Codex and ChatGPT, rather than require manual pasting. A consent-gated local hook receiver now exists in source, tested with synthetic transcripts; it is not connected to installed assistants or the desktop app yet. Complete account history, background monitoring and inference are not available. See [automatic capture](docs/automatic-capture.md). Manual paste remains a fallback.
+Save the work behind your decisions. Find it when you need it.
 
-**Early development. Not an installable product yet.** Windows desktop development builds now save and reopen pasted conversations locally. AI, repository mapping and installers remain pending. The browser sample is fictional, not durable memory. Library is the latest design preference; the existing interface is still Workspace.
+**Local first** · **Codex integration** · **Original sources** · **No model required for search**
 
-AI progress: Ask memory now previews one explicitly selected original passage and the complete credential-free provider request, with discard/expiry and cancellation. Nothing is sent. Key entry and HTTPS sending remain pending; the interface cannot produce real AI answers. Native request control and internal Windows credential foundations are separate verified subsets. No real keys or paid calls were used. See [preview UI verification](docs/verification/ai-preview-ui-01.md), [AI request verification](docs/verification/ai-requests-01.md) and [credential verification](docs/verification/native-credentials-01.md).
+[Get started](docs/user-guide.md) · [See what works](#what-works-today) · [Roadmap](docs/roadmap.md) · [Contribute](CONTRIBUTING.md)
 
-Desktop progress: Welcome/Sessions offer create/open/close for one local vault, pasted conversation saving, manual notes and source-checked reading. WebView reload, app restart and owned-worker exit checks pass with isolated synthetic data. No AI or cloud calls. See [desktop vault verification](docs/verification/native-vault-01.md) and [local development setup](docs/development.md#project-local-windows-desktop-development).
+</div>
 
-The first vault is under your device's local app-data/dev.mindpalace.local/vault directory. Opening is manual; closing preserves files. Original saved text is hash-checked when read; manual notes are not confirmed decisions. Custom folder selection/full recovery UI remain pending.
+---
 
-Uncertain saves are never automatically retried. An unchanged draft retains its operation ID while the app is open: reopen the vault and explicitly retry it. Do not reload before resolving it; durable retry drafts across app restart are still pending. Other real-memory pages remain unconnected; sample mode stays separate.
+Mind Palace is a desktop memory workspace for coding conversations. Connect Codex, keep session transcripts in a local vault, and ask questions that return exact passages from those sessions.
 
-## Development
+> **Current stage: Windows desktop development build.** The Codex capture-to-answer workflow has passed native tests with synthetic data. Browser mode offers a fictional sample; it cannot connect your desktop vault.
 
-Angular 22 on compatible Node.js, Tauri 2, and a bundled Python memory service are the approved architecture. See the [implementation plan](docs/implementation-plan.md), [current status](docs/implementation-status.md), and [research](docs/research.md).
+![Mind Palace answering from a stored synthetic Codex conversation](docs/images/ask-memory.png)
+
+*An actual native answer with a quote and source link. Screenshots use synthetic conversations and the app's MP lettermark. No private session data is shown.*
+
+## Why use it?
+
+A coding conversation can contain the reason for a database choice, a rejected approach, or the next task. Mind Palace keeps the original record available after the chat ends.
+
+- **Keep the source.** Captured revisions remain immutable; the reader checks original content before showing it.
+- **Find the evidence.** Ask searches stored conversation text and returns an exact quote with a source link.
+- **Resume with context.** Read your saved session without reopening the original coding client.
+- **Stay local.** Capture, storage and source search need no API key or cloud AI call.
+
+## What works today
+
+| Capability | Current behavior |
+| --- | --- |
+| Codex setup | Guided vault opening, exact folder consent and safe hook installation/removal. |
+| Capture while the app is closed | Approved Codex hooks write a local inbox independently of Mind Palace. |
+| Import and recovery | Vault open, refresh and Ask check captures. Known sessions can recover a missed tail from the approved folder. |
+| Existing history | Review source metadata, then explicitly confirm history import. |
+| Session library | Browse saved sessions, filter loaded titles, read messages and inspect the complete source. |
+| Ask memory | Local keyword search, exact quoted evidence, source links and abstention when evidence is missing. |
+| Manual fallback | Save pasted conversations and manual notes in the local vault. |
+| Storage safety | One canonical record per captured session, immutable source revisions, bounded imports and visible failure messages. |
+| Inbox controls | Pause capture, inspect health, repair known sessions and clean acknowledged old prefixes. |
+
+**Ask is source search today.** It does not generate model summaries. The banner `Local vault connected · AI off` means storage is open and no AI model is connected. Source search still works.
+
+## The working flow
+
+```mermaid
+flowchart LR
+    A[Use Codex] --> B[Approved local hooks]
+    B --> C[Local capture inbox]
+    C --> D[Open vault or sync]
+    D --> E[Session library]
+    E --> F[Ask a question]
+    F --> G[Exact quote and source link]
+```
+
+1. Open the **desktop build**. Create a local vault once, or open your existing vault.
+2. In **Connections**, select Codex and enter its exact transcript folder. Allow capture and save the scope.
+3. Click **Install Codex hook**. In Codex, use `/hooks` to review and trust the Mind Palace handlers.
+4. Use Codex. Capture can continue while Mind Palace is closed.
+5. Open the vault or click **Sync Codex to vault**. Read the result in **Sessions**.
+6. Open **Ask memory**, use terms from the conversation, and inspect the quoted source.
+
+Changed hook definitions need fresh Codex approval. An installed file does not prove that a hook ran. See the [user guide](docs/user-guide.md) for history import, pause/removal and troubleshooting.
+
+### Setup on your computer
+
+![Native Codex setup checklist](docs/images/codex-setup.png)
+
+*The actual setup checklist distinguishes an installed hook from runtime approval.*
+
+## Verified results
+
+The latest full native check covered setup, hook merge/removal, closed-app capture, restart import, missed-tail repair, Library filtering, fresh-turn Ask, source opening and explicit history import. A complete **20 MiB** source passed capture/import/read with a matching SHA-256. Latest recorded suites: **35 Angular tests** and **19 Rust tests** passed.
+
+These checks use isolated synthetic data. Installed Codex CLI **0.160.0** also passed normal persisted hook approval in a separate controlled fixture. No paid model generation was used.
+
+Read the evidence: [native workflow](docs/verification/codex-runtime-13.md), [hook trust](docs/verification/codex-trust-11.md), [two-minute test](docs/verification/codex-two-minute-10.md), [current status](docs/implementation-status.md).
+
+## Try the browser sample
+
+Use Node **24.16.0** and npm **11.17.0**, the versions used for the recorded checks.
 
 ```sh
 npm ci
 npm run dev:web
 ```
 
-Open `http://127.0.0.1:4200` and choose **Explore sample workspace**. The sample is fictional and resets on reload. Check the source messages, review a decision, and inspect the resulting handoff.
+Open `http://127.0.0.1:4200` and choose **Explore sample workspace**. The sample resets on reload. It demonstrates the interface; it does not save personal memory or connect Codex.
 
-```sh
-npm run check
-npx playwright install chromium
-npm run test:e2e
-npm run probe:runtime
-```
+For the real local workflow, use a prepared Windows desktop build. See [development setup](docs/development.md). Native builds need staged Python bundles, local compiler resources, WebView2 and native icons. Generated native resources are excluded from Git. The development guide explains the required preparation.
 
-Browser tests can reuse an existing compatible Chromium binary through the optional `MP_BROWSER_EXECUTABLE` environment variable; otherwise use Playwright's installation above. Developer tools are required for this prototype, not a claim that end users must install them in the planned desktop release. Python 3.12 was used for the runtime probe. Windows development desktop commands now exist; installer commands remain unavailable.
+## Under the hood
 
-Verified first milestone: production browser build, seven unit tests, seven end-to-end browser tests (all routes at 1024/768/390/320 px, source/review/handoff flow, theme, keyboard entry, unknown-answer abstention, inert input, and no external HTTP requests in the tested sample flow). See [verification evidence](docs/verification/step-03a.md).
+| Layer | Responsibility |
+| --- | --- |
+| Angular 22 | Setup, session reader and Ask interface. |
+| Tauri 2 | Validated native commands, process ownership and desktop boundary. |
+| Bundled Python | Capture inbox, immutable source files, vault storage and evidence search. |
+| Local hooks | Capture approved client events without running an inference model. |
 
-The app will not send memory to its developer or collect analytics. Copying selected content into a cloud assistant will share that content with that provider. Optional OpenAI/Anthropic API-key integration is now planned: selected content would leave the device and provider API charges may apply. It will be off by default. No cloud AI connection is active in the prototype; see [the cloud AI plan](docs/cloud-ai-plan.md).
+Sources and model output are data. They cannot grant permissions or execute instructions. Capture uses an approved source scope. Unknown history needs explicit confirmation. No developer analytics or hidden cloud sharing is enabled.
 
-Code is MIT licensed. The supplied temporary logo is a separate asset whose redistribution license has not been established, so its binary is kept out of public Git history for now; the local development copy uses the approved artwork. The app retains a lettermark fallback when the asset is missing.
+## Build with us
+
+Start with the [contribution guide](CONTRIBUTING.md). Reliability, synthetic fixtures, accessibility, source-backed documentation and packaging reproducibility are useful contribution areas.
+
+[User guide](docs/user-guide.md) · [Development](docs/development.md) · [Roadmap](docs/roadmap.md) · [Architecture and plan](docs/implementation-plan.md) · [Decisions](docs/decisions.md)
+
+Code is [MIT licensed](LICENSE). Public screenshots use the app's existing MP lettermark. See [asset provenance](design/brand/README.md) for artwork details.

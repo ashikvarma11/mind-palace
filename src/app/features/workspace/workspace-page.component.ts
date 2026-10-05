@@ -20,10 +20,11 @@ import { PageKey, SampleAnswer, WorkspaceStore } from '../../core/workspace-stor
 import { VaultPanel } from '../vault/vault-panel.component';
 import { LocalVault } from '../../core/local-vault';
 import { AiPreviewPanel } from '../ask/ai-preview-panel.component';
+import { CapturePanel } from '../connections/capture-panel.component';
 
 @Component({
   selector: 'app-workspace-page',
-  imports: [RouterLink, FormsModule, LucideDynamicIcon, VaultPanel, AiPreviewPanel],
+  imports: [RouterLink, FormsModule, LucideDynamicIcon, VaultPanel, AiPreviewPanel, CapturePanel],
   templateUrl: './workspace-page.component.html',
   styleUrl: './workspace-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

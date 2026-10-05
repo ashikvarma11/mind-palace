@@ -1,152 +1,59 @@
-<section class="panel" aria-label="Local AI request preview">
-  <span class="eyebrow">Review before sharing · local preview only</span>
-  <h1>Choose what an AI would see.</h1>
+<section class="panel" aria-label="Ask stored conversations">
+  <span class="eyebrow">Local vault search · no cloud call</span>
+  <h1>Ask your stored conversations.</h1>
   <p class="sub">
-    Nothing leaves your device here. AI answers and API-key setup are not connected yet.
+    Mind Palace searches verified original session text and returns the closest exact evidence. It
+    says when the vault does not contain an answer.
   </p>
+  <p class="small">Ask checks new Codex captures before searching. Answers quote stored text; they are not model-generated summaries.</p>
+  <div class="actions spaced"><a class="button" routerLink="/sessions">Browse session library</a><a class="button" routerLink="/connections">Check Codex connection</a></div>
   @if (!vault.native || !vault.connected()) {
-    <p>Open your local vault on Welcome, then return here.</p>
+    <p>Open your local vault, then return here.</p>
     <a class="button" routerLink="/welcome">Open local vault</a>
   } @else {
-    <div class="preview-columns">
-      <div>
-        <label for="preview-session">Saved conversation</label>
-        <select
-          id="preview-session"
-          [(ngModel)]="session"
-          [disabled]="ai.busy() || vault.busy() || !!ai.preview()"
-        >
-          <option value="">Choose one conversation</option>
-          @for (item of vault.list().items; track item.id) {
-            <option [value]="item.id">{{ item.title }}</option>
-          }
-        </select>
-        <button
-          class="button"
-          type="button"
-          (click)="load()"
-          [disabled]="!session || ai.busy() || vault.busy() || !!ai.preview()"
-        >
-          Load original conversation
-        </button>
-        @if (vault.selected(); as original) {
-          <h2 class="spaced">Original: {{ original.metadata.title }}</h2>
-          <pre aria-label="Original source for preview">{{ original.source_text }}</pre>
-          <p class="sub">
-            {{ sourceLength() }} Unicode characters. Choose a start (included) and end (excluded).
-            Offsets count Unicode code points: simple emoji count as one, combined emoji may count
-            as several. Up to 8,000 characters; total sharing limit 32 KB.
-          </p>
-          <form (ngSubmit)="create()">
-            <fieldset [disabled]="ai.busy() || vault.busy() || !!ai.preview()">
-              <legend>Request details</legend>
-              <div class="range-fields">
-                <label
-                  >Start character
-                  <input
-                    type="number"
-                    name="start"
-                    [(ngModel)]="start"
-                    min="0"
-                    [max]="sourceLength()"
-                    required
-                /></label>
-                <label
-                  >End character
-                  <input
-                    type="number"
-                    name="end"
-                    [(ngModel)]="end"
-                    min="1"
-                    [max]="sourceLength()"
-                    required
-                /></label>
-              </div>
-              <label for="preview-provider">AI provider</label>
-              <select id="preview-provider" name="provider" [(ngModel)]="provider">
-                <option value="openai">OpenAI API</option>
-                <option value="anthropic">Anthropic API</option>
-              </select>
-              <label
-                >Model identifier
-                <input
-                  type="text"
-                  name="model"
-                  [(ngModel)]="model"
-                  maxlength="100"
-                  required
-                  autocomplete="off"
-              /></label>
-              <p class="sub">
-                Enter the model identifier from your provider account. This preview does not check
-                availability or use a chat subscription.
-              </p>
-              <label
-                >Your question
-                <textarea
-                  name="question"
-                  [(ngModel)]="question"
-                  maxlength="4000"
-                  required
-                  rows="3"
-                ></textarea>
-              </label>
-              <p class="sub">
-                Maximum 2,000 Unicode characters. Output limit: 512 tokens, not a spending cap.
-              </p>
-              <button type="submit" class="button primary">Create local request preview</button>
-            </fieldset>
-          </form>
-        }
-      </div>
-      <div aria-live="polite">
-        @if (ai.busy()) {
-          <p role="status">
-            {{
-              ai.cancelling()
-                ? 'Cancellation requested. Waiting for cleanup…'
-                : 'Preparing locally…'
-            }}
-          </p>
-          <button class="button" type="button" (click)="ai.cancel()" [disabled]="ai.cancelling()">
-            Cancel preview request
-          </button>
-        }
-        @if (ai.preview(); as preview) {
-          <h2>Exact request preview</h2>
-          <p class="badge pending">
-            {{
-              ai.expired() ? 'Expired · discard and preview again' : 'Local preview · nothing sent'
-            }}
-          </p>
-          <p class="sub">{{ preview.sharing_warning }} Sending is disabled in this build.</p>
-          <pre aria-label="Exact provider request">{{ payload() }}</pre>
-          <p class="small">
-            Source S1 · characters {{ preview.local_references[0].start }}–{{
-              preview.local_references[0].end
-            }}. Receipt expires within five minutes; this is not permission to send.
-          </p>
-          <div class="actions">
-            <button class="button" type="button" (click)="ai.discard()" [disabled]="ai.busy()">
-              Discard preview and edit</button
-            ><button class="button primary" type="button" disabled>
-              Send to AI · not available yet
+    <form class="ask-form" (ngSubmit)="ask()">
+      <label for="memory-question">Question</label>
+      <textarea
+        id="memory-question"
+        name="question"
+        [(ngModel)]="question"
+        maxlength="2000"
+        required
+        rows="3"
+        placeholder="What did we decide about the local database?"
+      ></textarea>
+      <button class="button primary" type="submit" [disabled]="vault.busy() || !question.trim()">
+        {{ vault.busy() ? 'Searching locally…' : 'Ask Mind Palace' }}
+      </button>
+    </form>
+    <div class="answer-panel" aria-live="polite">
+      @if (vault.answer(); as result) {
+        <span class="badge" [class.pending]="result.status === 'insufficient_evidence'">
+          {{ result.status === 'answered' ? 'Answer from stored evidence' : 'Insufficient evidence' }}
+        </span>
+        <pre class="answer">{{ result.answer }}</pre>
+        @for (source of result.sources; track source.session_id + ':' + source.start) {
+          <article class="source-card">
+            <h2>{{ source.title }}</h2>
+            <p class="small">
+              {{ source.provider === 'codex' ? 'Codex session' : 'Stored conversation' }} · exact
+              source characters {{ source.start }}–{{ source.end }}
+            </p>
+            <blockquote>{{ source.quote }}</blockquote>
+            <button class="text-link" type="button" (click)="openSource(source.session_id)">
+              Open stored session
             </button>
-          </div>
-        } @else if (!ai.busy()) {
-          <h2>No request preview yet</h2>
-          <p class="sub">
-            Choose only the original passage you want to include. Manual notes and the rest of your
-            vault are not added.
-          </p>
+          </article>
         }
-      </div>
+      } @else {
+        <p class="sub">Ask a question to search all conversations in the open vault. Use terms from the session for the best keyword match.</p>
+      }
     </div>
-  }
-  @if (ai.error()) {
-    <p role="alert" class="notice-box">{{ ai.error() }}</p>
   }
   @if (vault.error()) {
     <p role="alert" class="notice-box">{{ vault.error() }}</p>
+  }
+  @if (vault.notice()) {
+    <p role="status" class="notice-box">{{ vault.notice() }}</p>
   }
 </section>

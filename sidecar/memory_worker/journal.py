@@ -56,7 +56,7 @@ class Journal:
                 data = base64.b64decode(entry["data"], validate=True)
             except (ValueError, TypeError):
                 raise WorkerError("VALIDATION_ERROR", "Invalid recovery journal.") from None
-            if len(data) > 262144 or digest(data) != entry["new"] or target in [item[0] for item in prepared]:
+            if len(data) > 20 * 1024 * 1024 or digest(data) != entry["new"] or target in [item[0] for item in prepared]:
                 raise WorkerError("VALIDATION_ERROR", "Invalid recovery journal.")
             prepared.append((target, data, entry["old"], entry["new"]))
         if not intent["done"]:
@@ -95,7 +95,7 @@ class Journal:
         entries = [{"path": relative, "old": old, "new": digest(data),
                     "data": base64.b64encode(data).decode("ascii")} for relative, data, old in changes]
         intent = {"version": 1, "fingerprint": fingerprint, "entries": entries, "result": result, "done": False}
-        if len(encoded(intent)) > 1024 * 1024:
+        if len(encoded(intent)) > 64 * 1024 * 1024:
             raise WorkerError("VALIDATION_ERROR", "Operation exceeds storage bounds.")
         write(path, encoded(intent), None)
         return self.apply(path, after_write)["result"]

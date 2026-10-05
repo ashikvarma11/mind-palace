@@ -4,11 +4,20 @@ export type NativeMemoryResult =
   | SessionRead
   | SessionList
   | SessionCreated
+  | MemoryAnswer
   | VaultStatus
   | AiPreviewRequest
   | AiPreviewResult
   | AiPrompt
-  | AiDiscardResult;
+  | AiDiscardResult
+  | CaptureStatus
+  | CaptureIndexResult
+  | CaptureImportResult
+  | CaptureHookStatus
+  | CaptureRecoveryResult
+  | CaptureHistoryPreview
+  | CaptureHistoryImportResult
+  | CaptureCleanupResult;
 export type Identifier = string;
 export type AiModel = string;
 export type AiCap = number;
@@ -63,6 +72,8 @@ export interface SessionMetadata {
   title: string;
   source_id: Identifier;
   review_status: "unreviewed";
+  source_kind?: "hook_capture";
+  provider?: "claude-code" | "codex";
   created_at: string;
 }
 export interface SessionRead {
@@ -80,6 +91,24 @@ export interface SessionList {
 }
 export interface SessionCreated {
   id: Identifier;
+}
+export interface MemoryAnswer {
+  schema_version: 1;
+  status: "answered" | "insufficient_evidence";
+  answer: string;
+  /**
+   * @maxItems 5
+   */
+  sources: MemoryAnswerSource[];
+}
+export interface MemoryAnswerSource {
+  session_id: Identifier;
+  title: string;
+  quote: string;
+  start: number;
+  end: number;
+  snapshot_sha256: string;
+  provider?: "claude-code" | "codex";
 }
 export interface VaultStatus {
   connected: boolean;
@@ -144,4 +173,85 @@ export interface AiPrompt {
 }
 export interface AiDiscardResult {
   discarded: true;
+}
+export interface CaptureStatus {
+  schema_version: 1;
+  inbox_root: string;
+  health: CaptureHealth;
+  /**
+   * @minItems 2
+   * @maxItems 2
+   */
+  clients: [CaptureClient, CaptureClient];
+}
+export interface CaptureHealth {
+  schema_version: 1;
+  kind: "capture_health";
+  derived: true;
+  bytes_used: number;
+  quota_bytes: 1073741824;
+  failures: number;
+  pending_spool: number;
+  retention_days: 30;
+  last_indexed_at: string | null;
+}
+export interface CaptureClient {
+  provider: "claude-code" | "codex";
+  configured: boolean;
+  enabled: boolean;
+  memory_enabled: boolean;
+  source_root: string;
+  /**
+   * @maxItems 32
+   */
+  memory_roots: string[];
+  revision: string;
+  snippet: string;
+}
+export interface CaptureIndexResult {
+  status: "indexed";
+  sessions: number;
+  memories: number;
+  revisions: number;
+}
+export interface CaptureImportResult {
+  schema_version: 1;
+  created: number;
+  updated: number;
+  unchanged: number;
+  acknowledged: number;
+  skipped: number;
+  memories_pending: number;
+  next_offset: number | null;
+}
+export interface CaptureHookStatus {
+  status: "installed" | "absent" | "partial";
+  config_path: string;
+  trust_verified: false;
+}
+export interface CaptureRecoveryResult {
+  restored: number;
+  unchanged: number;
+  skipped: number;
+}
+export interface CaptureHistoryPreview {
+  preview_id: string;
+  source_root: string;
+  sessions: number;
+  files: number;
+  bytes: number;
+  skipped: number;
+  earliest: string | null;
+  latest: string | null;
+}
+export interface CaptureHistoryImportResult {
+  captured: number;
+  skipped: number;
+  next_offset: number | null;
+}
+export interface CaptureCleanupResult {
+  removed_revisions: number;
+  removed_chunks: number;
+  bytes_freed: number;
+  deferred: boolean;
 }

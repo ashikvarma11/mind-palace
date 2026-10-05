@@ -4,15 +4,14 @@
   [attr.aria-busy]="vault.busy()"
 >
   <span class="eyebrow">On this device · no cloud calls</span>
-  <h2>Your local conversations</h2>
+  <h2>Your session library</h2>
   @if (!vault.native) {
     <p class="sub">
       Local storage is available in the desktop app. This browser preview never saves personal data.
     </p>
   } @else {
     <p class="sub">
-      Development vault: your device’s local app-data folder, under dev.mindpalace.local/vault.
-      Opening is manual; closing never deletes saved files.
+      Sessions stay on this computer. Opening the vault checks new Codex captures. Closing keeps your saved files.
     </p>
     @if (!vault.connected()) {
       <div class="actions">
@@ -43,7 +42,9 @@
           Close local vault
         </button>
       </div>
-      <div class="vault-columns">
+      <div class="actions spaced"><a class="button" routerLink="/connections">Connect or repair Codex</a><a class="button" routerLink="/ask">Ask stored sessions</a></div>
+      <div class="library-layout">
+        <details class="manual-paste" [open]="showPaste()"><summary>Save a pasted conversation</summary>
         <form (ngSubmit)="vault.save()">
           <h3>Save a pasted conversation</h3>
           <label
@@ -88,10 +89,13 @@
             {{ vault.draftLocked() ? 'Retry unchanged save' : 'Save conversation locally' }}
           </button>
         </form>
-        <div>
+        </details>
+        <div class="library-list">
           <h3>Saved conversations ({{ vault.list().total }})</h3>
+          <label for="session-filter">Find a stored session</label><input id="session-filter" name="session-filter" [ngModel]="query()" (ngModelChange)="query.set($event)" placeholder="Filter loaded titles" />
+          <p class="small">Search filters the loaded list. Load more to include older sessions.</p>
           <ul class="conversation-list">
-            @for (item of vault.list().items; track item.id) {
+            @for (item of filtered(); track item.id) {
               <li>
                 <button
                   class="button"
@@ -101,12 +105,19 @@
                   (click)="vault.read(item.id)"
                 >
                   {{ item.title }}</button
-                ><small>Unreviewed · {{ item.created_at }}</small>
+                ><small
+                  >Unreviewed ·
+                  {{
+                    item.provider === 'codex'
+                      ? 'Codex capture · '
+                      : item.provider === 'claude-code'
+                        ? 'Claude Code capture · '
+                        : ''
+                  }}{{ item.created_at }}</small
+                >
               </li>
             } @empty {
-              <li class="sub">
-                No conversations saved yet. Nothing has been captured automatically.
-              </li>
+              <li class="sub">{{ vault.list().total === 0 ? 'No sessions yet. Connect Codex, complete a turn, then refresh conversations.' : 'No loaded titles match. Clear the filter or load more sessions.' }}</li>
             }
           </ul>
           @if (vault.list().next_offset !== null) {
@@ -115,17 +126,31 @@
             </button>
           }
         </div>
-      </div>
       @if (vault.selected(); as session) {
         <section class="saved-source" aria-label="Saved original conversation">
           <h3>{{ session.metadata.title }}</h3>
           <span class="badge">Unreviewed · original source checked</span>
+          @if (session.metadata.provider) {
+            <span class="badge">{{ session.metadata.provider }} hook capture</span>
+          }
           <h4>Your notes</h4>
           <pre>{{ session.body || 'No notes provided.' }}</pre>
           <h4>Original conversation</h4>
-          <pre>{{ session.source_text }}</pre>
+          @if (conversation().messages.length > 0) {
+            @for (message of conversation().messages; track $index) {
+              <article><h4>{{ message.role === 'user' ? 'You' : 'Codex' }}</h4><pre>{{ message.text }}</pre></article>
+            }
+            @if (conversation().total > 200) { <p class="small">Showing the latest 200 messages. The complete source remains stored below.</p> }
+          }
+          @if (session.metadata.provider === 'codex') {
+            <button class="button" type="button" (click)="showOriginal.set(!showOriginal())">{{ showOriginal() ? 'Hide complete source' : 'Show complete source' }}</button>
+            @if (showOriginal()) { <pre>{{ session.source_text }}</pre> }
+          } @else { <pre>{{ session.source_text }}</pre> }
         </section>
+      } @else {
+        <section class="saved-source reading-empty"><span class="eyebrow">Original session</span><h3>Select a session to read</h3><p class="sub">Read the conversation, inspect its complete source, or ask a question with cited evidence.</p></section>
       }
+      </div>
     }
   }
   @if (vault.busy()) {

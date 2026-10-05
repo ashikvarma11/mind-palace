@@ -1,7 +1,20 @@
 import { Injectable, InjectionToken, inject, signal } from '@angular/core';
 import { invoke } from '@tauri-apps/api/core';
-import type { SessionCreated, SessionList, SessionRead, VaultStatus } from './contracts.generated';
+import type {
+  MemoryAnswer,
+  CaptureImportResult,
+  CaptureStatus,
+  SessionCreated,
+  SessionList,
+  SessionRead,
+  VaultStatus,
+} from './contracts.generated';
 import {
+  validateMemoryAnswer,
+  validateCaptureImportResult,
+  validateCaptureIndexResult,
+  validateCaptureStatus,
+  validateCaptureCleanupResult,
   validateSessionCreated,
   validateSessionList,
   validateSessionRead,
@@ -37,6 +50,7 @@ export class LocalVault {
   readonly notice = signal('');
   readonly list = signal<SessionList>({ items: [], total: 0, next_offset: null });
   readonly selected = signal<SessionRead | null>(null);
+  readonly answer = signal<MemoryAnswer | null>(null);
   readonly draftLocked = signal(false);
   draft = { title: '', body: '', source_text: '' };
   private pending: { op_id: string; title: string; body: string; source_text: string } | null =
@@ -76,17 +90,51 @@ export class LocalVault {
         this.connected.set(false);
         this.list.set({ items: [], total: 0, next_offset: null });
         this.selected.set(null);
+        this.answer.set(null);
       }
     } finally {
       this.busy.set(false);
     }
   }
+  private async syncCapturedSessions(): Promise<number> {
+    const status = await this.checked<CaptureStatus>('capture_status', {}, validateCaptureStatus);
+    if (!status.clients.some((client) => client.provider === 'codex' && client.configured)) return 0;
+    const indexed: unknown = await this.invoke('capture_index');
+    if (!validateCaptureIndexResult(indexed)) throw { code: 'INVALID_RESPONSE' };
+    let offset = 0;
+    let changed = 0;
+    for (let page = 0; page < 500; page += 1) {
+      const result = await this.checked<CaptureImportResult>(
+        'capture_import',
+        { offset },
+        validateCaptureImportResult,
+      );
+      changed += result.created + result.updated;
+      if (result.next_offset === null) {
+        const cleanup: unknown = await this.invoke('capture_cleanup');
+        if (!validateCaptureCleanupResult(cleanup)) throw { code: 'INVALID_RESPONSE' };
+        return changed;
+      }
+      if (result.next_offset <= offset) throw { code: 'INVALID_RESPONSE' };
+      offset = result.next_offset;
+    }
+    throw { code: 'INVALID_RESPONSE' };
+  }
   async refreshStatus(): Promise<void> {
     await this.run(async () => {
       const status = await this.checked<VaultStatus>('vault_status', {}, validateVaultStatus);
-      this.connected.set(status.connected);
-      if (status.connected) await this.loadList(0);
+      if (status.connected) {
+        await this.loadList(0);
+        try {
+          const imported = await this.syncCapturedSessions();
+          await this.loadList(0);
+          if (imported) this.notice.set(`${imported} Codex session${imported === 1 ? '' : 's'} synced to the local vault.`);
+        } finally {
+          this.connected.set(true);
+        }
+      }
       else {
+        this.connected.set(false);
         this.list.set({ items: [], total: 0, next_offset: null });
         this.selected.set(null);
       }
@@ -95,9 +143,18 @@ export class LocalVault {
   async open(create: boolean): Promise<void> {
     await this.run(async () => {
       const status = await this.checked<VaultStatus>('vault_open', { create }, validateVaultStatus);
-      this.connected.set(status.connected);
-      await this.loadList(0);
-      this.notice.set('Local vault open. No AI or cloud processing is enabled.');
+      try {
+        await this.loadList(0);
+        const imported = await this.syncCapturedSessions();
+        await this.loadList(0);
+        this.notice.set(
+          imported
+            ? `${imported} Codex session${imported === 1 ? '' : 's'} synced to the local vault.`
+            : 'Local vault open. No new captured revisions were imported.',
+        );
+      } finally {
+        this.connected.set(status.connected);
+      }
     });
   }
   async close(): Promise<void> {
@@ -106,6 +163,7 @@ export class LocalVault {
       this.connected.set(status.connected);
       this.list.set({ items: [], total: 0, next_offset: null });
       this.selected.set(null);
+      this.answer.set(null);
       this.notice.set('Vault closed. Saved files remain on this device.');
     });
   }
@@ -118,7 +176,15 @@ export class LocalVault {
     this.list.set(offset ? { ...list, items: [...this.list().items, ...list.items] } : list);
   }
   async reload(): Promise<void> {
-    await this.run(() => this.loadList(0));
+    await this.run(async () => {
+      const imported = await this.syncCapturedSessions();
+      await this.loadList(0);
+      this.notice.set(
+        imported
+          ? `${imported} Codex session${imported === 1 ? '' : 's'} synced to the local vault.`
+          : 'No new captured revisions were imported. This does not verify hook delivery.',
+      );
+    });
   }
   async more(): Promise<void> {
     const offset = this.list().next_offset;
@@ -128,6 +194,31 @@ export class LocalVault {
     await this.run(async () => {
       this.selected.set(
         await this.checked<SessionRead>('sessions_read', { id }, validateSessionRead),
+      );
+    });
+  }
+  async ask(question: string): Promise<void> {
+    if (!question.trim() || Array.from(question).length > 2000) {
+      this.error.set('Enter a question of up to 2,000 characters.');
+      return;
+    }
+    await this.run(async () => {
+      this.answer.set(null);
+      this.notice.set('');
+      if (this.connected()) {
+        try {
+          const imported = await this.syncCapturedSessions();
+          if (imported) await this.loadList(0);
+        } catch (error: unknown) {
+          const code = typeof error === 'object' && error !== null && 'code' in error
+            ? String(error.code) : '';
+          if (!['BUSY', 'CAPTURE_UNAVAILABLE', 'CAPTURE_TIMEOUT', 'CAPTURE_PROCESS_FAILED',
+            'CAPTURE_RESOURCES_INVALID', 'CAPTURE_RESPONSE_INVALID'].includes(code)) throw error;
+          this.notice.set('New captures could not be synced. This answer uses sessions already in the vault. Check Connections before retrying sync.');
+        }
+      }
+      this.answer.set(
+        await this.checked<MemoryAnswer>('sessions_ask', { question }, validateMemoryAnswer),
       );
     });
   }

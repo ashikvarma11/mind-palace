@@ -2,6 +2,7 @@ mod worker;
 mod paths;
 mod commands;
 mod ai_requests;
+mod capture;
 #[allow(dead_code)] // Internal foundation only; no credential command/UI until cancellation is verified.
 mod credentials;
 use tauri::Manager;
@@ -14,10 +15,14 @@ fn native_health() -> &'static str {
 pub fn run() {
     tauri::Builder::default()
         .manage(commands::VaultState::default())
+        .manage(capture::CaptureState::default())
         .invoke_handler(tauri::generate_handler![native_health, commands::vault_status,
             commands::vault_open, commands::vault_close, commands::sessions_create,
             commands::sessions_list, commands::sessions_read, commands::ai_preview,
-            commands::ai_discard, commands::ai_cancel])
+            commands::sessions_ask, commands::ai_discard, commands::ai_cancel, capture::capture_status,
+            capture::capture_configure, capture::capture_index, capture::capture_import,
+            capture::capture_codex_hook, capture::capture_recover, capture::capture_cleanup,
+            capture::capture_history_preview, capture::capture_history_import])
         .build(tauri::generate_context!())
         .expect("Mind Palace desktop shell failed to start")
         .run(|app, event| {

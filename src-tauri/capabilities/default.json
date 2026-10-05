@@ -2,5 +2,5 @@
   "identifier": "main-local",
   "description": "Main-window local app-managed vault only; no arbitrary files, processes, credentials or cloud calls.",
   "windows": ["main"],
-  "permissions": ["allow-native-health", "allow-vault-status", "allow-vault-open", "allow-vault-close", "allow-sessions-create", "allow-sessions-list", "allow-sessions-read", "allow-ai-preview", "allow-ai-discard", "allow-ai-cancel"]
+  "permissions": ["allow-native-health", "allow-vault-status", "allow-vault-open", "allow-vault-close", "allow-sessions-create", "allow-sessions-list", "allow-sessions-read", "allow-sessions-ask", "allow-ai-preview", "allow-ai-discard", "allow-ai-cancel", "allow-capture-status", "allow-capture-configure", "allow-capture-index", "allow-capture-import", "allow-capture-codex-hook", "allow-capture-recover", "allow-capture-cleanup", "allow-capture-history-preview", "allow-capture-history-import"]
 }

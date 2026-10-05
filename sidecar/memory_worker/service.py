@@ -5,12 +5,20 @@ from .paths import ID
 UUID = {"type": "string", "pattern": "^" + ID + "$"}
 TEXT = {"type": "string", "maxLength": 32768}
 TITLE = {"type": "string", "minLength": 1, "maxLength": 200}
+HEX = {"type": "string", "pattern": "^[0-9a-f]{64}$"}
 PARAMS = {
     "health": object_params({}),
     "sessions.create": object_params({"op_id": UUID, "title": TITLE, "body": TEXT, "source_text": {"type": "string", "maxLength": 65536}}),
     "sessions.read": object_params({"id": UUID}),
     "sessions.list": object_params({"limit": {"type": "integer", "minimum": 1, "maximum": 50},
                                     "offset": {"type": "integer", "minimum": 0, "maximum": 1000}}),
+    "sessions.ask": object_params({"question": {"type": "string", "minLength": 1, "maxLength": 2000}}),
+    "captures.ingest": object_params({"op_id": UUID, "provider": {"enum": ["claude-code", "codex"]},
+                                       "session_key": HEX, "session_id": {"type": "string", "pattern": "^[A-Za-z0-9_-]{1,128}$"},
+                                       "title": TITLE, "source_text": {"type": "string", "maxLength": 20971520},
+                                       "selected_sha256": HEX,
+                                       "revisions": {"type": "array", "minItems": 1, "maxItems": 5000,
+                                                     "uniqueItems": True, "items": HEX}}),
     "decisions.create": object_params({"op_id": UUID, "title": TITLE, "body": TEXT}),
     "decisions.read": object_params({"id": UUID}),
     "decisions.confirm": object_params({"op_id": UUID, "id": UUID, "expected_revision": {"type": "integer", "minimum": 1}, "confirm": {"const": True}}),

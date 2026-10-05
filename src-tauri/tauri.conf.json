@@ -25,7 +25,7 @@
   },
   "bundle": {
     "active": false,
-    "resources": {"resources/memory-worker/": "memory-worker/"},
+    "resources": {"resources/memory-worker/": "memory-worker/", "resources/memory-capture/": "memory-capture/"},
     "icon": ["icons/icon.png", "icons/icon.ico"]
   }
 }

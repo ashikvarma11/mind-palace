@@ -5,7 +5,7 @@ from .contracts import validate
 from .journal import encoded
 from .service import dispatch
 
-MAX_FRAME = 1024 * 1024
+MAX_FRAME = 64 * 1024 * 1024
 
 
 def parse(frame):

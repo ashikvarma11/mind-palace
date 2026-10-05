@@ -1,5 +1,60 @@
 # File ledger — planned before creation
 
+- CONTRIBUTING.md — explain contribution scope, setup, tests, privacy boundaries and review evidence.
+- docs/user-guide.md — guide Codex setup, capture, Library, Ask and safe troubleshooting.
+- docs/roadmap.md — separate measured capabilities, partial features and remaining acceptance work.
+- docs/images/codex-setup.png — show the actual native setup checklist with synthetic data.
+- docs/images/session-library.png — evaluated synthetic Library screenshot; removed from the public set because capture caught a refresh in progress.
+- docs/images/ask-memory.png — show an actual native quoted answer with synthetic evidence and the public lettermark.
+- .tools/native/verification/docs-*.png (ignored) — hold synthetic lettermark screenshot sources for public documentation.
+- docs/verification/docs-refresh-14.md — record documentation claim/link/image checks and screenshot provenance.
+
+- docs/verification/codex-runtime-13.md — record bounded native command timing, capture startup failures and complete Codex workflow rechecks.
+
+- .tools/native/verification/codex-setup.png — retain the isolated native guided Codex setup screen for visual verification.
+- .tools/native/verification/codex-library.png — retain the isolated native Library reading view with synthetic session evidence.
+- .tools/native/verification/codex-ask.png — retain the isolated native local Ask answer and exact synthetic citations.
+- .tools/native/verification/codex-setup-narrow.png — retain the isolated 390-pixel native setup layout for overflow checks.
+
+- docs/verification/codex-ui-12.md — record guided Codex setup, Library reading, local Ask, responsive and native workflow verification.
+- src/app/features/connections/capture-panel.component.spec.ts — verify UI setup gates, explicit trust uncertainty and blocked/paused capture states.
+
+- tools/verify-codex-trust.py — prepare an isolated synthetic receiver and local provider, then verify actual Codex persisted approval and execution without a bypass.
+
+- .tools/codex-trust-probe/ (ignored) — hold installed-client protocol schemas and isolated normal-hook-trust diagnostics with synthetic sources only.
+- docs/verification/codex-trust-11.md — record actual persisted trust, fresh-client execution without bypass, change invalidation and limitations.
+
+- docs/verification/codex-two-minute-10.md — record the user-approved two-minute installed-client test, measured duration, exact rollout and local Ask results, with explicit fixture and process topology limits.
+
+Codex client and recovery checks (4 October 2026):
+- tools/verify-codex-client.py — run the installed Codex client with isolated settings and a loopback fixture provider, then verify real hook capture and exact vault evidence without paid inference.
+- docs/verification/codex-recovery-08.md — record live-client fixture delivery, recovery, retention, full-size import results and remaining product limits.
+- .tools/codex-hook-probe/client-* (ignored) — keep isolated Codex homes, synthetic rollouts, capture settings and safe verification reports for the local client check.
+- .tools/codex-hook-probe/client-*/hook-outcomes.jsonl (ignored) — record only hook event, start/result, elapsed milliseconds and safe failure code for deadline diagnosis.
+- sidecar/memory_worker/capture_recovery.py — validate bounded Codex rollout metadata, repair known sessions, and confirm exact scoped history previews without reading unrelated stores.
+- sidecar/tests/test_capture_recovery.py — verify missing-event repair, history consent/revision checks, malformed-file isolation and safe redundant-prefix retention with synthetic sources.
+- Capture runtime settings/history-previews/<uuid>.json — retain a short-lived scoped history candidate manifest for explicit user confirmation.
+- sidecar/memory_worker/session_text.py — extract validated Codex user/assistant text spans for local search while preserving exact raw-source evidence offsets.
+
+Codex native workflow verification (4 October 2026):
+- docs/verification/codex-workflow-07.md — record the real desktop synthetic end-to-end result, test commands, failed attempts, and remaining live-client limits.
+
+ChatGPT export sync 01 (3 October 2026; source-only, no account/private API access):
+- sidecar/memory_worker/chatgpt_sync.py — opt-in bounded ZIP/JSON history and explicit memory-text sync into immutable account-scoped inbox revisions, preserving branches and source fragments.
+- sidecar/tests/test_chatgpt_sync.py — synthetic sync/restart/branch/exclusion/memory/hostile archive/consent/concurrency tests without account access or model calls.
+- docs/chatgpt-sync.md — source-inspected GitHub shortlist, supported sync contract, developer usage, coverage limits and desktop integration handoff.
+- docs/verification/chatgpt-sync-01.md — actual Windows source/subprocess checks, failures and unverified account/native/installer gates.
+
+Shared user-installed hook inbox 02 (latest user direction, 3 October):
+- sidecar/memory_worker/capture_inbox.py — hook wrapper, explicitly scoped Markdown memory snapshots and bounded validated JSON/Markdown indexes over immutable captures in one shared local inbox; no hook registration or network.
+- sidecar/tests/test_capture_inbox.py — synthetic shared-provider, resumed-session, tampering, pause, index-rebuild and real wrapper-process checks.
+- docs/hook-sync.md — approved shared-folder hook architecture, supported-client setup examples, index contract and remaining native/memory gates.
+- docs/verification/hook-inbox-02.md — record actual source hook/index checks separately from installation and desktop ingestion.
+- sidecar/memory_worker/paths.py — share an explicit extended Windows path helper for capture/export IO without changing machine settings.
+- tools/capture-hook.py — working-directory-independent source/frozen launcher for the user-installed hook receiver and inbox index command.
+- .tools/capture-dist/memory-capture/ — ignored generated Windows onedir capture executable and bundled Python/dependency support files for synthetic packaging QA only.
+- .tools/capture-build/ and .tools/memory-capture.spec — ignored generated PyInstaller intermediates/spec for the dedicated capture development build; not installer/release artifacts.
+
 Automatic capture receiver 01 (development subset; no assistant registration or private-data reads):
 - sidecar/memory_worker/session_capture.py — consent-file-gated hook receiver, scoped bounded transcript reads, immutable idempotent local snapshots and redacted errors.
 - sidecar/tests/test_session_capture.py — synthetic hook process/storage tests for both provider labels, append/resume, duplicates, partial writes, pause, scope escape and malformed data.
@@ -137,3 +192,55 @@ Cloud foundation 01 (offline subset; no credentials or network):
 - docs/verification/cloud-foundation-01.md — report offline adapter and frozen-worker verification with native/key/live-call limitations.
 - tools/probe-credentials.py — test Windows Credential Manager only with a fresh diagnostic target and random fake bytes, cleaning up in finally; never enumerate existing credentials.
 - tools/tests/test_credential_probe.py — verify diagnostic target restrictions and real write/read/remove with fake data, no providers or production keys.
+
+Hook desktop control 03 (planned before creation, 3 October 2026):
+- sidecar/memory_worker/capture_control.py — fixed app-owned setup/status/consent/index operations, explicit source scopes, safe manual hook snippets, no assistant settings writes.
+- sidecar/tests/test_capture_control.py — synthetic consent, pause, conflict, scope and actual frozen control/capture/index checks.
+- src-tauri/src/capture.rs — narrow supervised capture-control gateway with fixed resource/root resolution and bounded transport.
+- schemas/native-capture.schema.json — strict setup/status/index native response contracts.
+- src/app/core/capture-connection.ts — validated desktop capture gateway and explicit consent state.
+- src/app/core/capture-connection.spec.ts — native boundary malformed-response/consent/error tests.
+- src/app/features/connections/capture-panel.component.ts — Connections setup/status component with manual installation instructions.
+- src/app/features/connections/capture-panel.component.html — per-client explicit scope, consent and copyable snippet controls.
+- src/app/features/connections/capture-panel.component.scss — responsive setup fields and inert snippet layout.
+- tools/stage-capture.py — reuse bounded resource staging for the fixed capture receiver inventory.
+- docs/verification/hook-desktop-03.md — preserve source/frozen/native/UI evidence and remaining actual-client/ingestion gates.
+- src-tauri/resources/memory-capture/ (ignored) — full staged receiver support files and integrity manifest.
+- node_modules/ (ignored project junction) — reuse already installed original-project dependencies without global installation.
+- .tools/native/verification/ (ignored) — isolated synthetic native capture roots and WebView profiles.
+
+Hook canonical ingestion 04 (planned before creation, 3 October 2026):
+- sidecar/tests/test_capture_ingest.py — prove validated hook revisions become one canonical unreviewed Session, remain idempotent, and reject divergent or changed sources.
+- docs/verification/hook-ingest-04.md — record real source/frozen/native/UI ingestion checks and the remaining live-client limitation.
+- Vault runtime `imports/<provider>/<session-key>.json` — map one validated provider session to its stable canonical Session/source identifiers and imported revision set.
+- Vault runtime `sources/<source-id>/revisions/<sha256>.txt` — preserve each selected canonical hook-source revision as an immutable UTF-8 file.
+
+Hook producer contracts 05 (planned before creation, 3 October 2026):
+- sidecar/tests/fixtures/codex-hook-events.json — hold synthetic Codex lifecycle event shapes and opaque JSONL lines based on the official hook contract.
+- sidecar/tests/fixtures/claude-code-hook-events.json — hold synthetic Claude Code lifecycle event shapes and opaque JSONL lines based on the official hook contract.
+- sidecar/tests/test_hook_contracts.py — prove both provider event fixtures pass the bounded receiver and preserve transcript bytes without parsing provider instructions.
+- tools/measure-hook-deadline.py — measure frozen receiver process latency against a selected synchronous hook deadline using only temporary synthetic data.
+- tools/probe-codex-hook.py — replace live Codex hook identifiers and transcript paths with synthetic values before invoking the receiver, and record only event names.
+- docs/verification/hook-contracts-05.md — record provider contract fixture, installed-client probe and deadline measurement evidence with explicit limits.
+- .tools/codex-hook-probe/ (ignored) — hold temporary synthetic consent, transcript, event-name marker and inbox data for the installed Codex probe.
+- .codex/hooks.json (temporary probe only) — load the privacy-safe project hook during the installed Codex check, then remove it after the check.
+
+Codex reliability 06 (planned before creation, 3 October 2026):
+- docs/verification/hook-reliability-06.md — record stale-prefix regression evidence, focused checks, and the remaining spool/chunk/live-session gates.
+- Capture runtime `inbox/spool/<provider>/<unique-id>.json` — hold one immutable, unique hook delivery until an app-side index operation validates and publishes its content-addressed snapshot.
+- Capture runtime `inbox/objects/chunks/<sha256>.jsonl` — preserve one content-addressed transcript segment with boundaries only after complete JSONL records.
+- Capture runtime `inbox/<provider>/<session-key>/<transcript-sha256>.json` schema 2 — preserve ordered chunk references and exact transcript identity without embedding the full transcript.
+- Capture runtime `inbox/failures/<unique-id>.json` — record bounded hook failure code, provider, event type and time without session content, identifiers or source paths.
+- Capture runtime `inbox/health.json` — cache validated local inbox usage, failure count, pending spool count and retention settings for hook preflight and the desktop status view.
+- Capture runtime `inbox/imported/<provider>/<session-key>.json` — store the validated vault-import acknowledgment required before retention can remove a redundant prefix.
+- Capture runtime `settings/codex-hooks-backups/<uuid>.json` — preserve exact user hook settings before each Mind Palace install or removal edit.
+- Codex runtime `~/.codex/memories/mind-palace-handoff-2026-10-03.md` — retain a concise local handoff for this Mind Palace session; repository plans, decisions, status and verification remain authoritative.
+
+Caveman side note (explicitly requested, recorded before creation, 4 October 2026):
+- C:/Users/varma/.codex/skills/caveman/ — hold the pinned upstream JuliusBrussee/caveman skill for Codex discovery; installer copies only the selected skill directory.
+- C:/Users/varma/.codex/hooks/caveman-context.ps1 — emit local skill context on SessionStart and SubagentStart without reading prompts or transcripts.
+- C:/Users/varma/.codex/hooks.json — merge these user-level context hooks while preserving all existing hook groups.
+- C:/Users/varma/.codex/AGENTS.md — retain the requested always-on response preference and pass it to delegated agents when hook trust is pending.
+- C:/Users/varma/.codex/hooks/caveman-backup-<uuid>.json — preserve exact prior hooks and global instruction bytes before the authorized configuration edit.
+- docs/verification/caveman-setup-09.md — record skill provenance, actual hook checks, preservation and trust limits.
+- .tools/caveman-probe/ (ignored) — hold isolated synthetic Codex hook configuration and content-free delivery results without account credentials.

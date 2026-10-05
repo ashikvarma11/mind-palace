@@ -14,7 +14,7 @@ def file_hash(path):
     no_links(path)
     if not path.exists():
         return None
-    if not path.is_file() or path.stat().st_size > 1024 * 1024:
+    if not path.is_file() or path.stat().st_size > 64 * 1024 * 1024:
         raise WorkerError("VALIDATION_ERROR", "Stored file exceeds the supported bounds.")
     return digest(path.read_bytes())
 

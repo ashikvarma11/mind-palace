@@ -25,7 +25,7 @@ import { LocalVault } from './core/local-vault';
 })
 export class App {
   readonly environmentLabel =
-    '__TAURI_INTERNALS__' in globalThis ? 'Desktop prototype' : 'Browser prototype';
+    '__TAURI_INTERNALS__' in globalThis ? 'Desktop development build' : 'Browser preview';
   readonly store = inject(WorkspaceStore);
   readonly vault = inject(LocalVault);
   readonly logoMissing = signal(false);
